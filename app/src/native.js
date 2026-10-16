@@ -8,6 +8,7 @@ import { App } from '@capacitor/app';
 import { Haptics, NotificationType, ImpactStyle } from '@capacitor/haptics';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import SEED from './seed.json'; // one-time carry-over of the web log (Oct 2–16); merged, never overwrites
 
 const native = Capacitor.isNativePlatform();
 const log = (...a) => console.log('[native]', ...a);
@@ -120,6 +121,11 @@ async function shareLog() {
 (async () => {
   if (!native) { log('web; bridge idle'); return; }
   document.documentElement.classList.add('native');
+
+  // carry the web log over (idempotent: mergeDay keeps the max of each counter)
+  try { window.dispatchEvent(new CustomEvent('ach:seed', { detail: { days: SEED } })); } catch (e) { log('seed failed', e); }
+  // version line at the bottom of the page
+  try { const i = await App.getInfo(); const v = document.getElementById('ver'); if (v) v.textContent = `Achilló ${i.version} · build ${i.build}`; } catch (e) {}
 
   const share = document.getElementById('shareLog');
   if (share) { share.hidden = false; share.onclick = shareLog; }

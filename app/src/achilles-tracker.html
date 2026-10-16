@@ -136,6 +136,7 @@ button[aria-pressed="true"]{background:var(--tint);color:var(--accent);border-co
 .tally button{width:32px;height:32px;min-height:0;padding:0;border-radius:50%;font-family:var(--display);font-size:15px;font-weight:700}
 .tally button.on{background:var(--ok);border-color:var(--ok);color:#fff}
 .tally button:disabled:not(.on){opacity:.5}
+.ver{text-align:center;font-size:11px;color:var(--muted);padding:14px 0 4px;letter-spacing:.02em}
 .tally button.sum{width:auto;min-width:32px;padding:0 10px;border-radius:16px;opacity:1}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
 .seg button{padding:6px 12px;min-height:36px;font-weight:500;border-radius:999px;background:var(--bg)}
@@ -480,6 +481,7 @@ pre.rtext{display:none}
     <div class="rsec"><h3>Questions for the visit</h3><ul class="rq" id="rq"></ul></div>
     <div class="rsub" id="rfoot"></div>
   </section>
+  <div class="ver" id="ver">Achilló · web</div>
 </div>
 
 <script>
@@ -912,6 +914,7 @@ window.addEventListener('ach:open',e=>{const k=e.detail&&e.detail.kind;if(sess||
   else if(k==='round'){const d=day();startSession(false,false,homeLeft(d).length||bfrPending()?'home':gymLeft(d).length?'gym':'ankle');}
   else if(k==='imagery')startSession(false,false,'imagery');
   else window.scrollTo(0,0);});
+window.addEventListener('ach:seed',e=>{const sd=e.detail&&e.detail.days;if(!sd)return;let n=0;Object.keys(sd).forEach(k=>{const before=JSON.stringify(days[k]||null);days[k]=mergeDay(days[k],JSON.parse(JSON.stringify(sd[k])));if(JSON.stringify(days[k])!==before){local.set('day:'+k,days[k]);n++;}});if(n){renderAll();setStatus('Imported '+n+' day'+(n>1?'s':'')+' from the web log.');}});
 window.addEventListener('ach:state?',()=>{const d=day();const b=bootFor(today);nativeEvt('state',{today:TODAY,rounds:d.ankle||0,partial:(d.ankleDone||[]).length,imagery:d.imagery||0,bfr:d.bfr||0,snackLast:snackLast(),snackName:(()=>{const s=snackNext();return s?ANK_DEF.find(x=>x[0]===s)[2].split(' · ')[0]:'';})(),hingeToday:b.changeToday&&b.cur.deg<30?b.cur.deg:null,hingeSet:d.hingeSet||null,hingeNext:b.next?{date:keyOf(b.next.from),deg:b.next.deg}:null,checked:!!verdictKind(TODAY),log:days});});
 function advance(quiet){
   let i=sess.i+1;
@@ -1001,8 +1004,9 @@ function renderAnkle(){const el=$('ankList');if(!el)return;el.innerHTML='';const
     r.append(t,b);el.appendChild(r);});}
 $('sImg').onclick=()=>startSession(false,false,'imagery');
 $('tPause').onclick=e=>{if(!sess)return; paused=!paused;
-  if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';}
-  else{sess.stepEnd+=Date.now()-pauseStart;pauseStart=0;lastShown=null;tick();}
+  if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';try{speechSynthesis.cancel();}catch(e){}}
+  else{sess.stepEnd+=Date.now()-pauseStart;pauseStart=0;lastShown=null;tick();
+    const st=sess&&sess.steps[sess.i];if(st&&EX[st.ex]&&EX[st.ex].speakCue){sess.stepEnd=Date.now()+st.secs*1000;sayStep();}}
   setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack();};
 // ---- skip / jump: skipping never marks an exercise done; the next Start plays only what's left.
 const REST_KEY=/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/;
