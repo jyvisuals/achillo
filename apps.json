@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.2",
+          "buildVersion": "2",
+          "date": "2026-10-16T18:14:25Z",
+          "localizedDescription": "Pause now stops the imagery voice (resume re-reads the scene). Your web log through Oct 16 is carried over. Version shown at the bottom of the page.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.2.ipa",
+          "size": 873164,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.1",
           "buildVersion": "1",
           "date": "2026-10-16T18:04:57Z",
@@ -41,11 +50,11 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.1",
-      "versionDate": "2026-10-16T18:04:57Z",
-      "versionDescription": "Achilló: new name and icon; header clear of the status bar; Quick-ones row fixed; updates now arrive through AltStore.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.1.ipa",
-      "size": 872428
+      "version": "1.1.2",
+      "versionDate": "2026-10-16T18:14:25Z",
+      "versionDescription": "Pause now stops the imagery voice (resume re-reads the scene). Your web log through Oct 16 is carried over. Version shown at the bottom of the page.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.2.ipa",
+      "size": 873164
     }
   ],
   "news": []
