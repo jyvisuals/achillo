@@ -1,1 +1,1 @@
-Settings panel (gear, top right): voice and speed, cues and volume, haptics, reminder times and quick-one cadence, which drills rotate, weight, export/import. Reminders no longer pop while the app is open.
+Pick a quick one: every drill, most overdue first, split into Boot on and Boot off.

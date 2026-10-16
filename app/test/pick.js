@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{const R=Date;window.__off=new R('2026-10-16T18:40').getTime()-R.now();class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+window.__off);}static now(){return R.now()+window.__off;}};window.Date=D;});
+await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2200);
+await p.evaluate(()=>[...document.querySelectorAll('#nowBtns button')].find(b=>b.textContent==='Pick a quick one').click());await p.waitForTimeout(200);
+console.log('errors',errs);console.log(await p.$$eval('#snackPick .ankh, #snackPick .ankrow span',els=>els.map(e=>e.textContent)));
+await p.click('#snackPick button[data-k="doming"]');await p.waitForTimeout(400);console.log('session:',await p.textContent('#isoh'),'|',await p.textContent('#sName'));
+for(let i=0;i<40;i++){await p.evaluate(()=>{window.__off+=15000;});await p.waitForTimeout(120);}await p.waitForTimeout(2200);
+console.log('snacks:',await p.evaluate(()=>JSON.parse(localStorage.getItem('ach:day:2026-10-16')).snacks.map(x=>x.k)));
+await b.close();})();

@@ -118,6 +118,7 @@ textarea{width:100%;min-height:48px;padding:10px;border:1px solid var(--line);bo
 .sctl.paused .ctlb.go,.sctl.paused #tJump{display:none}.sctl.paused{grid-template-columns:1fr 1fr}
 .sctl.paused #tPause{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .sctl.aud{grid-template-columns:1fr 1fr;max-width:200px;margin-top:4px;margin-left:auto;margin-right:auto}.sctl.aud .ctlb{min-height:44px}.sctl.aud .ctlb.off{opacity:.55}
+.snackpick{margin:8px 0 2px;font-size:14px}.snackpick small{font-size:12px}
 .jumplist{display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow:auto;width:100%}.jumprow{text-align:left;width:100%}.jumprow.done{opacity:.55}.jumprow.now{border-color:var(--hold)}
 .reps i.done{background:var(--hold)}
 .btns{display:flex;flex-wrap:wrap;gap:8px}
@@ -1216,7 +1217,26 @@ function renderNow(){preHint=null;_renderNow();prebuildNext();if(weekFor(today))
     const q=document.createElement('button');const nm=ANK_DEF.find(x=>x[0]===sn)[2].split(' · ')[0];
     q.textContent='Quick one · '+nm;q.title=snackDue()?'All sets, a few minutes. Boot on.':'Next one around '+new Date(snackLast()+55*60000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
     q.onclick=()=>startSession(false,false,'snack:'+sn);bb.appendChild(q);}
-  const b=document.createElement('button');b.textContent='Log gym';b.onclick=openGym;bb.appendChild(b);}}
+  if(h>=7&&h<23){const pk=document.createElement('button');pk.textContent='Pick a quick one';pk.onclick=toggleSnackPick;bb.appendChild(pk);}
+  const b=document.createElement('button');b.textContent='Log gym';b.onclick=openGym;bb.appendChild(b);
+  renderSnackPick();}}
+// ---- quick-one picker: every drill, sorted by what's most overdue, split by boot on / boot off ----
+let snackPickOpen=false;
+function toggleSnackPick(){snackPickOpen=!snackPickOpen;renderSnackPick();}
+function snackLastAll(){const last={};Object.keys(days).sort().forEach(k=>{(days[k]&&days[k].snacks||[]).forEach(x=>{if(!last[x.k]||x.t>last[x.k])last[x.k]=x.t;});});return last;}
+function renderSnackPick(){let el=$('snackPick');
+  if(!el){el=document.createElement('div');el.id='snackPick';el.className='snackpick';$('nowBtns').after(el);}
+  el.hidden=!snackPickOpen;if(!snackPickOpen){el.innerHTML='';return;}
+  const last=snackLastAll(),now=Date.now(),pool=prefs.pool||SNACK_POOL;
+  const keys=ANK_DEF.filter(x=>!/^(scar|bootback)$/.test(x[0])).map(x=>x[0]);
+  const ago=t=>{if(!t)return 'not yet';const m=Math.round((now-t)/60000);return m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' d ago';};
+  // priority: never done first, then oldest; drills in your rotation edge ahead of the rest
+  const score=k=>(last[k]||0)-(pool.includes(k)?3600000:0);
+  const sec=(title,list)=>{if(!list.length)return '';return '<div class="ankh">'+title+'</div>'+list.sort((a,b)=>score(a)-score(b)).map(k=>{const d=ANK_DEF.find(x=>x[0]===k);
+    return '<div class="ankrow"><span>'+d[2]+' <small class="muted">· '+d[1]+' set'+(d[1]>1?'s':'')+' · '+ago(last[k])+'</small></span><button class="pill" data-k="'+k+'">Go</button></div>';}).join('');};
+  el.innerHTML=sec('Boot on',keys.filter(k=>ANK_DEF.find(x=>x[0]===k)[7]))+sec('Boot off',keys.filter(k=>!ANK_DEF.find(x=>x[0]===k)[7]))+'<div class="btns" style="margin-top:8px"><button id="snackPickClose">Close</button></div>';
+  el.querySelectorAll('button[data-k]').forEach(b=>b.onclick=()=>{snackPickOpen=false;el.hidden=true;startSession(false,false,'snack:'+b.dataset.k);});
+  $('snackPickClose').onclick=toggleSnackPick;}
 function _renderNow(){
   const d=day(); const h=new Date().getHours(); const w=weekFor(today);
   const txt=$('nowText'), btns=$('nowBtns'); btns.innerHTML='';
