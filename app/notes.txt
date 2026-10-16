@@ -1,0 +1,1 @@
+Achilló: new name and icon; header clear of the status bar; Quick-ones row fixed; updates now arrive through AltStore.

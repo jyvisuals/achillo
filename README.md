@@ -1,9 +1,11 @@
-# Achilló — AltStore source
+# Achilló
 
-Static AltStore source for the Achilló rehab app (built from `~/dev/achilles-app`).
+Jon's Achilles rehab app for iPhone, and the AltStore source that delivers it.
 
-- `apps.json` — the source feed AltStore reads. Updated by `Build Achilles.command`.
-- `ipa/` — unsigned builds, one per version; AltStore signs on install.
-- `index.html` — one-tap "Add to AltStore" page at https://raw.githubusercontent.com/jyvisuals/achillo/main/
+- `app/` — the app: `src/achilles-tracker.html` (the page, same as the web version), `src/native.js` (notifications, haptics, Share log), the Capacitor iOS project.
+- `.github/workflows/build.yml` — every push to `app/` builds an unsigned IPA on GitHub's Mac runners and publishes it below.
+- `apps.json` + `ipa/` — the AltStore feed. Subscribe once in AltStore → Sources → + with
+  `https://raw.githubusercontent.com/jyvisuals/achillo/main/apps.json`; new builds appear as **Update**.
 
-Don't edit `apps.json` by hand; the build script rewrites it.
+Release note for the next build goes in `app/notes.txt`. Versions are `1.1.<run number>`.
+`app/make-ipa.sh` still builds and publishes from a Mac if GitHub ever can't.

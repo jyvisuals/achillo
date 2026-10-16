@@ -1,0 +1,18 @@
+{
+  "appId": "com.jyvisuals.achilles",
+  "appName": "Achilló",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "automatic",
+    "backgroundColor": "#0d1512",
+    "preferredContentMode": "mobile",
+    "allowsLinkPreview": false,
+    "scrollEnabled": true
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon",
+      "sound": "default"
+    }
+  }
+}

@@ -1,0 +1,1 @@
+window.__hap=[];export const Haptics={notification:async(o)=>{window.__hap.push('n:'+o.type)},impact:async(o)=>{window.__hap.push('i:'+o.style)}};export const NotificationType={Success:'SUCCESS'};export const ImpactStyle={Light:'LIGHT'};

@@ -1,0 +1,55 @@
+name: Build Achilló
+on:
+  push:
+    branches: [main]
+    paths: ['app/**', '.github/**']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: build
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Web bundle
+        working-directory: app
+        run: |
+          npm ci
+          node build.js
+          npx cap sync ios
+      - name: Build IPA
+        working-directory: app/ios/App
+        env:
+          V: 1.1.${{ github.run_number }}
+          N: ${{ github.run_number }}
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app || true
+          xcodebuild -version
+          xcodebuild -resolvePackageDependencies -project App.xcodeproj -scheme App -destination 'generic/platform=iOS' >/dev/null
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            MARKETING_VERSION="$V" CURRENT_PROJECT_VERSION="$N" -quiet build
+          APP=$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name "*.app" | head -1)
+          test -n "$APP"
+          rm -rf Payload && mkdir Payload && cp -R "$APP" Payload/
+          zip -qr "$RUNNER_TEMP/Achillo-$V.ipa" Payload
+          echo "IPA=$RUNNER_TEMP/Achillo-$V.ipa" >> "$GITHUB_ENV"
+      - name: Publish to feed
+        env:
+          V: 1.1.${{ github.run_number }}
+          N: ${{ github.run_number }}
+        run: |
+          python3 .github/publish.py "$V" "$N" "$IPA" app/notes.txt
+          git config user.name "Achilló build"
+          git config user.email "noreply@github.com"
+          git add apps.json ipa
+          git commit -m "Achilló $V [skip ci]"
+          git push

@@ -1,0 +1,146 @@
+// Native bridge for the Achilles Rebuild Log. Bundled by build.js into www/native.js.
+// Talks to the page through window events only:
+//   page -> here : 'ach:saved' (a day record was written), 'ach:done' (an exercise finished), 'ach:state' (answer to 'ach:state?')
+//   here -> page : 'ach:state?' (ask for today's state), 'ach:open' {kind} (start a session after a notification tap)
+import { Capacitor } from '@capacitor/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { App } from '@capacitor/app';
+import { Haptics, NotificationType, ImpactStyle } from '@capacitor/haptics';
+import { Share } from '@capacitor/share';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+
+const native = Capacitor.isNativePlatform();
+const log = (...a) => console.log('[native]', ...a);
+
+// ---- hinge ladder (mirrors the page) ----
+const LADDER = [['2026-10-16', 25], ['2026-10-20', 20], ['2026-10-23', 15], ['2026-10-27', 10], ['2026-10-30', 5], ['2026-11-03', 0]];
+const VISIT = { day: '2026-10-30', h: 12, m: 15, body: 'Duke at 1:15 today. Tap Share log before you go in.' };
+const keyOf = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const at = (dayKey, h, m = 0) => { const [y, mo, d] = dayKey.split('-').map(Number); return new Date(y, mo - 1, d, h, m, 0, 0); };
+const addDays = (dayKey, n) => { const t = at(dayKey, 12); t.setDate(t.getDate() + n); return keyOf(t); };
+
+// ---- state from the page ----
+function askState() {
+  return new Promise((res) => {
+    const h = (e) => { window.removeEventListener('ach:state', h); res(e.detail); };
+    window.addEventListener('ach:state', h);
+    window.dispatchEvent(new Event('ach:state?'));
+    setTimeout(() => { window.removeEventListener('ach:state', h); res(null); }, 1500);
+  });
+}
+
+// ---- notifications ----
+let idSeq = 1;
+function note(list, when, title, body, kind) {
+  if (when.getTime() <= Date.now() + 20000) return;
+  list.push({ id: idSeq++, title, body, schedule: { at: when, allowWhileIdle: true }, extra: { kind }, sound: 'default' });
+}
+
+async function reschedule(reason) {
+  if (!native) return;
+  const st = await askState();
+  if (!st) { log('no state; skip schedule'); return; }
+  const perm = await LocalNotifications.checkPermissions();
+  if (perm.display !== 'granted') { const r = await LocalNotifications.requestPermissions(); if (r.display !== 'granted') { log('notifications not allowed'); return; } }
+
+  const pending = await LocalNotifications.getPending();
+  if (pending.notifications.length) await LocalNotifications.cancel({ notifications: pending.notifications.map((n) => ({ id: n.id })) });
+
+  const L = [];
+  const today = st.today;
+  const now = Date.now();
+  idSeq = 1;
+
+  for (let i = 0; i < 3; i++) {
+    const dk = addDays(today, i);
+    const isToday = i === 0;
+    const rounds = isToday ? st.rounds : 0;
+    const imagery = isToday ? st.imagery : 0;
+
+    // Morning: check-in then Barefoot PT
+    if (rounds === 0 && !(isToday && st.checked))
+      note(L, at(dk, 7, 55), 'Morning check', 'All good? Then Barefoot PT' + (dk <= '2026-11-12' ? ' with BFR first.' : '.'), 'round');
+
+    // Hinge day
+    const h = LADDER.find((x) => x[0] === dk);
+    if (h && !(isToday && st.hingeSet === h[1]))
+      note(L, at(dk, 8, 5), `Hinge day: ${h[1]}°`, 'Down one notch if this morning is quiet. If it\'s grumpy, hold a day or two.', 'hinge');
+
+    // Quick ones: one set, hourly, between rounds (today + tomorrow only; iOS caps pending notifications)
+    if (i < 2) {
+      let t;
+      if (!isToday) t = at(dk, 10);
+      else if (rounds >= 1) {
+        const last = st.snackLast || 0;
+        t = now - last >= 60 * 60000 ? new Date(now + 15 * 60000) : new Date(last + 60 * 60000); // overdue → nudge soon; else an hour after the last one
+      } else t = at(dk, 10).getTime() > now ? at(dk, 10) : new Date(now + 60 * 60000); // morning round not done yet
+      const end = at(dk, 21, 5).getTime();
+      let first = true;
+      while (t.getTime() <= end) {
+        note(L, new Date(t), 'Quick one', first && isToday && st.snackName ? `${st.snackName}: one set, about a minute. Boot on.` : 'One set of a boot-on drill, about a minute.', 'snack');
+        t = new Date(t.getTime() + 60 * 60000);
+        first = false;
+      }
+    }
+
+    // Evening round
+    if (rounds < 2) {
+      note(L, at(dk, 16, 0), 'Evening round', 'Barefoot PT (no cuff), then Boot-on PT.', 'round');
+      note(L, at(dk, 18, 30), 'Evening round', 'Still time for round two before dinner settles in.', 'round');
+    }
+    // Imagery
+    if (imagery < 2) note(L, at(dk, 20, 25), 'Evening imagery', 'Five minutes, eyes closed, voice-led.', 'imagery');
+    // Visit
+    if (dk === VISIT.day) note(L, at(dk, VISIT.h, VISIT.m), 'Duke follow-up', VISIT.body, 'open');
+  }
+
+  if (L.length) await LocalNotifications.schedule({ notifications: L });
+  log(`scheduled ${L.length} (${reason})`);
+}
+
+let tmr = null;
+const scheduleSoon = (why) => { clearTimeout(tmr); tmr = setTimeout(() => reschedule(why).catch((e) => log('schedule failed', e)), 1500); };
+
+// ---- share log ----
+async function shareLog() {
+  const st = await askState();
+  if (!st) return;
+  const payload = { exported: new Date().toISOString(), app: 'Achilles Rebuild Log (iOS)', days: st.log };
+  const name = `achilles-log-${st.today}.json`;
+  try {
+    const f = await Filesystem.writeFile({ path: name, data: JSON.stringify(payload, null, 1), directory: Directory.Cache, encoding: Encoding.UTF8 });
+    await Share.share({ title: 'Achilles log', text: `Rehab log through ${st.today}`, url: f.uri, dialogTitle: 'Share log' });
+  } catch (e) {
+    // fall back to plain text if the file share is refused
+    try { await Share.share({ title: 'Achilles log', text: JSON.stringify(payload) }); } catch (_) { log('share failed', e); }
+  }
+}
+
+// ---- wire up ----
+(async () => {
+  if (!native) { log('web; bridge idle'); return; }
+  document.documentElement.classList.add('native');
+
+  const share = document.getElementById('shareLog');
+  if (share) { share.hidden = false; share.onclick = shareLog; }
+  const status = document.getElementById('status');
+  if (status) setTimeout(() => { if (/device only/i.test(status.textContent)) status.textContent = 'Saved on this phone. Share log sends it along.'; }, 1200);
+
+  window.addEventListener('ach:saved', () => scheduleSoon('saved'));
+  window.addEventListener('ach:done', () => { Haptics.notification({ type: NotificationType.Success }).catch(() => {}); });
+  document.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('button')) Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }, true);
+
+  await LocalNotifications.addListener('localNotificationActionPerformed', (a) => {
+    const kind = (a.notification && a.notification.extra && a.notification.extra.kind) || 'open';
+    setTimeout(() => window.dispatchEvent(new CustomEvent('ach:open', { detail: { kind } })), 600);
+  });
+
+  let loadedDay = keyOf(new Date());
+  App.addListener('appStateChange', ({ isActive }) => {
+    if (!isActive) return;
+    if (keyOf(new Date()) !== loadedDay) { location.reload(); return; }
+    scheduleSoon('resume');
+  });
+
+  scheduleSoon('launch');
+})();

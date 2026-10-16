@@ -1,0 +1,8 @@
+node_modules/
+www/
+ios/App/App/public/
+ios/App/build/
+test/out/
+*.ipa
+build.log
+.version
