@@ -635,7 +635,7 @@ function renderTasks(){
   };
   if(isoN>0)row('Calf press','4 × 30 s at ~50%. '+(isoN===1?'Once, at night.':isoN===2?'Twice, 6–8 h apart.':'Three today: morning, mid-afternoon, night.')+' Tap to log one done off-app.',d.iso||0,'iso',isoN,true);
   {const L=ankLeft(d).length,T=ankBases().length-1;row('Chris’s program','Twice a day, morning and evening: Barefoot PT then Boot-on PT. '+(L<T&&L>0?(T-L)+' of '+T+' done this round; picks up where you left off.':(d.ankle===1?'Evening round still to do.':'')),d.ankle||0,'ankle',2,true);}
-  row('Quick ones','One set of a boot-on drill every hour or so between rounds. Logs itself.',(d.snacks||[]).length,'snackN',8,false);
+  row('Quick ones','One boot-on drill, all its sets, every hour or so between rounds. Logs itself.',(d.snacks||[]).length,'snackN',8,false);
   row('Imagery','5 min guided, first-person. One after a session, one at bedtime.',d.imagery||0,'imagery',2,true);
   if(bfrDay(today))row('BFR',(verdictKind(TODAY)&&verdictKind(TODAY)!=='go'?'Skipped today: morning wasn\'t quiet. ':'First thing after the morning check: ')+'seated calf raise 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15 × 3 s squeezes.',d.bfr||0,'bfr',1,true);
 
@@ -709,7 +709,7 @@ function bfrPlanned(){const v=verdictKind(TODAY);return bfrDay(today)&&(!v||v===
 // Home block (boot off, cuff woven in) and gym block (boot on, pick between sets).
 const isHome=k=>{const d=ANK_DEF.find(x=>x[0]===k);return d&&!d[7]&&k!=='bootback';};
 const isGym=k=>{const d=ANK_DEF.find(x=>x[0]===k);return d&&d[7]&&k!=='bootback';};
-// Quick ones: Chris's "pick a drill every hour or so" — one set of a boot-on exercise, rotating least-recent first.
+// Quick ones: Chris's "pick a drill every hour or so" — one boot-on exercise, all its sets, rotating least-recent first.
 const SNACK_POOL=['toeyoga2','inviso','eviso','hiprot','pfstraight'];
 function snackLast(){const d=day();const a=d.snacks||[];return a.length?a[a.length-1].t:0;}
 function snackDue(){return Date.now()-snackLast()>=55*60000;}
@@ -757,7 +757,7 @@ function breathCue(st,left){ // 4 in, 6 out, repeating through the hold
   if(st.kind!=='hold'||st.secs<20){$('tBreath').textContent='';ringEl.classList.remove('breathe');return;}
   ringEl.classList.add('breathe'); const t=(st.secs-left)%10; $('tBreath').textContent=t<4?'breathe in':'breathe out';}
 function build(withPress,withRoutine,mode,forced){ if(withRoutine===undefined)withRoutine=true;
-  let list; if(forced&&forced.length)list=forced; else if(mode==='home')list=homeList(); else if(mode==='gym')list=gymLeft(day()).flatMap(k=>ANK_KEYS[k]); else if(mode&&mode.startsWith('snack:'))list=[ANK_KEYS[mode.slice(6)][0]]; else if(mode==='ankle')list=ankList(); else if(mode&&mode.startsWith('ankle:'))list=ankList(mode.slice(6)); else if(mode==='bfrpress')list=BFR_PRESS.concat(withRoutine?ROUTINE:[]); else if(mode==='bfrquad')list=BFR_QUAD; else if(mode==='foot')list=ankList(); else if(mode==='imagery')list=['imagery']; else list=homeList();
+  let list; if(forced&&forced.length)list=forced; else if(mode==='home')list=homeList(); else if(mode==='gym')list=gymLeft(day()).flatMap(k=>ANK_KEYS[k]); else if(mode&&mode.startsWith('snack:'))list=ANK_KEYS[mode.slice(6)].slice(); else if(mode==='ankle')list=ankList(); else if(mode&&mode.startsWith('ankle:'))list=ankList(mode.slice(6)); else if(mode==='bfrpress')list=BFR_PRESS.concat(withRoutine?ROUTINE:[]); else if(mode==='bfrquad')list=BFR_QUAD; else if(mode==='foot')list=ankList(); else if(mode==='imagery')list=['imagery']; else list=homeList();
   const steps=[];
   list.forEach((k,ei)=>{const e=EX[k];if(!e)return;
     const H=t=>t&&t.replace('{HINGE}',bootFor(today).cur.deg+'°');
@@ -1157,7 +1157,7 @@ function renderNow(){preHint=null;_renderNow();prebuildNext();if(weekFor(today))
   const sn=snackNext(),h=new Date().getHours();
   if(sn&&h>=7&&h<23&&verdictKind(TODAY)!=='back'&&![...bb.children].some(x=>/^Quick one/.test(x.textContent))){
     const q=document.createElement('button');const nm=ANK_DEF.find(x=>x[0]===sn)[2].split(' · ')[0];
-    q.textContent='Quick one · '+nm;q.title=snackDue()?'One set, about a minute. Boot on.':'Next one around '+new Date(snackLast()+55*60000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+    q.textContent='Quick one · '+nm;q.title=snackDue()?'All sets, a few minutes. Boot on.':'Next one around '+new Date(snackLast()+55*60000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
     q.onclick=()=>startSession(false,false,'snack:'+sn);bb.appendChild(q);}
   const b=document.createElement('button');b.textContent='Log gym';b.onclick=openGym;bb.appendChild(b);}}
 function _renderNow(){
@@ -1215,7 +1215,7 @@ function _renderNow(){
       hint(homeLeft(d).length?'home':'gym',false,false);btn(partial?'Resume evening round':'Start evening round',()=>startSession(false,false,homeLeft(d).length?'home':'gym'),true);snackBtn(btn);img();return;}
     // between rounds: one quick exercise an hour, rotating
     if(rounds>=1&&h>=7&&h<23){const sn=snackNext();if(sn){const due=snackDue();const nm=ANK_DEF.find(x=>x[0]===sn)[2].split(' · ')[0];
-      if(due){txt.textContent=(rounds>=2?'Both rounds done. ':(h<16?'Morning round done. ':''))+'Quick one: '+nm+', one set, about a minute. Boot on. Chris: one drill every hour or so between rounds.';hint('snack:'+sn,false,false);btn('Quick one · '+nm,()=>startSession(false,false,'snack:'+sn),true);img();return;}
+      if(due){txt.textContent=(rounds>=2?'Both rounds done. ':(h<16?'Morning round done. ':''))+'Quick one: '+nm+', all sets, a few minutes. Boot on. Chris: one drill every hour or so between rounds.';hint('snack:'+sn,false,false);btn('Quick one · '+nm,()=>startSession(false,false,'snack:'+sn),true);img();return;}
       else{const last=snackLast();txt.textContent=(rounds>=2?'Both rounds done. ':'')+'Next quick one around '+new Date(last+55*60000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+(rounds===1?'; evening round from 4.':'.');btn('Quick one · '+nm,()=>startSession(false,false,'snack:'+sn));img();return;}}}
   }
   const isoN=isoTarget(),isoK=d.iso||0;

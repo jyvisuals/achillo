@@ -92,7 +92,7 @@ async function reschedule(reason) {
       const end = at(dk, 21, 5).getTime();
       let first = true;
       while (t.getTime() <= end) {
-        note(L, new Date(t), 'Quick one', first && isToday && st.snackName ? `${st.snackName}: one set, about a minute. Boot on.` : 'One set of a boot-on drill, about a minute.', 'snack');
+        note(L, new Date(t), 'Quick one', first && isToday && st.snackName ? `${st.snackName}: all sets, a few minutes. Boot on.` : 'One boot-on drill, all sets, a few minutes.', 'snack');
         t = new Date(t.getTime() + 60 * 60000);
         first = false;
       }

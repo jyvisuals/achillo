@@ -1,1 +1,1 @@
-Lock screen shows the exercise, set and rep. Notification buttons: Start now / Snooze 20 min, and "Done already" on round reminders. A light tap on every rep phase. Calls and Siri pause the session and it resumes after. Screen stays awake during a session.
+Quick ones now run the whole exercise (all sets), not one set.
