@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.6",
+          "buildVersion": "6",
+          "date": "2026-10-16T22:40:10Z",
+          "localizedDescription": "Pick a quick one: every drill, most overdue first, split into Boot on and Boot off.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.6.ipa",
+          "size": 885866,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.5",
           "buildVersion": "5",
           "date": "2026-10-16T18:56:49Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.4.ipa",
           "size": 881817,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.3",
-          "buildVersion": "3",
-          "date": "2026-10-16T18:26:50Z",
-          "localizedDescription": "Lock screen shows the exercise, set and rep. Notification buttons: Start now / Snooze 20 min, and \"Done already\" on round reminders. A light tap on every rep phase. Calls and Siri pause the session and it resumes after. Screen stays awake during a session.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.3.ipa",
-          "size": 881810,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.5",
-      "versionDate": "2026-10-16T18:56:49Z",
-      "versionDescription": "Settings panel (gear, top right): voice and speed, cues and volume, haptics, reminder times and quick-one cadence, which drills rotate, weight, export/import. Reminders no longer pop while the app is open.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.5.ipa",
-      "size": 885162
+      "version": "1.1.6",
+      "versionDate": "2026-10-16T22:40:10Z",
+      "versionDescription": "Pick a quick one: every drill, most overdue first, split into Boot on and Boot off.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.6.ipa",
+      "size": 885866
     }
   ],
   "news": []
