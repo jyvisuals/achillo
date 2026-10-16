@@ -1,1 +1,1 @@
-Quick ones now run the whole exercise (all sets), not one set.
+Settings panel (gear, top right): voice and speed, cues and volume, haptics, reminder times and quick-one cadence, which drills rotate, weight, export/import. Reminders no longer pop while the app is open.

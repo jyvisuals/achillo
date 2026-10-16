@@ -21,6 +21,11 @@ const keyOf = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, 
 const at = (dayKey, h, m = 0) => { const [y, mo, d] = dayKey.split('-').map(Number); return new Date(y, mo - 1, d, h, m, 0, 0); };
 const addDays = (dayKey, n) => { const t = at(dayKey, 12); t.setDate(t.getDate() + n); return keyOf(t); };
 
+// ---- user prefs (written by the page's Settings panel) ----
+const PREF_DEF = { remind: 1, morning: '7:55', cadence: 60, lastHour: 21, evening: '16:00', imageryAt: '20:25', haptics: 1 };
+function prefs() { try { return Object.assign({}, PREF_DEF, JSON.parse(localStorage.getItem('ach:prefs') || '{}')); } catch (e) { return { ...PREF_DEF }; } }
+const hm = (str) => { const [h, m] = String(str).split(':').map(Number); return [h || 0, m || 0]; };
+
 // ---- state from the page ----
 function askState() {
   return new Promise((res) => {
@@ -60,6 +65,10 @@ async function reschedule(reason) {
 
   const pending = await LocalNotifications.getPending();
   if (pending.notifications.length) await LocalNotifications.cancel({ notifications: pending.notifications.map((n) => ({ id: n.id })) });
+  const P = prefs();
+  if (!P.remind) { log('reminders off'); return; }
+  const [mH, mM] = hm(P.morning), [eH, eM] = hm(P.evening), [iH, iM] = hm(P.imageryAt);
+  const cad = Math.max(30, Number(P.cadence) || 60), lastH = Number(P.lastHour) || 21;
 
   const L = [];
   const today = st.today;
@@ -74,12 +83,12 @@ async function reschedule(reason) {
 
     // Morning: check-in then Barefoot PT
     if (rounds === 0 && !(isToday && st.checked))
-      note(L, at(dk, 7, 55), 'Morning check', 'All good? Then Barefoot PT' + (dk <= '2026-11-12' ? ' with BFR first.' : '.'), 'round');
+      note(L, at(dk, mH, mM), 'Morning check', 'All good? Then Barefoot PT' + (dk <= '2026-11-12' ? ' with BFR first.' : '.'), 'round');
 
     // Hinge day
     const h = LADDER.find((x) => x[0] === dk);
     if (h && !(isToday && st.hingeSet === h[1]))
-      note(L, at(dk, 8, 5), `Hinge day: ${h[1]}°`, 'Down one notch if this morning is quiet. If it\'s grumpy, hold a day or two.', 'hinge');
+      note(L, new Date(at(dk, mH, mM).getTime() + 10 * 60000), `Hinge day: ${h[1]}°`, 'Down one notch if this morning is quiet. If it\'s grumpy, hold a day or two.', 'hinge');
 
     // Quick ones: one set, hourly, between rounds (today + tomorrow only; iOS caps pending notifications)
     if (i < 2) {
@@ -87,24 +96,24 @@ async function reschedule(reason) {
       if (!isToday) t = at(dk, 10);
       else if (rounds >= 1) {
         const last = st.snackLast || 0;
-        t = now - last >= 60 * 60000 ? new Date(now + 15 * 60000) : new Date(last + 60 * 60000); // overdue → nudge soon; else an hour after the last one
-      } else t = at(dk, 10).getTime() > now ? at(dk, 10) : new Date(now + 60 * 60000); // morning round not done yet
-      const end = at(dk, 21, 5).getTime();
+        t = now - last >= cad * 60000 ? new Date(now + 15 * 60000) : new Date(last + cad * 60000); // overdue → nudge soon; else one cadence after the last one
+      } else t = at(dk, 10).getTime() > now ? at(dk, 10) : new Date(now + cad * 60000); // morning round not done yet
+      const end = at(dk, lastH, 5).getTime();
       let first = true;
       while (t.getTime() <= end) {
         note(L, new Date(t), 'Quick one', first && isToday && st.snackName ? `${st.snackName}: all sets, a few minutes. Boot on.` : 'One boot-on drill, all sets, a few minutes.', 'snack');
-        t = new Date(t.getTime() + 60 * 60000);
+        t = new Date(t.getTime() + cad * 60000);
         first = false;
       }
     }
 
     // Evening round
     if (rounds < 2) {
-      note(L, at(dk, 16, 0), 'Evening round', 'Barefoot PT (no cuff), then Boot-on PT.', 'round');
-      note(L, at(dk, 18, 30), 'Evening round', 'Still time for round two before dinner settles in.', 'round');
+      note(L, at(dk, eH, eM), 'Evening round', 'Barefoot PT (no cuff), then Boot-on PT.', 'round');
+      note(L, new Date(at(dk, eH, eM).getTime() + 150 * 60000), 'Evening round', 'Still time for round two.', 'round');
     }
     // Imagery
-    if (imagery < 2) note(L, at(dk, 20, 25), 'Evening imagery', 'Five minutes, eyes closed, voice-led.', 'imagery');
+    if (imagery < 2) note(L, at(dk, iH, iM), 'Evening imagery', 'Five minutes, eyes closed, voice-led.', 'imagery');
     // Visit
     if (dk === VISIT.day) note(L, at(dk, VISIT.h, VISIT.m), 'Duke follow-up', VISIT.body, 'open');
   }
@@ -147,8 +156,8 @@ async function shareLog() {
   if (status) setTimeout(() => { if (/device only/i.test(status.textContent)) status.textContent = 'Saved on this phone. Share log sends it along.'; }, 1200);
 
   window.addEventListener('ach:saved', () => scheduleSoon('saved'));
-  window.addEventListener('ach:done', () => { Haptics.notification({ type: NotificationType.Success }).catch(() => {}); });
-  document.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('button')) Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }, true);
+  window.addEventListener('ach:done', () => { if (prefs().haptics) Haptics.notification({ type: NotificationType.Success }).catch(() => {}); });
+  document.addEventListener('click', (e) => { if (prefs().haptics && e.target.closest && e.target.closest('button')) Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }, true);
 
   await registerActions();
   await LocalNotifications.addListener('localNotificationActionPerformed', (a) => {
@@ -165,7 +174,7 @@ async function shareLog() {
   const keep = async (on) => { if (on === awake) return; awake = on; try { on ? await KeepAwake.keepAwake() : await KeepAwake.allowSleep(); } catch (e) {} };
   window.addEventListener('ach:step', (e) => {
     const d = e.detail || {}; keep(true);
-    if (d.quiet) return;
+    if (d.quiet || !prefs().haptics) return;
     const k = d.kind;
     if (k === 'setup') Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
     else if (k === 'up' || k === 'hold') Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});

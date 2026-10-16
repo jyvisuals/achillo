@@ -1,0 +1,16 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{const R=Date;window.__off=new R('2026-10-16T15:00').getTime()-R.now();class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+window.__off);}static now(){return R.now()+window.__off;}};window.Date=D;});
+await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
+await p.click('#setBtn');await p.waitForTimeout(300);
+console.log('errors',errs,'| panel visible:',await p.evaluate(()=>!document.getElementById('setCard').hidden&&getComputedStyle(document.getElementById('nowBtns')).display==='none'));
+console.log('segs on:',await p.$$eval('#setCard .seg button.on',bs=>bs.map(b=>b.parentElement.id+'='+b.textContent)));
+await p.click('#cadSeg button[data-v="90"]');await p.click('#eveSeg button[data-v="17:00"]');await p.click('#rateSeg button[data-v="1.15"]');await p.click('#volSeg button[data-v="1.8"]');await p.waitForTimeout(2200);
+console.log('prefs:',await p.evaluate(()=>localStorage.getItem('ach:prefs')),'| vol:',await p.evaluate(()=>localStorage.getItem('ach:vol')));
+const pend=await p.evaluate(()=>window.__ln.pending.map(n=>new Date(n.schedule.at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' '+n.title));
+console.log('today notes:',pend.filter((x,i)=>i<6));
+await p.click('#poolChk button:first-child');await p.waitForTimeout(100);console.log('pool:',await p.evaluate(()=>JSON.parse(localStorage.getItem('ach:prefs')).pool));
+await p.click('#remSeg button[data-v="0"]');await p.waitForTimeout(2200);console.log('pending after reminders off:',await p.evaluate(()=>window.__ln.pending.length));
+await p.click('#setClose');await p.waitForTimeout(300);console.log('closed:',await p.evaluate(()=>document.getElementById('setCard').hidden),'| tVol label:',await p.getAttribute('#tVol','aria-label'));
+await b.close();})();

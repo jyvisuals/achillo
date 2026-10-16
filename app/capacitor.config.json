@@ -12,7 +12,8 @@
   "plugins": {
     "LocalNotifications": {
       "smallIcon": "ic_stat_icon",
-      "sound": "default"
+      "sound": "default",
+      "presentationOptions": []
     }
   }
 }

@@ -230,6 +230,15 @@ details.fold>.body{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .inl input{width:64px;padding:5px 7px;font-size:14px}
 /* gym focus mode */
 .wrap.gym-mode>:not(#gymCard){display:none}
+.wrap.set-mode>:not(#setCard):not(.ver){display:none}
+.dayline{position:relative}.gear{position:absolute;right:0;top:0;width:40px;height:40px;min-height:0;padding:0;border-radius:50%;display:grid;place-items:center}.gear svg{width:22px;height:22px;fill:currentColor}
+.sgrp{padding:12px 0 4px;border-top:1px solid var(--line)}.sgrp:first-of-type{border-top:0}.sgrp h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;font-size:14.5px}.srow>label,.srow>span:first-child{color:var(--ink)}
+.seg{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.srow.stack{flex-direction:column;align-items:flex-start;gap:6px}.srow.stack .seg{justify-content:flex-start}.seg button{min-height:32px;padding:4px 11px;border-radius:999px;font-size:13px}.seg button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.srow select{max-width:58vw;padding:7px 10px;border-radius:10px;background:var(--card2,transparent);color:var(--ink);border:1px solid var(--line);font-size:14px}
+.shint{font-size:12.5px;color:var(--muted);line-height:1.4;margin:2px 0 8px}
+.chk{display:flex;flex-wrap:wrap;gap:6px}.chk button{min-height:32px;padding:4px 12px;border-radius:999px;font-size:13px}.chk button.on{background:var(--ok);border-color:var(--ok);color:#fff}
+html:not(.native) .native-only{display:none}
 .wrap.gym-mode #gymCard{border-color:var(--accent);min-height:60vh}
 .gymbig{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .gymbig:first-child{border-top:0;padding-top:0}
@@ -320,6 +329,7 @@ pre.rtext{display:none}
     <div class="dayline">
       <div class="daynum num" id="dayNum">Day —</div>
       <div class="daymeta"><div class="date" id="headline">Today</div><div class="phase" id="phaseLine"></div></div>
+      <button id="setBtn" class="gear" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.6 7.6 0 0 0-1.7-1l-.4-2.7h-4l-.4 2.7a7.6 7.6 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.6 7.6 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7.6 7.6 0 0 0 1.7-1l2.5 1 2-3.5L19.4 13zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></button>
     </div>
     <div class="strip" id="strip" aria-hidden="true"></div>
     <div class="striplabels"><span style="left:0">Oct 2</span><span style="left:33.3%">50%</span><span style="left:50%">100%</span><span style="left:76%">neutral</span><span style="left:100%">Nov 12</span></div>
@@ -480,6 +490,48 @@ pre.rtext{display:none}
     <div class="rsec"><h3>Flagged mornings and notes</h3><div class="rlist" id="rnotes"></div></div>
     <div class="rsec"><h3>Questions for the visit</h3><ul class="rq" id="rq"></ul></div>
     <div class="rsub" id="rfoot"></div>
+  </section>
+  <section id="setCard" aria-labelledby="seth" hidden>
+    <div class="rhead"><div><div class="eyebrow">Achilló</div><h2 id="seth">Settings</h2></div><div class="btns"><button id="setClose" class="primary">Done</button></div></div>
+
+    <div class="sgrp"><h3>Voice</h3>
+      <div class="srow"><label for="voiceSel">Voice</label><select id="voiceSel"><option value="">System default</option></select></div>
+      <div class="srow stack"><span>Speed</span><div class="seg" id="rateSeg" data-pref="rate"><button data-v="0.9">Slow</button><button data-v="1.02">Normal</button><button data-v="1.15">Brisk</button><button data-v="1.3">Fast</button></div></div>
+      <div class="srow"><span></span><button id="voiceTry" class="pill">Hear it</button></div>
+      <div class="shint">More voices: iOS Settings → Accessibility → Spoken Content → Voices → English. Downloaded voices show up here.</div>
+    </div>
+
+    <div class="sgrp"><h3>Cues</h3>
+      <div class="srow"><span>Sound cues</span><div class="seg" id="soundSeg" data-pref="sound"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
+      <div class="srow"><span>Volume</span><div class="seg" id="volSeg" data-pref="vol"><button data-v="0.5">Soft</button><button data-v="1">Normal</button><button data-v="1.8">Loud</button></div></div>
+      <div class="srow native-only"><span>Haptic taps</span><div class="seg" id="hapSeg" data-pref="haptics"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
+    </div>
+
+    <div class="sgrp native-only"><h3>Reminders</h3>
+      <div class="srow"><span>Reminders</span><div class="seg" id="remSeg" data-pref="remind"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
+      <div class="srow stack"><span>Morning check</span><div class="seg" id="mornSeg" data-pref="morning"><button data-v="7:30">7:30</button><button data-v="7:55">7:55</button><button data-v="8:30">8:30</button><button data-v="9:00">9:00</button></div></div>
+      <div class="srow stack"><span>Quick ones every</span><div class="seg" id="cadSeg" data-pref="cadence"><button data-v="45">45 min</button><button data-v="60">60 min</button><button data-v="90">90 min</button><button data-v="120">2 h</button></div></div>
+      <div class="srow stack"><span>Last quick one</span><div class="seg" id="lastSeg" data-pref="lastHour"><button data-v="19">7 PM</button><button data-v="20">8 PM</button><button data-v="21">9 PM</button><button data-v="22">10 PM</button></div></div>
+      <div class="srow stack"><span>Evening round</span><div class="seg" id="eveSeg" data-pref="evening"><button data-v="15:00">3:00</button><button data-v="16:00">4:00</button><button data-v="17:00">5:00</button><button data-v="18:00">6:00</button></div></div>
+      <div class="srow stack"><span>Imagery</span><div class="seg" id="imgSeg" data-pref="imageryAt"><button data-v="20:00">8:00</button><button data-v="20:25">8:25</button><button data-v="21:00">9:00</button><button data-v="21:30">9:30</button></div></div>
+      <div class="shint">Reminders rebuild themselves whenever you log something, so anything already done stays quiet.</div>
+    </div>
+
+    <div class="sgrp"><h3>Quick-one drills</h3>
+      <div class="chk" id="poolChk"></div>
+      <div class="shint">Each hour picks the drill you've done least recently from the ones ticked.</div>
+    </div>
+
+    <div class="sgrp"><h3>You</h3>
+      <div class="srow"><label for="bw2">Weight</label><span><input id="bw2" type="number" inputmode="decimal" min="80" max="400" placeholder="lbs" style="width:72px;padding:6px 8px"> lbs</span></div>
+      <div class="shint">Used for the weight-bearing ceiling on the home screen.</div>
+    </div>
+
+    <div class="sgrp"><h3>Data</h3>
+      <div class="btns"><button id="expBtn">Export log</button><button id="impBtn">Import log</button></div>
+      <textarea id="impBox" hidden placeholder="Paste a log export here, then tap Import again." style="min-height:90px;margin-top:8px"></textarea>
+      <div class="shint" id="dataHint"></div>
+    </div>
   </section>
   <div class="ver" id="ver">Achilló · web</div>
 </div>
@@ -715,7 +767,7 @@ function snackLast(){const d=day();const a=d.snacks||[];return a.length?a[a.leng
 function snackDue(){return Date.now()-snackLast()>=55*60000;}
 function snackNext(){const d=day();const a=d.snacks||[];const last={};a.forEach(x=>{last[x.k]=x.t;});
   const y=days[keyOf(new Date(today.getTime()-DAY))];(y&&y.snacks||[]).forEach(x=>{if(!last[x.k])last[x.k]=x.t;});
-  return SNACK_POOL.slice().sort((p,q)=>(last[p]||0)-(last[q]||0))[0];}
+  const pool=SNACK_POOL.filter(k=>(prefs.pool||SNACK_POOL).includes(k));return (pool.length?pool:SNACK_POOL).slice().sort((p,q)=>(last[p]||0)-(last[q]||0))[0];}
 function snackBtn(btn){const sn=snackNext();if(sn&&snackDue())btn('Quick one · '+ANK_DEF.find(x=>x[0]===sn)[2].split(' · ')[0],()=>startSession(false,false,'snack:'+sn));}
 function homeLeft(d){return ankBases().filter(k=>isHome(k)&&!(d.ankleDone||[]).includes(k));}
 function gymLeft(d){return ankBases().filter(k=>isGym(k)&&!(d.ankleDone||[]).includes(k));}
@@ -728,13 +780,18 @@ function homeList(){const d=day();const left=homeLeft(d);
   const after=left.filter(k=>k!=='scar').flatMap(k=>ANK_KEYS[k]);
   const calf=d.bfrA?[]:['bcr30','srest','bcr15a','srest','bcr15b','srest','bcr15c','cuffdown'];
   return calf.concat(d.bfrA&&!left.includes('scar')?[]:gap,['bpi1','srest','bpi2','srest','bpi3','srest','bpi4','deflate'],after);}
+const PREF_DEF={rate:1.02,voice:'',haptics:1,remind:1,morning:'7:55',cadence:60,lastHour:21,evening:'16:00',imageryAt:'20:25',pool:['toeyoga2','inviso','eviso','hiprot','pfstraight']};
+let prefs=Object.assign({},PREF_DEF,local.get('prefs')||{});
+let audRefresh=null,volRefresh=null;
+function savePrefs(){local.set('prefs',prefs);nativeEvt('saved',{day:TODAY,prefs:true});}
+function pickVoice(){try{if(!prefs.voice)return null;return speechSynthesis.getVoices().find(v=>v.voiceURI===prefs.voice)||null;}catch(e){return null;}}
 let voice=true, soundPref=true, vol=1; try{voice=localStorage.getItem('ach:voice')!=='0';soundPref=localStorage.getItem('ach:sound')!=='0';vol=parseFloat(localStorage.getItem('ach:vol')||'1')||1;}catch(e){}
 let trackOn=false, trackURL=null;
 let timer=null, paused=false, sound=soundPref, ac=null, wake=null, skip=false, sess=null;
 const arc=document.getElementById('arc'), C=389.6; const arcEx=document.getElementById('arcEx'), CEX=452.4;
 const $=id=>document.getElementById(id);
 function beep(f,ms){if(!sound||trackOn)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(.15,ac.currentTime);o.start();o.stop(ac.currentTime+ms/1000);}catch(e){}}
-function speak(t){if(!voice||!t)return;try{const u=new SpeechSynthesisUtterance(t);u.rate=1.02;u.onend=u.onerror=()=>{setTimeout(syncTrack,150);};speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
+function speak(t){if(!voice||!t)return;try{const u=new SpeechSynthesisUtterance(t);u.rate=prefs.rate||1.02;const pv=pickVoice();if(pv)u.voice=pv;u.onend=u.onerror=()=>{setTimeout(syncTrack,150);};speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
 function sayStep(){const s=sess.steps[sess.i];const e=EX[s.ex];
   // Voice only for instructions; the rhythm is carried by sound cues (see buildTrack).
   if(s.kind==='setup'){speak(e.name.split(' · set')[0].replace(/\(\d of \d\)/,'')+'. '+(s.cue||''));return;}
@@ -1050,14 +1107,14 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
   if(sess&&navigator.wakeLock&&!wake){navigator.wakeLock.request('screen').then(w=>wake=w).catch(()=>{});}}});
 (function(){const AUD={both:'<svg viewBox="0 0 48 24"><g><path d="M3 4h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-5 4v-4H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></g><g transform="translate(25 0)"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></g></svg>',cues:'<svg viewBox="0 0 24 24"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></svg>',voice:'<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>',off:'<svg viewBox="0 0 24 24"><g opacity=".45"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></g><path d="M4 20L20 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'};const NAMES={both:'Voice and cues',cues:'Cues only',voice:'Voice only',off:'Silent'};
   const b=$('tAud');const mode=()=>voice&&sound?'both':sound?'cues':voice?'voice':'off';
-  const set=()=>{const m=mode();b.innerHTML='<i class="ic">'+AUD[m]+'</i>';b.setAttribute('aria-label',NAMES[m]);b.title=NAMES[m];b.classList.toggle('off',m==='off');};set();
+  const set=()=>{const m=mode();b.innerHTML='<i class="ic">'+AUD[m]+'</i>';b.setAttribute('aria-label',NAMES[m]);b.title=NAMES[m];b.classList.toggle('off',m==='off');};set();audRefresh=set;
   b.onclick=()=>{const m=mode();const next={both:'cues',cues:'voice',voice:'off',off:'both'}[m];const wasSound=sound;
     voice=(next==='both'||next==='voice');sound=(next==='both'||next==='cues');
     try{localStorage.setItem('ach:voice',voice?'1':'0');localStorage.setItem('ach:sound',sound?'1':'0');}catch(e){}
     set();flash(NAMES[next]);if(!sound&&wasSound)stopTrack();else if(sound&&!wasSound&&sess)startTrack();if(voice)speak(NAMES[next]+'.');};})();
 let flashT=null;function flash(t){const n=$('sNext');if(!n)return;const keep=n.dataset.keep||n.textContent;n.dataset.keep=keep;n.textContent=t;n.style.color='var(--accent)';clearTimeout(flashT);flashT=setTimeout(()=>{n.textContent=n.dataset.keep||'';n.style.color='';delete n.dataset.keep;},1600);}
 (function(){const b=$('tVol');const VOL={'0.5':'<svg viewBox="0 0 24 24"><path d="M5 9v6h3.5L13 19V5L8.5 9z"/><circle cx="17" cy="12" r="1.6"/></svg>','1':'<svg viewBox="0 0 24 24"><path d="M5 9v6h3.5L13 19V5L8.5 9z"/><path d="M16 9a4.2 4.2 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>','1.8':'<svg viewBox="0 0 24 24"><path d="M5 9v6h3.5L13 19V5L8.5 9z"/><path d="M16 9a4.2 4.2 0 0 1 0 6M18.8 6.5a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'};const L={0.5:'Cues soft',1:'Cues normal',1.8:'Cues louder'};
-  const set=()=>{b.innerHTML='<i class="ic">'+(VOL[String(vol)]||VOL['1'])+'</i>';b.setAttribute('aria-label',L[vol]||'Cues normal');b.title=L[vol]||'Cues normal';};set();
+  const set=()=>{b.innerHTML='<i class="ic">'+(VOL[String(vol)]||VOL['1'])+'</i>';b.setAttribute('aria-label',L[vol]||'Cues normal');b.title=L[vol]||'Cues normal';};set();volRefresh=set;
   b.onclick=()=>{vol=vol===0.5?1:vol===1?1.8:0.5;try{localStorage.setItem('ach:vol',String(vol))}catch(e){};set();flash(L[vol]);pre.key=null;if(pre.url){URL.revokeObjectURL(pre.url);pre.url=null;}if(sess&&sound){stopTrack();startTrack();}else prebuildNext();};})();
 
 // ---------- morning check ----------
@@ -1336,6 +1393,38 @@ function envCheck(){const ua=navigator.userAgent||'';const ios=/iPhone|iPad|iPod
   if(standalone)msg='You opened the home-screen icon. iOS pauses its audio when you leave. For background cues, open the link in Safari instead.';
   else if(inApp)msg='This is running inside an app, not Safari. Audio stops when you leave the app. For background cues, open this link in Safari: tap Share → Open in Safari.';
   const n=$('envNote');if(msg){n.innerHTML=msg;n.hidden=false;}else n.hidden=true;}
+// ---------- settings panel ----------
+function openSettings(){renderSettings();document.querySelector('.wrap').classList.add('set-mode');$('setCard').hidden=false;window.scrollTo(0,0);}
+function closeSettings(){document.querySelector('.wrap').classList.remove('set-mode');$('setCard').hidden=true;renderAll();}
+$('setBtn').onclick=openSettings;$('setClose').onclick=closeSettings;
+function segVal(key){return key==='sound'?(sound?'1':'0'):key==='vol'?String(vol):String(prefs[key]);}
+function setSeg(key,v){
+  if(key==='sound'){const was=sound;sound=v==='1';try{localStorage.setItem('ach:sound',sound?'1':'0');}catch(e){}if(audRefresh)audRefresh();if(!sound&&was)stopTrack();else if(sound&&!was&&sess)startTrack();return;}
+  if(key==='vol'){vol=parseFloat(v);try{localStorage.setItem('ach:vol',String(vol));}catch(e){}if(volRefresh)volRefresh();pre.key=null;if(pre.url){URL.revokeObjectURL(pre.url);pre.url=null;}if(sess&&sound){stopTrack();startTrack();}else prebuildNext();return;}
+  prefs[key]=/^-?\d+(\.\d+)?$/.test(v)?parseFloat(v):v;savePrefs();}
+function renderSettings(){
+  document.querySelectorAll('#setCard .seg').forEach(seg=>{const key=seg.dataset.pref;const cur=segVal(key);
+    seg.querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.v===cur);b.onclick=()=>{setSeg(key,b.dataset.v);renderSettings();};});});
+  // voices
+  const sel=$('voiceSel');const fill=()=>{let vs=[];try{vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));}catch(e){}
+    vs.sort((a,b)=>(a.lang===navigator.language?-1:0)-(b.lang===navigator.language?-1:0)||a.name.localeCompare(b.name));
+    sel.innerHTML='<option value="">System default</option>'+vs.map(v=>'<option value="'+v.voiceURI.replace(/"/g,'&quot;')+'">'+v.name.replace(/</g,'&lt;')+(/premium|enhanced/i.test(v.name+v.voiceURI)?'':'')+' · '+v.lang+'</option>').join('');
+    sel.value=prefs.voice||'';if(sel.value!==(prefs.voice||''))sel.value='';};
+  fill();try{speechSynthesis.onvoiceschanged=fill;}catch(e){}
+  sel.onchange=()=>{prefs.voice=sel.value;savePrefs();speak('This is how I\'ll sound.');};
+  $('voiceTry').onclick=()=>{const on=voice;voice=true;speak('Toe yoga. Lift the big toe, four small toes stay down. Hold.');voice=on;};
+  // quick-one pool
+  const pc=$('poolChk');pc.innerHTML='';SNACK_POOL.forEach(k=>{const def=ANK_DEF.find(x=>x[0]===k);const b=document.createElement('button');b.textContent=def?def[2]:k;const on=(prefs.pool||SNACK_POOL).includes(k);b.className=on?'on':'';
+    b.onclick=()=>{let pool=(prefs.pool||SNACK_POOL).slice();if(on){if(pool.length<=1)return;pool=pool.filter(x=>x!==k);}else pool.push(k);prefs.pool=pool;savePrefs();renderSettings();renderNow();};pc.appendChild(b);});
+  // weight
+  const bw2=$('bw2');bw2.value=settings.bodyWeight||'';bw2.onchange=()=>{settings.bodyWeight=parseFloat(bw2.value)||null;$('bw').value=bw2.value;renderWB();saveSettings();};
+  // data
+  $('expBtn').onclick=()=>{if(window.__nativeApp&&!$('shareLog').hidden){$('shareLog').click();return;}
+    const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),app:'Achilló',days,settings,prefs},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='achillo-log-'+TODAY+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);$('dataHint').textContent='Exported.';};
+  $('impBtn').onclick=()=>{const box=$('impBox');if(box.hidden){box.hidden=false;box.focus();$('dataHint').textContent='Paste the export, then tap Import again.';return;}
+    try{const j=JSON.parse(box.value);const src=j.days||j;let n=0;Object.keys(src).forEach(k=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(k))return;const before=JSON.stringify(days[k]||null);days[k]=mergeDay(days[k],src[k]);if(JSON.stringify(days[k])!==before){local.set('day:'+k,days[k]);if(db)save(k);n++;}});
+      $('dataHint').textContent='Imported '+n+' day'+(n===1?'':'s')+'.';box.hidden=true;box.value='';renderAll();}catch(e){$('dataHint').textContent='That didn\'t parse as a log export.';}};
+}
 function renderAll(){envCheck();renderTrends();renderNow();renderBoot();renderGym();renderHeader();renderWB();renderTasks();renderMorning();renderWeeks();renderLog();renderHealth();renderAnkle();}
 setInterval(()=>{if(!sess)renderNow();},600000);
 (function(){const g=$('dialTicks');for(let k=0;k<=6;k++){const a=Math.PI-(Math.PI*k/6);const x1=56+40*Math.cos(a),y1=62-40*Math.sin(a),x2=56+45*Math.cos(a),y2=62-45*Math.sin(a);
