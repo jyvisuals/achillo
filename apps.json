@@ -1,0 +1,25 @@
+{
+  "name": "Achilló",
+  "identifier": "com.jyvisuals.achillo",
+  "subtitle": "Jon's Achilles rehab log",
+  "description": "Private AltStore source for the Achilló rehab app. Builds are published by the app's build script.",
+  "iconURL": "https://jyvisuals.github.io/achillo/icon.png",
+  "website": "https://jyvisuals.github.io/achillo/",
+  "tintColor": "#e2a24a",
+  "apps": [
+    {
+      "name": "Achilló",
+      "bundleIdentifier": "com.jyvisuals.achilles",
+      "developerName": "Jon Youngpenn",
+      "subtitle": "Guided Achilles rehab, by ear",
+      "localizedDescription": "Daily post-op Achilles program: BFR, Chris's barefoot and boot-on routines, hourly quick ones, hinge ladder, imagery. Audio cues keep going with the screen locked; reminders come from the app.",
+      "iconURL": "https://jyvisuals.github.io/achillo/icon.png",
+      "tintColor": "#e2a24a",
+      "category": "health",
+      "screenshots": [],
+      "versions": [],
+      "appPermissions": { "entitlements": [], "privacy": {} }
+    }
+  ],
+  "news": []
+}
