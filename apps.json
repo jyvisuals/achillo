@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.1",
+          "buildVersion": "1",
+          "date": "2026-10-16T18:04:57Z",
+          "localizedDescription": "Achilló: new name and icon; header clear of the status bar; Quick-ones row fixed; updates now arrive through AltStore.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.1.ipa",
+          "size": 872428,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.0.1",
           "buildVersion": "1",
           "date": "2026-10-16T17:56:08Z",
@@ -32,11 +41,11 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.0.1",
-      "versionDate": "2026-10-16T17:56:08Z",
+      "version": "1.1.1",
+      "versionDate": "2026-10-16T18:04:57Z",
       "versionDescription": "Achilló: new name and icon; header clear of the status bar; Quick-ones row fixed; updates now arrive through AltStore.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.0.1.ipa",
-      "size": 874097
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.1.ipa",
+      "size": 872428
     }
   ],
   "news": []
