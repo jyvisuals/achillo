@@ -17,8 +17,26 @@
       "tintColor": "#e2a24a",
       "category": "health",
       "screenshots": [],
-      "versions": [],
-      "appPermissions": { "entitlements": [], "privacy": {} }
+      "versions": [
+        {
+          "version": "1.0.1",
+          "buildVersion": "1",
+          "date": "2026-10-16T17:56:08Z",
+          "localizedDescription": "Achilló: new name and icon; header clear of the status bar; Quick-ones row fixed; updates now arrive through AltStore.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.0.1.ipa",
+          "size": 874097,
+          "minOSVersion": "15.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      },
+      "version": "1.0.1",
+      "versionDate": "2026-10-16T17:56:08Z",
+      "versionDescription": "Achilló: new name and icon; header clear of the status bar; Quick-ones row fixed; updates now arrive through AltStore.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.0.1.ipa",
+      "size": 874097
     }
   ],
   "news": []
