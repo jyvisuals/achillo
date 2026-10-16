@@ -11,8 +11,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Keep the exercise cues playing with the screen locked or another app in front.
         // Pairs with UIBackgroundModes=audio in Info.plist.
         activateAudioSession()
-        NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { _ in
-            self.activateAudioSession()
+        // Phone call / Siri / alarm: tell the page so the session pauses itself, then resumes.
+        NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { note in
+            guard let info = note.userInfo,
+                  let raw = info[AVAudioSessionInterruptionTypeKey] as? UInt,
+                  let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
+            switch type {
+            case .began:
+                self.tellPage("window.dispatchEvent(new CustomEvent('ach:interrupt',{detail:{began:true}}))")
+            case .ended:
+                self.activateAudioSession()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    self.tellPage("window.dispatchEvent(new CustomEvent('ach:interrupt',{detail:{began:false}}))")
+                }
+            @unknown default: break
+            }
         }
         return true
     }
@@ -25,6 +38,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    }
+
+    func tellPage(_ js: String) {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let root = scenes.flatMap { $0.windows }.first { $0.isKeyWindow }?.rootViewController
+        guard let vc = root as? CAPBridgeViewController else { return }
+        vc.bridge?.webView?.evaluateJavaScript(js, completionHandler: nil)
     }
 
     func activateAudioSession() {

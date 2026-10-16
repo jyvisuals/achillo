@@ -898,7 +898,13 @@ let pauseStart=0;
 function enter(idx,fromEnd,quiet){ // move to step idx, ending fromEnd + its length
   sess.i=idx; const st=sess.steps[idx]; sess.stepEnd=fromEnd+st.secs*1000;
   if(!quiet){sayStep();if(st.kind==='setup')beep(620,120);}
+  lockInfo(); nativeEvt('step',{kind:st.kind,ex:st.ex,rep:st.rep,reps:(EX[st.ex]||{}).reps||1,secs:st.secs,quiet:!!quiet});
 }
+// Lock screen: exercise and set as the title, phase and rep as the subtitle.
+function lockInfo(){try{if(!('mediaSession' in navigator)||!sess)return;const st=sess.steps[sess.i];const e=EX[st.ex]||{};
+  const title=(e.name||'Session').replace(/\(\d of \d\)/,'').trim();
+  const sub=st.kind==='setup'?'Get set':st.kind==='mark'?'Done':e.speakCue?'Imagery':(st.label||'')+((e.reps||1)>1&&!/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/.test(st.ex)?' · rep '+(st.rep+1)+' of '+e.reps:'');
+  navigator.mediaSession.metadata=new MediaMetadata({title,artist:(paused?'Paused · ':'')+sub,album:'Achilló'});}catch(e){}}
 // Check exercises off the moment they finish, not at the end of the session.
 function recordDone(key){try{nativeEvt('done',{key});if(sess&&sess.mode&&sess.mode.startsWith('snack:'))return;const d=day();let changed=false;
   const base=EX[key]&&EX[key].base;
@@ -914,6 +920,11 @@ window.addEventListener('ach:open',e=>{const k=e.detail&&e.detail.kind;if(sess||
   else if(k==='round'){const d=day();startSession(false,false,homeLeft(d).length||bfrPending()?'home':gymLeft(d).length?'gym':'ankle');}
   else if(k==='imagery')startSession(false,false,'imagery');
   else window.scrollTo(0,0);});
+let autoPaused=false;
+window.addEventListener('ach:interrupt',e=>{const began=!!(e.detail&&e.detail.began);
+  if(began){if(sess&&!paused){autoPaused=true;$('tPause').click();}}
+  else if(autoPaused){autoPaused=false;if(sess&&paused)$('tPause').click();}});
+window.addEventListener('ach:markRound',()=>{const d=day();if((d.ankle||0)>=2)return;d.ankle=(d.ankle||0)+1;d.ankleDone=[];d.foot=1;queueSave(TODAY);renderAll();setStatus('Round logged from the reminder.');});
 window.addEventListener('ach:seed',e=>{const sd=e.detail&&e.detail.days;if(!sd)return;let n=0;Object.keys(sd).forEach(k=>{const before=JSON.stringify(days[k]||null);days[k]=mergeDay(days[k],JSON.parse(JSON.stringify(sd[k])));if(JSON.stringify(days[k])!==before){local.set('day:'+k,days[k]);n++;}});if(n){renderAll();setStatus('Imported '+n+' day'+(n>1?'s':'')+' from the web log.');}});
 window.addEventListener('ach:state?',()=>{const d=day();const b=bootFor(today);nativeEvt('state',{today:TODAY,rounds:d.ankle||0,partial:(d.ankleDone||[]).length,imagery:d.imagery||0,bfr:d.bfr||0,snackLast:snackLast(),snackName:(()=>{const s=snackNext();return s?ANK_DEF.find(x=>x[0]===s)[2].split(' · ')[0]:'';})(),hingeToday:b.changeToday&&b.cur.deg<30?b.cur.deg:null,hingeSet:d.hingeSet||null,hingeNext:b.next?{date:keyOf(b.next.from),deg:b.next.deg}:null,checked:!!verdictKind(TODAY),log:days});});
 function advance(quiet){
@@ -959,7 +970,7 @@ function resumeSession(){
   if(sound){$('sNext').textContent='Session resumed. Tap Pause, then Resume, to restart the beeps.';}
   return true;
 }
-function finish(complete){
+function finish(complete){nativeEvt('session',{active:false});
   clearInterval(timer);timer=null; stopTrack(); if(wake){try{wake.release()}catch(e){} wake=null;}
   const d=day(); const w=weekFor(today)||WEEKS[0]; const done=sess?sess.doneEx:[];
   const pressDone=false; const routineDone=false;
@@ -1007,7 +1018,7 @@ $('tPause').onclick=e=>{if(!sess)return; paused=!paused;
   if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';try{speechSynthesis.cancel();}catch(e){}}
   else{sess.stepEnd+=Date.now()-pauseStart;pauseStart=0;lastShown=null;tick();
     const st=sess&&sess.steps[sess.i];if(st&&EX[st.ex]&&EX[st.ex].speakCue){sess.stepEnd=Date.now()+st.secs*1000;sayStep();}}
-  setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack();};
+  setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); lockInfo(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack();};
 // ---- skip / jump: skipping never marks an exercise done; the next Start plays only what's left.
 const REST_KEY=/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/;
 const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(k)?'bfrB':k;

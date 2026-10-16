@@ -1,1 +1,1 @@
-Pause now stops the imagery voice (resume re-reads the scene). Your web log through Oct 16 is carried over. Version shown at the bottom of the page.
+Lock screen shows the exercise, set and rep. Notification buttons: Start now / Snooze 20 min, and "Done already" on round reminders. A light tap on every rep phase. Calls and Siri pause the session and it resumes after. Screen stays awake during a session.

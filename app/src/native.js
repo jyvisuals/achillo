@@ -8,6 +8,7 @@ import { App } from '@capacitor/app';
 import { Haptics, NotificationType, ImpactStyle } from '@capacitor/haptics';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { KeepAwake } from '@capacitor-community/keep-awake';
 import SEED from './seed.json'; // one-time carry-over of the web log (Oct 2–16); merged, never overwrites
 
 const native = Capacitor.isNativePlatform();
@@ -32,9 +33,22 @@ function askState() {
 
 // ---- notifications ----
 let idSeq = 1;
+const ACTION_TYPE = { snack: 'SNACK', round: 'ROUND', imagery: 'IMAGERY' };
 function note(list, when, title, body, kind) {
   if (when.getTime() <= Date.now() + 20000) return;
-  list.push({ id: idSeq++, title, body, schedule: { at: when, allowWhileIdle: true }, extra: { kind }, sound: 'default' });
+  list.push({ id: idSeq++, title, body, schedule: { at: when, allowWhileIdle: true }, extra: { kind }, sound: 'default', actionTypeId: ACTION_TYPE[kind] });
+}
+async function registerActions() {
+  try {
+    await LocalNotifications.registerActionTypes({ types: [
+      { id: 'SNACK', actions: [{ id: 'start', title: 'Start now', foreground: true }, { id: 'snooze', title: 'Snooze 20 min' }] },
+      { id: 'ROUND', actions: [{ id: 'start', title: 'Start', foreground: true }, { id: 'done', title: 'Done already' }] },
+      { id: 'IMAGERY', actions: [{ id: 'start', title: 'Start', foreground: true }, { id: 'snooze', title: 'Snooze 20 min' }] },
+    ] });
+  } catch (e) { log('actions', e); }
+}
+async function snooze(kind, title, body) {
+  try { await LocalNotifications.schedule({ notifications: [{ id: 9000 + Math.floor(Math.random() * 900), title, body, schedule: { at: new Date(Date.now() + 20 * 60000), allowWhileIdle: true }, extra: { kind }, sound: 'default', actionTypeId: ACTION_TYPE[kind] }] }); } catch (e) { log('snooze', e); }
 }
 
 async function reschedule(reason) {
@@ -136,10 +150,28 @@ async function shareLog() {
   window.addEventListener('ach:done', () => { Haptics.notification({ type: NotificationType.Success }).catch(() => {}); });
   document.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('button')) Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }, true);
 
+  await registerActions();
   await LocalNotifications.addListener('localNotificationActionPerformed', (a) => {
-    const kind = (a.notification && a.notification.extra && a.notification.extra.kind) || 'open';
+    const n = a.notification || {};
+    const kind = (n.extra && n.extra.kind) || 'open';
+    const act = a.actionId || 'tap';
+    if (act === 'snooze') { snooze(kind, n.title || 'Achilló', n.body || ''); return; }
+    if (act === 'done' && kind === 'round') { setTimeout(() => window.dispatchEvent(new Event('ach:markRound')), 400); return; }
     setTimeout(() => window.dispatchEvent(new CustomEvent('ach:open', { detail: { kind } })), 600);
   });
+
+  // Haptics per rep + screen awake during a session (released when it ends)
+  let awake = false;
+  const keep = async (on) => { if (on === awake) return; awake = on; try { on ? await KeepAwake.keepAwake() : await KeepAwake.allowSleep(); } catch (e) {} };
+  window.addEventListener('ach:step', (e) => {
+    const d = e.detail || {}; keep(true);
+    if (d.quiet) return;
+    const k = d.kind;
+    if (k === 'setup') Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
+    else if (k === 'up' || k === 'hold') Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+    else if (k === 'down') Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+  });
+  window.addEventListener('ach:session', (e) => { if (e.detail && e.detail.active === false) keep(false); });
 
   let loadedDay = keyOf(new Date());
   App.addListener('appStateChange', ({ isActive }) => {
