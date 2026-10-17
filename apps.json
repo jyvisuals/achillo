@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.20",
+          "buildVersion": "20",
+          "date": "2026-10-17T13:25:46Z",
+          "localizedDescription": "Vibration strength: Off / Subtle / Normal / Strong. Push now feels gritty and builds; lowering is smooth and sinks.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.20.ipa",
+          "size": 932944,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.19",
           "buildVersion": "19",
           "date": "2026-10-17T13:16:17Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.18.ipa",
           "size": 931935,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.17",
-          "buildVersion": "17",
-          "date": "2026-10-17T12:13:46Z",
-          "localizedDescription": "Ring combines A and D: notches for reps (now up to 40) and sets; during BFR the outer ring becomes the 10-minute cuff dial with set dots in the middle.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.17.ipa",
-          "size": 924783,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.19",
-      "versionDate": "2026-10-17T13:16:17Z",
-      "versionDescription": "Ring stays steady through relax, rests and setup: rep notches stay put, only the center circle breathes.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.19.ipa",
-      "size": 932150
+      "version": "1.1.20",
+      "versionDate": "2026-10-17T13:25:46Z",
+      "versionDescription": "Vibration strength: Off / Subtle / Normal / Strong. Push now feels gritty and builds; lowering is smooth and sinks.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.20.ipa",
+      "size": 932944
     }
   ],
   "news": []
