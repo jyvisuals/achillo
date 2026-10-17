@@ -105,6 +105,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         CAPPluginMethod(name: "stopSpeaking", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "voices", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "nowPlaying", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "render", returnType: CAPPluginReturnPromise),
     ]
 
     private var player: AVAudioPlayer?
@@ -223,6 +224,99 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
             MPNowPlayingInfoCenter.default().nowPlayingInfo = info
             call.resolve()
         }
+    }
+
+    // MARK: render: mix spoken instructions into the cue track, so the whole session is one file.
+    // items: [{t: seconds, text}] placed on the session timeline; output 16 kHz mono WAV in Caches.
+    private let renderQueue = DispatchQueue(label: "achillo.render", qos: .userInitiated)
+    private let renderSynth = AVSpeechSynthesizer()
+
+    @objc func render(_ call: CAPPluginCall) {
+        guard let cuePath = call.getString("cuePath"), let cueURL = URL(string: cuePath) ?? Optional(URL(fileURLWithPath: cuePath)) else { call.reject("cuePath required"); return }
+        let outName = call.getString("out") ?? "baked.wav"
+        let rate = Float(call.getDouble("rate") ?? 1.0)
+        let voiceId = call.getString("voice") ?? ""
+        let items: [JSObject] = call.getArray("items", JSObject.self) ?? []
+        renderQueue.async {
+            do {
+                let sr: Double = 16000
+                guard let fmt = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sr, channels: 1, interleaved: false) else { throw NSError(domain: "render", code: 1) }
+                // cue track → 16 kHz float
+                let cueFile = try AVAudioFile(forReading: cueURL)
+                guard let cueBuf = AVAudioPCMBuffer(pcmFormat: cueFile.processingFormat, frameCapacity: AVAudioFrameCount(cueFile.length)) else { throw NSError(domain: "render", code: 2) }
+                try cueFile.read(into: cueBuf)
+                guard let cue16 = self.convert(cueBuf, to: fmt) else { throw NSError(domain: "render", code: 3, userInfo: [NSLocalizedDescriptionKey: "cue convert"]) }
+                let n = Int(cue16.frameLength)
+                var out = [Float](repeating: 0, count: n)
+                if let ch = cue16.floatChannelData?[0] { for i in 0..<n { out[i] = ch[i] } }
+                // each instruction → speech buffers → mixed in at its time
+                let voice: AVSpeechSynthesisVoice? = voiceId.isEmpty ? AVSpeechSynthesisVoice(language: AVSpeechSynthesisVoice.currentLanguageCode()) : (AVSpeechSynthesisVoice(identifier: voiceId) ?? AVSpeechSynthesisVoice(language: AVSpeechSynthesisVoice.currentLanguageCode()))
+                var placed = 0
+                for it in items {
+                    guard let text = it["text"] as? String, !text.isEmpty else { continue }
+                    let t = (it["t"] as? NSNumber)?.doubleValue ?? 0
+                    let u = AVSpeechUtterance(string: text)
+                    u.voice = voice
+                    u.rate = max(AVSpeechUtteranceMinimumSpeechRate, min(AVSpeechUtteranceMaximumSpeechRate, AVSpeechUtteranceDefaultSpeechRate * rate))
+                    let done = DispatchSemaphore(value: 0)
+                    var pieces: [AVAudioPCMBuffer] = []
+                    var finished = false
+                    let lock = NSLock()
+                    DispatchQueue.main.async {
+                        self.renderSynth.write(u) { b in
+                            guard let pb = b as? AVAudioPCMBuffer else { return }
+                            lock.lock(); defer { lock.unlock() }
+                            if pb.frameLength == 0 { if !finished { finished = true; done.signal() }; return }
+                            if let c = self.convert(pb, to: fmt) { pieces.append(c) }
+                        }
+                    }
+                    _ = done.wait(timeout: .now() + 15)
+                    lock.lock(); let got = pieces; lock.unlock()
+                    var at = Int(t * sr)
+                    for pc in got {
+                        guard let ch = pc.floatChannelData?[0] else { continue }
+                        let m = Int(pc.frameLength)
+                        for i in 0..<m where at + i < n && at + i >= 0 { out[at + i] = max(-1, min(1, out[at + i] * 0.6 + ch[i])) }
+                        at += m
+                    }
+                    placed += 1
+                }
+                // write 16-bit WAV
+                let dir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+                let outURL = dir.appendingPathComponent(outName)
+                try? FileManager.default.removeItem(at: outURL)
+                let settings: [String: Any] = [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: sr, AVNumberOfChannelsKey: 1, AVLinearPCMBitDepthKey: 16, AVLinearPCMIsFloatKey: false, AVLinearPCMIsBigEndianKey: false]
+                let file = try AVAudioFile(forWriting: outURL, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
+                let chunk = 16000 * 30
+                var i = 0
+                while i < n {
+                    let m = min(chunk, n - i)
+                    guard let b = AVAudioPCMBuffer(pcmFormat: fmt, frameCapacity: AVAudioFrameCount(m)) else { break }
+                    b.frameLength = AVAudioFrameCount(m)
+                    out.withUnsafeBufferPointer { src in b.floatChannelData![0].update(from: src.baseAddress! + i, count: m) }
+                    try file.write(from: b)
+                    i += m
+                }
+                call.resolve(["path": outURL.absoluteString, "placed": placed, "duration": Double(n) / sr])
+            } catch {
+                call.reject("render failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func convert(_ buf: AVAudioPCMBuffer, to fmt: AVAudioFormat) -> AVAudioPCMBuffer? {
+        if buf.format == fmt { return buf }
+        guard let conv = AVAudioConverter(from: buf.format, to: fmt) else { return nil }
+        let ratio = fmt.sampleRate / buf.format.sampleRate
+        let cap = AVAudioFrameCount(Double(buf.frameLength) * ratio + 1024)
+        guard let out = AVAudioPCMBuffer(pcmFormat: fmt, frameCapacity: cap) else { return nil }
+        var fed = false
+        var err: NSError?
+        conv.convert(to: out, error: &err) { _, status in
+            if fed { status.pointee = .endOfStream; return nil }
+            fed = true; status.pointee = .haveData; return buf
+        }
+        return err == nil ? out : nil
     }
 
     private func updateNowPlayingRate() {

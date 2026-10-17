@@ -2,7 +2,7 @@ const { chromium } = require('playwright');
 (async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
 await p.addInitScript(()=>{const R=Date;window.__off=new R('2026-10-16T15:00').getTime()-R.now();class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+window.__off);}static now(){return R.now()+window.__off;}};window.Date=D;});
-await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
+await p.clock.install({time:new Date('2026-10-16T14:00:00')});await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
 await p.click('#tabbar button[data-tab=settings]');await p.waitForTimeout(300);
 console.log('errors',errs,'| panel visible:',await p.evaluate(()=>!document.getElementById('setCard').hidden&&getComputedStyle(document.getElementById('nowBtns')).display==='none'));
 console.log('segs on:',await p.$$eval('#setCard .seg button.on',bs=>bs.map(b=>b.parentElement.id+'='+b.textContent)));

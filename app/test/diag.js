@@ -2,7 +2,7 @@ const { chromium } = require('playwright');
 (async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
 await p.addInitScript(()=>{window.__failNative=true;});
-await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
+await p.clock.install({time:new Date('2026-10-16T14:00:00')});await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
 await p.evaluate(()=>[...document.querySelectorAll('#nowBtns button')].find(b=>b.textContent==='Pick a quick one').click());await p.waitForTimeout(200);
 await p.click('#snackPick button[data-k="inviso"]');await p.waitForTimeout(3500);
 await p.evaluate(()=>{document.querySelector('.wrap').classList.remove('focus');});

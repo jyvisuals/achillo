@@ -1,1 +1,1 @@
-Audio fixes from your diagnostics: the native player now actually switches on (it was being skipped at launch), restarts no longer pile up when you skip, faster start, and a crash when ending a session mid-start is gone. Diagnostics now log timings and whether the native audio module answers.
+Voice is now recorded into the session's audio file, so instructions can't drop out or talk over cues. The next likely session is prepared ahead on the Today screen, so Start plays right away. Skips land on the next exercise's spoken intro.

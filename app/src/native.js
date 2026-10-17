@@ -27,18 +27,19 @@ function makeNativeTrack() {
   const emit = (t) => { (L[t] || []).forEach((f) => { try { f({ type: t }); } catch (e) {} }); if (t === 'loadedmetadata' && tr.onloadedmetadata) try { tr.onloadedmetadata(); } catch (e) {} };
   let pos = 0, t0 = 0, playing = false, dur = NaN, src = null, ready = Promise.resolve(), silent = true, gen = 0, seekGen = 0, holdPoll = 0;
   const cur = () => (playing ? pos + (nowMs() - t0) / 1000 : pos);
-  async function writeTrack(url, myGen) {
+  let cueUri = null, prepared = null, bakeGen = 0;
+  async function writeTrack(url, myGen, name = 'cue-track.wav', alive = () => myGen === gen) {
     const buf = new Uint8Array(await (await fetch(url)).arrayBuffer());
     const CH = 3 * 174762; let first = true;
     for (let i = 0; i < buf.length; i += CH) {
-      if (myGen !== gen) return null;
+      if (!alive()) return null;
       let bin = ''; const part = buf.subarray(i, i + CH);
       for (let j = 0; j < part.length; j += 0x8000) bin += String.fromCharCode.apply(null, part.subarray(j, j + 0x8000));
       const data = btoa(bin);
-      if (first) { await Filesystem.writeFile({ path: 'cue-track.wav', data, directory: Directory.Cache }); first = false; }
-      else await Filesystem.appendFile({ path: 'cue-track.wav', data, directory: Directory.Cache });
+      if (first) { await Filesystem.writeFile({ path: name, data, directory: Directory.Cache }); first = false; }
+      else await Filesystem.appendFile({ path: name, data, directory: Directory.Cache });
     }
-    const { uri } = await Filesystem.getUri({ path: 'cue-track.wav', directory: Directory.Cache });
+    const { uri } = await Filesystem.getUri({ path: name, directory: Directory.Cache });
     return uri;
   }
   const tr = {
@@ -59,7 +60,11 @@ function makeNativeTrack() {
       if (!u || /^data:/.test(u)) { silent = true; ready = Promise.resolve(); return; }
       silent = false;
       ready = (async () => {
-        const uri = await writeTrack(u, myGen); if (!uri || myGen !== gen) return;
+        if (prepared && prepared.url === u && prepared.path && prepared.opts === tr.__opts) {
+          const r = await AchAudio.open({ path: prepared.path }); if (myGen !== gen) return; dur = r.duration; cueUri = prepared.cue;
+          log('using prepared track'); if (prepared.baked) window.dispatchEvent(new Event('ach:baked')); emit('loadedmetadata'); return;
+        }
+        const uri = await writeTrack(u, myGen); if (!uri || myGen !== gen) return; cueUri = uri;
         const r = await AchAudio.open({ path: uri }); dur = r.duration; emit('loadedmetadata');
       })().catch((e) => { fail(e, 'load'); if (fb) fb.src = u; });
     },
@@ -80,7 +85,35 @@ function makeNativeTrack() {
     addEventListener(t, f) { (L[t] = L[t] || []).push(f); },
     removeEventListener(t, f) { L[t] = (L[t] || []).filter((x) => x !== f); },
     async __verify() { if (fb) return !fb.paused; try { const s = await AchAudio.status(); return !!s.playing; } catch (e) { tr.__lastError = 'status: ' + (e && e.message); return false; } },
-    __lastError: '',
+    __lastError: '', __opts: '',
+    // Render the spoken instructions into the current track, then swap to it at the same spot.
+    async __bake(items, opts) {
+      if (fb || !items || !items.length) return false;
+      await ready; if (!cueUri) return false;
+      const myGen = gen, my = ++bakeGen; const T = nowMs();
+      try {
+        const r = await AchAudio.render({ cuePath: cueUri, items, rate: opts.rate || 1.02, voice: opts.voice || '', out: 'baked-' + (my % 2) + '.wav' });
+        if (myGen !== gen || my !== bakeGen) return false;
+        const at = cur(); const was = playing;
+        const o = await AchAudio.open({ path: r.path }); dur = o.duration;
+        if (was) { const p = await AchAudio.play({ time: at }); pos = p.position; t0 = nowMs(); playing = !!p.playing; } else { pos = at; }
+        log('voice baked into track:', r.placed, 'lines,', Math.round(nowMs() - T) + 'ms'); window.dispatchEvent(new Event('ach:baked')); return true;
+      } catch (e) { log('bake failed', e); return false; }
+    },
+    // Ahead of time: save and render the next likely session so Start plays immediately.
+    async __prepare(url, items, opts) {
+      if (fb) return;
+      const key = url, o = tr.__opts;
+      if (prepared && prepared.url === key && prepared.opts === o) return;
+      const mine = { url: key, opts: o, path: null, cue: null }; prepared = mine; const T = nowMs();
+      try {
+        const cue = await writeTrack(url, 0, 'pre-cue.wav', () => prepared === mine); if (!cue || prepared !== mine) return;
+        mine.cue = cue;
+        if (!items || !items.length) { mine.path = cue; log('prepared cue track', Math.round(nowMs() - T) + 'ms'); return; }
+        const r = await AchAudio.render({ cuePath: cue, items, rate: opts.rate || 1.02, voice: opts.voice || '', out: 'pre-baked.wav' });
+        if (prepared === mine) { mine.path = r.path; mine.baked = true; log('prepared next session with voice:', r.placed, 'lines,', Math.round(nowMs() - T) + 'ms'); }
+      } catch (e) { log('prepare failed', e); if (prepared === mine) prepared = null; }
+    },
   };
   AchAudio.addListener('ended', () => { pos = dur || cur(); playing = false; emit('ended'); });
   AchAudio.addListener('routeLost', () => { if (playing) { pos = cur(); playing = false; } window.dispatchEvent(new Event('ach:routeLost')); });

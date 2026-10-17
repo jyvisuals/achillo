@@ -921,14 +921,19 @@ const arc=document.getElementById('arc'), C=389.6; const arcEx=document.getEleme
 const $=id=>document.getElementById(id);
 function beep(f,ms){if(!sound||trackOn)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(.15,ac.currentTime);o.start();o.stop(ac.currentTime+ms/1000);}catch(e){}}
 function speak(t){if(!voice||!t)return;if(window.__nativeSpeak&&!window.__nativeSpeakBroken){window.__nativeSpeak(t,{rate:prefs.rate,voice:prefs.voice}).then(ok=>{if(!ok){window.__nativeSpeakBroken=true;speak(t);}});return;}try{const u=new SpeechSynthesisUtterance(t);u.rate=prefs.rate||1.02;const pv=pickVoice();if(pv)u.voice=pv;u.onend=u.onerror=()=>{setTimeout(syncTrack,150);};speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
-function sayStep(){const s=sess.steps[sess.i];const e=EX[s.ex];
-  // Voice only for instructions; the rhythm is carried by sound cues (see buildTrack).
-  if(s.kind==='setup'){speak(e.name.split(' · set')[0].replace(/\(\d of \d\)/,'')+'. '+(s.cue||''));return;}
-  if(e.speakCue){speak(s.cue);return;}
-  if(e.timed&&s.rep===0&&s.kind==='hold'){speak(e.name+'. '+s.cue);return;}
-  if(/^(cuffdown|cuffoff|deflate|bootback)$/.test(s.ex)){const nxt=sess.list[s.ei+1];const nn=nxt&&EX[nxt]?EX[nxt].name.split(' · ')[0].replace(/\(\d of \d\)/,''):'';
-    speak((s.ex==='deflate'?'Cuff off. ':s.ex==='bootback'?'Boot back on. ':'Cuff off for now. ')+(nn?'Next: '+nn+'.':'That\'s the block.'));return;}
-}
+// Voice only for instructions; the rhythm is carried by sound cues (see buildTrack).
+function stepSpeech(steps,list,i){const s=steps[i];const e=EX[s.ex];if(!e)return '';
+  if(s.kind==='setup')return e.name.split(' · set')[0].replace(/\(\d of \d\)/,'')+'. '+(s.cue||'');
+  if(e.speakCue)return s.cue||'';
+  if(e.timed&&s.rep===0&&s.kind==='hold')return e.name+'. '+s.cue;
+  if(/^(cuffdown|cuffoff|deflate|bootback)$/.test(s.ex)){const nxt=list[s.ei+1];const nn=nxt&&EX[nxt]?EX[nxt].name.split(' · ')[0].replace(/\(\d of \d\)/,''):'';
+    return (s.ex==='deflate'?'Cuff off. ':s.ex==='bootback'?'Boot back on. ':'Cuff off for now. ')+(nn?'Next: '+nn+'.':'That\'s the block.');}
+  return '';}
+// The spoken lines laid out on the track's timeline, so the app can record them into the audio file.
+function speechPlan(steps,list){const offs=stepOffsetsOf(steps);const out=[];steps.forEach((st,i)=>{if(st.kind==='mark')return;const t=stepSpeech(steps,list,i);if(t)out.push({t:offs[i],text:t});});return out;}
+const voiceOpts=()=>JSON.stringify([prefs.rate||1.02,prefs.voice||'',voice?1:0]);
+function sayStep(){if(sess.baked&&trackOn&&!paused)return;speak(stepSpeech(sess.steps,sess.list,sess.i));}
+window.addEventListener('ach:baked',()=>{if(!sess||!voice)return;sess.baked=true;try{window.__nativeStopSpeak&&window.__nativeStopSpeak();}catch(e){}dbg('audio: voice now in the track');});
 const setL=(id,t)=>{const b=$(id);b.setAttribute('aria-label',t);b.title=t;const l=b.querySelector('.l');if(l)l.textContent=t;else b.textContent=t;};
 function drawReps(total,done){const r=$('reps');
   if(total>12){ // long sets: one bar that fills, instead of 30 little pills
@@ -1049,7 +1054,7 @@ async function buildTrackFor(steps){
   jobs.forEach(([_,t,g],k)=>{const b=bufs[k];let o=Math.round(t*SR);if(o<0)o=0;const n=Math.min(b.length,dst.length-o);for(let q=0;q<n;q++)dst[o+q]+=b[q]*g*.5*vol;});
   return URL.createObjectURL(wavFromBuffer({length:dst.length,sampleRate:SR,getChannelData:()=>dst}));
 }
-function stopTrack(){trackOn=false;try{track.pause();track.removeAttribute('src');track.load();}catch(e){} if(trackURL){URL.revokeObjectURL(trackURL);trackURL=null;}}
+function stopTrack(){trackOn=false;if(sess)sess.baked=false;try{track.pause();track.removeAttribute('src');track.load();}catch(e){} if(trackURL){URL.revokeObjectURL(trackURL);trackURL=null;}}
 function syncTrack(){if(!trackOn||!sess)return;const want=posSeconds();if(Math.abs(track.currentTime-want)>1.5){dbg('sync: seek',track.currentTime.toFixed(1),'->',want.toFixed(1));try{track.currentTime=want;}catch(e){}}
   if(paused){track.pause();}else if(track.paused){track.play().catch(()=>{});}
   try{if('mediaSession' in navigator){navigator.mediaSession.playbackState=paused?'paused':'playing';
@@ -1061,7 +1066,8 @@ track.addEventListener('ended',()=>{if(sess&&trackOn){lastShown=null;tick();}});
 const pre={key:null,url:null,busy:false}; window.__pre=pre;
 const listKey=l=>vol+':'+l.join('|');
 async function prebuild(mode,wp,wr){try{if(sess||pre.busy||!sound)return;preAssume=true;let b;try{b=build(wp,wr,mode);}finally{preAssume=false;}if(!b.list.length)return;const k=listKey(b.list);if(pre.key===k&&pre.url)return;
-  pre.busy=true;const url=await buildTrackFor(b.steps);if(pre.url)URL.revokeObjectURL(pre.url);pre.key=k;pre.url=url;}catch(e){}finally{pre.busy=false;}}
+  pre.busy=true;const url=await buildTrackFor(b.steps);if(pre.url)URL.revokeObjectURL(pre.url);pre.key=k;pre.url=url;
+  if(track.__prepare){track.__opts=voiceOpts();track.__prepare(url,voice?speechPlan(b.steps,b.list):[],{rate:prefs.rate,voice:prefs.voice});}}catch(e){}finally{pre.busy=false;}}
 let preHint=null;
 function hint(mode,wp,wr){preHint=[mode,wp,wr];}
 function prebuildNext(){if(!preHint||sess)return;const [m,wp,wr]=preHint;setTimeout(()=>prebuild(m,wp,wr),300);}
@@ -1078,13 +1084,14 @@ async function startTrack_(){
   if(!sound||!sess)return; const myGen=++trackGen; const T0=performance.now(); const ms=()=>Math.round(performance.now()-T0)+'ms';
   dbg('audio: start', sess.mode, 'steps', sess.steps.length, window.__nativeAudio?'native':'web');
   if(!window.__nativeApp){try{track.src=SILENT;await Promise.race([track.play(),new Promise(r=>setTimeout(r,800))]);}catch(e){}} // unlock (browsers only)
-  if(!sess)return;
+  if(!sess)return; sess.baked=false; track.__opts=voiceOpts();
   if(trackURL){URL.revokeObjectURL(trackURL);trackURL=null;}
   const k=listKey(sess.list); if(pre.url&&pre.key===k){trackURL=pre.url;pre.url=null;pre.key=null;dbg('audio: using prebuilt track',ms());} else {trackURL=await buildTrack();dbg('audio: built track',ms());} if(!sess)return;
   track.src=trackURL; track.loop=false; track.onloadedmetadata=()=>{try{track.currentTime=posSeconds();}catch(e){}};
   try{track.currentTime=posSeconds();}catch(e){}
   if(!sess)return;
-  try{await track.play();trackOn=true;dbg('audio: playing at',track.currentTime.toFixed(1),'of',track.duration,ms());}catch(e){trackOn=false;dbg('audio: play failed',e&&e.message,track.__lastError||'');}
+  try{await track.play();trackOn=true;dbg('audio: playing at',track.currentTime.toFixed(1),'of',track.duration,ms());
+    if(voice&&!sess.baked&&track.__bake){const g=myGen;track.__bake(speechPlan(sess.steps,sess.list),{rate:prefs.rate,voice:prefs.voice}).then(ok=>{if(!ok&&g===trackGen)dbg('audio: live voice (not baked)');});}}catch(e){trackOn=false;dbg('audio: play failed',e&&e.message,track.__lastError||'');}
   lockInfo();
   setTimeout(async()=>{if(!sess||paused||!sound||myGen!==trackGen)return;let ok;const t1=track.currentTime;
     if(track.__verify)ok=await track.__verify();else{await new Promise(r=>setTimeout(r,1200));ok=!track.paused&&track.currentTime>t1;}
@@ -1265,7 +1272,7 @@ document.addEventListener('visibilitychange',()=>{dbg('app:',document.visibility
   b.onclick=()=>{const m=mode();const next={both:'cues',cues:'voice',voice:'off',off:'both'}[m];const wasSound=sound;
     voice=(next==='both'||next==='voice');sound=(next==='both'||next==='cues');
     try{localStorage.setItem('ach:voice',voice?'1':'0');localStorage.setItem('ach:sound',sound?'1':'0');}catch(e){}
-    set();flash(NAMES[next]);if(!sound&&wasSound)stopTrack();else if(sound&&!wasSound&&sess)startTrack();if(voice)speak(NAMES[next]+'.');};})();
+    set();flash(NAMES[next]);if(!sound&&wasSound)stopTrack();else if(sound&&!wasSound&&sess)startTrack();else if(sess&&sound&&sess.baked&&!voice){stopTrack();startTrack();}if(voice)speak(NAMES[next]+'.');};})();
 let flashT=null;function flash(t){const n=$('sNext');if(!n)return;const keep=n.dataset.keep||n.textContent;n.dataset.keep=keep;n.textContent=t;n.style.color='var(--accent)';clearTimeout(flashT);flashT=setTimeout(()=>{n.textContent=n.dataset.keep||'';n.style.color='';delete n.dataset.keep;},1600);}
 (function(){const b=$('tVol');const VOL={'0.5':'<svg viewBox="0 0 24 24"><path d="M5 9v6h3.5L13 19V5L8.5 9z"/><circle cx="17" cy="12" r="1.6"/></svg>','1':'<svg viewBox="0 0 24 24"><path d="M5 9v6h3.5L13 19V5L8.5 9z"/><path d="M16 9a4.2 4.2 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>','1.8':'<svg viewBox="0 0 24 24"><path d="M5 9v6h3.5L13 19V5L8.5 9z"/><path d="M16 9a4.2 4.2 0 0 1 0 6M18.8 6.5a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'};const L={0.5:'Cues soft',1:'Cues normal',1.8:'Cues louder'};
   const set=()=>{b.innerHTML='<i class="ic">'+(VOL[String(vol)]||VOL['1'])+'</i>';b.setAttribute('aria-label',L[vol]||'Cues normal');b.title=L[vol]||'Cues normal';};set();volRefresh=set;
