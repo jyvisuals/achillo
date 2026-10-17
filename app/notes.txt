@@ -1,1 +1,1 @@
-Vibration strength: Off / Subtle / Normal / Strong. Push now feels gritty and builds; lowering is smooth and sinks.
+Rest start is now a crisp double-click followed by stillness, so it can't be mistaken for lowering.

@@ -260,7 +260,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
                 try? self.hPlayer?.stop(atTime: CHHapticTimeImmediate); call.resolve(["ok": true]); return
             case "tick": ev = [self.tap(0, 0.45 * k, 0.9)]
             case "go": ev = [self.tap(0, 1 * k, 1), self.tap(0.11, 0.8 * k, 0.8)]
-            case "rest": ev = [self.tap(0, 0.4 * k, 0.2), self.tap(0.2, 0.3 * k, 0.15)]
+            case "rest": ev = [self.tap(0, 0.75 * k, 1), self.tap(0.13, 0.75 * k, 1)] // a crisp double-click, then stillness: nothing like the smooth lowering
             case "setup": ev = [self.tap(0, 0.7 * k, 0.4)]
             case "relax": ev = [self.tap(0, 0.3 * k, 0.1)]
             case "lastrep": ev = [self.tap(0, 0.6 * k, 0.9), self.tap(0.09, 0.6 * k, 0.9), self.tap(0.18, 0.6 * k, 0.9)]
