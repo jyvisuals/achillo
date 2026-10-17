@@ -272,11 +272,19 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
                     }
                     _ = done.wait(timeout: .now() + 15)
                     lock.lock(); let got = pieces; lock.unlock()
+                    // stop each line where the next one starts (or where a skip could land), with a short fade
+                    let until = (it["until"] as? NSNumber)?.doubleValue ?? 0
+                    let stop = until > t ? min(n, Int(until * sr)) : n
+                    let fade = Int(0.08 * sr)
                     var at = Int(t * sr)
                     for pc in got {
                         guard let ch = pc.floatChannelData?[0] else { continue }
                         let m = Int(pc.frameLength)
-                        for i in 0..<m where at + i < n && at + i >= 0 { out[at + i] = max(-1, min(1, out[at + i] * 0.6 + ch[i])) }
+                        for i in 0..<m where at + i < stop && at + i >= 0 {
+                            let left = stop - (at + i)
+                            let g: Float = left < fade ? Float(left) / Float(fade) : 1
+                            out[at + i] = max(-1, min(1, out[at + i] * 0.6 + ch[i] * g))
+                        }
                         at += m
                     }
                     placed += 1

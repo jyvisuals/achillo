@@ -930,7 +930,12 @@ function stepSpeech(steps,list,i){const s=steps[i];const e=EX[s.ex];if(!e)return
     return (s.ex==='deflate'?'Cuff off. ':s.ex==='bootback'?'Boot back on. ':'Cuff off for now. ')+(nn?'Next: '+nn+'.':'That\'s the block.');}
   return '';}
 // The spoken lines laid out on the track's timeline, so the app can record them into the audio file.
-function speechPlan(steps,list){const offs=stepOffsetsOf(steps);const out=[];steps.forEach((st,i)=>{if(st.kind==='mark')return;const t=stepSpeech(steps,list,i);if(t)out.push({t:offs[i],text:t});});return out;}
+// Each line ends where the next line starts or the next exercise begins, so a skip never lands in the middle of an old sentence.
+function speechPlan(steps,list){const offs=stepOffsetsOf(steps);const out=[];const cuts=[];let pg=null;
+  steps.forEach((st,i)=>{if(st.kind==='mark')return;const g=groupOf(st.ex);if(g!==pg){cuts.push(offs[i]);pg=g;}const t=stepSpeech(steps,list,i);if(t){out.push({t:offs[i],text:t});cuts.push(offs[i]);}if(st.kind==='setup'||st.kind==='rest'||st.long)cuts.push(offs[i]+st.secs);});
+  out.forEach(it=>{const nx=cuts.filter(c=>c>it.t+0.05);it.until=nx.length?Math.min(...nx):0;});return out;}
+// A skip or jump silences whatever is being said right now.
+function hush(){try{window.__nativeStopSpeak&&window.__nativeStopSpeak();}catch(e){}try{if(!window.__nativeAudio)speechSynthesis.cancel();}catch(e){}}
 const voiceOpts=()=>JSON.stringify([prefs.rate||1.02,prefs.voice||'',voice?1:0]);
 function sayStep(){if(sess.baked&&trackOn&&!paused)return;speak(stepSpeech(sess.steps,sess.list,sess.i));}
 window.addEventListener('ach:baked',()=>{if(!sess||!voice)return;sess.baked=true;try{window.__nativeStopSpeak&&window.__nativeStopSpeak();}catch(e){}dbg('audio: voice now in the track');});
@@ -1241,7 +1246,7 @@ $('tPause').onclick=e=>{if(!sess)return; paused=!paused;
 const REST_KEY=/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/;
 const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(k)?'bfrB':k;
 const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);return d?d[2]:g==='bfrA'?'BFR seated calf raise':g==='bfrB'?'BFR band isometric':(EX[g]?EX[g].name:g);};
-function jumpTo(idx){if(!sess)return;$('jumpList').hidden=true;dbg('jump: to step',idx,sess.steps[idx]&&sess.steps[idx].ex);
+function jumpTo(idx){if(!sess)return;hush();$('jumpList').hidden=true;dbg('jump: to step',idx,sess.steps[idx]&&sess.steps[idx].ex);
   while(idx<sess.steps.length&&sess.steps[idx].kind==='mark')idx++;
   if(idx>=sess.steps.length){finish(true);return;}
   if(paused){paused=false;pauseStart=0;setL('tPause','Pause');}
@@ -1254,7 +1259,7 @@ $('tJump').onclick=()=>{if(!sess)return;const el=$('jumpList');if(!el.hidden){el
   sessGroups().forEach(({g,i})=>{const b=document.createElement('button');b.className='jumprow'+(g===cur?' now':'')+(groupDone(g)?' done':'');
     b.textContent=(groupDone(g)?'✓ ':g===cur?'▶ ':'')+groupName(g);b.onclick=()=>jumpTo(i);el.appendChild(b);});
   el.hidden=false;};
-$('tSkip').onclick=()=>{if(!sess)return; const st=sess.steps[sess.i];dbg('skip: from',st.ex,st.kind,'at',posSeconds().toFixed(1),'track',track.currentTime.toFixed(1),track.paused?'paused':'playing');
+$('tSkip').onclick=()=>{if(!sess)return; hush(); const st=sess.steps[sess.i];dbg('skip: from',st.ex,st.kind,'at',posSeconds().toFixed(1),'track',track.currentTime.toFixed(1),track.paused?'paused':'playing');
   if(!(st.kind==='setup'||st.long||st.kind==='rest'||REST_KEY.test(st.ex)||EX[st.ex].speakCue)){ // skip the whole exercise, all its sets, without checking it off
     const cur=groupOf(st.ex);let j=sess.i+1;while(j<sess.steps.length&&(sess.steps[j].kind==='mark'||REST_KEY.test(sess.steps[j].ex)||groupOf(sess.steps[j].ex)===cur))j++;
     jumpTo(j);return;}

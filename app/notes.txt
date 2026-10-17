@@ -1,1 +1,1 @@
-Voice is now recorded into the session's audio file, so instructions can't drop out or talk over cues. The next likely session is prepared ahead on the Today screen, so Start plays right away. Skips land on the next exercise's spoken intro.
+Skipping now cuts off whatever is being said. Spoken lines stop where the next exercise (or your skip) lands.

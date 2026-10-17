@@ -12,4 +12,4 @@ await p.waitForTimeout(2500);
 const log=await p.evaluate(()=>JSON.parse(localStorage.getItem('ach:dbg')||'[]').map(x=>String(x)).filter(x=>/audio|native: (voice|using|prepar|bake)/.test(x)));
 console.log(log.join('\n'));
 console.log(await p.evaluate(()=>window.__aa.calls.filter(c=>/render|open|play|stopSp/.test(c))));
-console.log('playing:',await p.evaluate(()=>window.__aa.playing),'errs',errs);await b.close();})();
+console.log('plan:',JSON.stringify(await p.evaluate(()=>window.__aa.rendered.items)));console.log('playing:',await p.evaluate(()=>window.__aa.playing),'errs',errs);await b.close();})();
