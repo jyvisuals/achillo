@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.13",
+          "buildVersion": "13",
+          "date": "2026-10-17T02:45:36Z",
+          "localizedDescription": "Audio fixes from your diagnostics: the native player now actually switches on (it was being skipped at launch), restarts no longer pile up when you skip, faster start, and a crash when ending a session mid-start is gone. Diagnostics now log timings and whether the native audio module answers.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.13.ipa",
+          "size": 911525,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.12",
           "buildVersion": "12",
           "date": "2026-10-17T02:35:59Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.11.ipa",
           "size": 909638,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.10",
-          "buildVersion": "10",
-          "date": "2026-10-17T02:27:31Z",
-          "localizedDescription": "Audio rebuilt on native iOS: cues play through the system audio player and the voice through iOS speech, so they no longer fight or stall. Headphones out pauses the session. If audio fails to start you get a Retry button. Lock-screen shows the exercise with working pause/skip. Session controls are proper circles again, and the sound buttons are back.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.10.ipa",
-          "size": 909267,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.12",
-      "versionDate": "2026-10-17T02:35:59Z",
-      "versionDescription": "Audio falls back automatically if the native player fails, and shows the reason. New: Settings > Diagnostics, a log of audio and session events you can share. Fixed: after picking a quick one, the screen could stop responding to taps.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.12.ipa",
-      "size": 911151
+      "version": "1.1.13",
+      "versionDate": "2026-10-17T02:45:36Z",
+      "versionDescription": "Audio fixes from your diagnostics: the native player now actually switches on (it was being skipped at launch), restarts no longer pile up when you skip, faster start, and a crash when ending a session mid-start is gone. Diagnostics now log timings and whether the native audio module answers.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.13.ipa",
+      "size": 911525
     }
   ],
   "news": []
