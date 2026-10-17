@@ -1,1 +1,1 @@
-No more zooming: double-tap and pinch zoom are off, and fields no longer zoom when tapped.
+Cues that stall (often after the voice speaks) now restart within a second, no need to leave the app and come back.

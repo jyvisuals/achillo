@@ -937,7 +937,16 @@ async function prebuild(mode,wp,wr){try{if(sess||pre.busy||!sound)return;preAssu
 let preHint=null;
 function hint(mode,wp,wr){preHint=[mode,wp,wr];}
 function prebuildNext(){if(!preHint||sess)return;const [m,wp,wr]=preHint;setTimeout(()=>prebuild(m,wp,wr),300);}
+let trackStarting=false;
 async function startTrack(){ // call from a user gesture
+  if(!sound||!sess||trackStarting)return; trackStarting=true; try{await startTrack_();}finally{trackStarting=false;}}
+// Watchdog: the cue track can be left paused when speech or the system takes the audio and never says it's done
+// (WKWebView often drops the speech 'end' event). Once a second, put it back.
+setInterval(()=>{try{if(!sess||paused||!sound||document.visibilityState!=='visible'&&!window.__nativeApp)return;
+  let speaking=false;try{speaking=speechSynthesis.speaking;}catch(e){}
+  if(!trackOn){if(!trackStarting)startTrack();return;}
+  if(track.paused&&!speaking){const want=posSeconds();try{if(Math.abs(track.currentTime-want)>1)track.currentTime=want;}catch(e){}track.play().catch(()=>{});}}catch(e){}},1000);
+async function startTrack_(){
   if(!sound||!sess)return; try{track.src=SILENT;await track.play();}catch(e){} // unlock the element
   if(trackURL){URL.revokeObjectURL(trackURL);}
   const k=listKey(sess.list); if(pre.url&&pre.key===k){trackURL=pre.url;pre.url=null;pre.key=null;} else trackURL=await buildTrack(); if(!sess)return;
