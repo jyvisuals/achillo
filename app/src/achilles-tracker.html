@@ -628,7 +628,7 @@ pre.rtext{display:none}
       <div class="native-only hapTry"><div class="muted" style="font-size:13px">Feel each one, so you can follow a session with the phone in your pocket:</div><div class="hapBtns">
         <button data-p="up" data-s="3">Push / up<small>swells</small></button><button data-p="hold" data-s="6">Hold<small>thud, heartbeat, 3 ticks</small></button><button data-p="down" data-s="3">Lower<small>smooth, fades out</small></button>
         <button data-p="relax">Relax<small>one soft tap</small></button><button data-p="lastrep" data-s="3">Last rep<small>triple tap</small></button><button data-p="rest">Rest starts<small>crisp double-click, then still</small></button>
-        <button data-p="tick">Rest ending<small>3 sharp ticks</small></button><button data-p="setup">Get set<small>one firm tap</small></button><button data-p="warn">Cuff 8 / 10 min<small>three long buzzes</small></button></div></div>
+        <button data-p="tick">Rest ending<small>3 sharp ticks</small></button><button data-p="setup">Get set<small>one firm tap</small></button><button data-p="warn">Cuff 8 / 10 min<small>three long buzzes</small></button></div><div class="muted" id="hapState" style="font-size:12px"></div></div>
     </div>
 
     <div class="sgrp native-only"><h3>Reminders</h3>
@@ -1005,6 +1005,7 @@ function drawSegs(){if(!sess){segKey=null;return;}const ringE=ringEl;if(!ringE)r
   if(L.inner==='count'){segBuild(si,62,1,0);segFill(si,[1-fr(L.t0,L.t1)],-1);}
   else if(L.inner==='bar'){segBuild(si,62,1,0);const r=L.reps;segFill(si,[fr(r[0][0],r[r.length-1][1])],-1);}
   else{const r=L.reps;segBuild(si,62,r.length,r.length>1?(r.length>12?4:6):0);const fl=r.map(([a,b])=>fr(a,b));segFill(si,fl,fl.findIndex(f=>f>0&&f<1));}}
+window.addEventListener('ach:hapstate',()=>{const el=$('hapState');if(el)el.textContent='Vibration engine: '+(window.__hapState||'');});
 document.querySelectorAll('#hapSeg button').forEach(b=>b.addEventListener('click',()=>{if(+b.dataset.v>0&&window.__buzz)setTimeout(()=>window.__buzz('up',1.6),60);}));
 document.querySelectorAll('.hapBtns button').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.p;if(!window.__buzz)return;
   if(p==='tick'){[0,1000,2000].forEach(t=>setTimeout(()=>window.__buzz('tick'),t));return;}if(p==='lastrep'){window.__buzz('lastrep');setTimeout(()=>window.__buzz('up',2.5),280);return;}window.__buzz(p,+b.dataset.s||1);}));

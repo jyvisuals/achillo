@@ -243,13 +243,13 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
                 let d = secs * 0.92
                 ev = [self.tap(0, 0.55 * k, 0.5), self.hum(0, d, 1, 0.5)]
                 var t = 0.18, gapT = 0.22
-                while t < d - 0.05 { let f = Float(t / d); ev.append(self.tap(t, (0.18 + 0.5 * f) * k, 0.55 + 0.45 * f)); gapT = max(0.07, gapT * 0.86); t += gapT }
-                curves = [CHHapticParameterCurve(parameterID: .hapticIntensityControl, controlPoints: [.init(relativeTime: 0, value: 0.12 * k), .init(relativeTime: d * 0.6, value: 0.55 * k), .init(relativeTime: d, value: 0.9 * k)], relativeTime: 0),
+                while t < d - 0.05 { let f = Float(t / d); ev.append(self.tap(t, (0.12 + 0.35 * f) * k, 0.55 + 0.45 * f)); gapT = max(0.07, gapT * 0.86); t += gapT }
+                curves = [CHHapticParameterCurve(parameterID: .hapticIntensityControl, controlPoints: [.init(relativeTime: 0, value: 0.35 * k), .init(relativeTime: d * 0.6, value: 0.7 * k), .init(relativeTime: d, value: 1.0 * k)], relativeTime: 0),
                           CHHapticParameterCurve(parameterID: .hapticSharpnessControl, controlPoints: [.init(relativeTime: 0, value: -0.4), .init(relativeTime: d, value: 0.35)], relativeTime: 0)]
             case "down": // easing off: smooth and sinking, no grain, dull and fading
                 let d = secs * 0.92
                 ev = [self.hum(0, d, 1, 0.3)]
-                curves = [CHHapticParameterCurve(parameterID: .hapticIntensityControl, controlPoints: [.init(relativeTime: 0, value: 0.6 * k), .init(relativeTime: d * 0.5, value: 0.3 * k), .init(relativeTime: d, value: 0.03)], relativeTime: 0),
+                curves = [CHHapticParameterCurve(parameterID: .hapticIntensityControl, controlPoints: [.init(relativeTime: 0, value: 0.85 * k), .init(relativeTime: d * 0.5, value: 0.5 * k), .init(relativeTime: d, value: 0.08)], relativeTime: 0),
                           CHHapticParameterCurve(parameterID: .hapticSharpnessControl, controlPoints: [.init(relativeTime: 0, value: 0), .init(relativeTime: d, value: -0.3)], relativeTime: 0)]
             case "hold": // a firm thud, then a soft heartbeat every second ("keep holding"), then three sharp ticks before release
                 let h = max(0.5, min(raw, 90))

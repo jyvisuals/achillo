@@ -300,7 +300,11 @@ whenReady(async () => {
   window.addEventListener('ach:saved', () => scheduleSoon('saved'));
   // Core Haptics patterns from the native plugin; plain taps if it isn't there.
   const fallback = (p) => { const st = p === 'up' || p === 'hold' || p === 'go' || p === 'warn' ? ImpactStyle.Heavy : p === 'setup' || p === 'lastrep' ? ImpactStyle.Medium : ImpactStyle.Light; Haptics.impact({ style: st }).catch(() => {}); };
-  const buzz = (pattern, secs) => { AchAudio.haptic({ pattern, secs: secs || 1, strength: Math.min(1, +prefs().haptics || 0.8) }).then((r) => { if (!r || !r.ok) fallback(pattern); }).catch(() => fallback(pattern)); };
+  let hapState = '';
+  const hapNote = (st) => { if (st === hapState) return; hapState = st; log('vibration engine:', st); window.__hapState = st; window.dispatchEvent(new Event('ach:hapstate')); };
+  const buzz = (pattern, secs) => AchAudio.haptic({ pattern, secs: secs || 1, strength: Math.min(1, +prefs().haptics || 0.8) })
+    .then((r) => { if (!r || !r.ok) { hapNote('basic taps only (' + ((r && r.error) || 'Core Haptics unavailable') + ')'); fallback(pattern); } else hapNote('full patterns'); })
+    .catch((e) => { hapNote('basic taps only (' + ((e && (e.message || e.code)) || 'native module missing') + ')'); fallback(pattern); });
   window.__buzz = buzz;
   window.addEventListener('ach:done', () => { if (prefs().haptics) buzz('success'); });
   document.addEventListener('click', (e) => { if (prefs().haptics && e.target.closest && e.target.closest('button') && !e.target.closest('.hapBtns')) Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }, true);

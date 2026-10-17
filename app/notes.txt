@@ -1,1 +1,1 @@
-Rest start is now a crisp double-click followed by stillness, so it can't be mistaken for lowering.
+Stronger swell on push and lower. Settings → Vibrations now shows whether full patterns or basic taps are running.
