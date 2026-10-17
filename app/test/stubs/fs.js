@@ -1,1 +1,1 @@
-export const Filesystem={writeFile:async(o)=>({uri:'file:///cache/'+o.path})};export const Directory={Cache:'CACHE'};export const Encoding={UTF8:'utf8'};
+window.__fsw=0;export const Filesystem={writeFile:async(o)=>{window.__fsw+=o.data.length;return {uri:'file:///cache/'+o.path};},appendFile:async(o)=>{window.__fsw+=o.data.length;},getUri:async(o)=>({uri:'file:///cache/'+o.path})};export const Directory={Cache:'CACHE'};export const Encoding={UTF8:'utf8'};

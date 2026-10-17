@@ -18,11 +18,11 @@ const html = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <script>window.__nativeApp=true;</script>
-<style>html{background:#e7ebe5}@media(prefers-color-scheme:dark){html{background:#0d1512}}.wrap{padding-top:calc(14px + env(safe-area-inset-top))!important;padding-bottom:calc(48px + env(safe-area-inset-bottom))!important}html,body{touch-action:manipulation;-webkit-text-size-adjust:100%}button,a,summary{touch-action:manipulation}input,select,textarea{font-size:16px!important}</style>
+<script src="native.js"></script>
+<style>html{background:#e7ebe5}@media(prefers-color-scheme:dark){html{background:#0d1512}}.wrap{padding-top:calc(14px + env(safe-area-inset-top))!important;padding-bottom:calc(104px + env(safe-area-inset-bottom))!important}html,body{touch-action:manipulation;-webkit-text-size-adjust:100%}button,a,summary{touch-action:manipulation}input,select,textarea{font-size:16px!important}</style>
 </head>
 <body>
 ${frag}
-<script src="native.js"></script>
 </body>
 </html>
 `;

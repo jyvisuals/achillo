@@ -2,7 +2,7 @@
 // Talks to the page through window events only:
 //   page -> here : 'ach:saved' (a day record was written), 'ach:done' (an exercise finished), 'ach:state' (answer to 'ach:state?')
 //   here -> page : 'ach:state?' (ask for today's state), 'ach:open' {kind} (start a session after a notification tap)
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { App } from '@capacitor/app';
 import { Haptics, NotificationType, ImpactStyle } from '@capacitor/haptics';
@@ -10,6 +10,83 @@ import { Share } from '@capacitor/share';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { KeepAwake } from '@capacitor-community/keep-awake';
 import SEED from './seed.json'; // one-time carry-over of the web log (Oct 2–16); merged, never overwrites
+
+
+// ===================== native audio (cue track + speech) =====================
+// The page's cue track used to play through the web view's <audio> element and its
+// voice through speechSynthesis; iOS pauses both unpredictably. On the phone the page
+// gets this shim instead: same surface as an <audio> element, backed by AVAudioPlayer.
+const AchAudio = registerPlugin('AchAudio');
+const nowMs = () => performance.now();
+function makeNativeTrack() {
+  const L = {};
+  const emit = (t) => { (L[t] || []).forEach((f) => { try { f({ type: t }); } catch (e) {} }); if (t === 'loadedmetadata' && tr.onloadedmetadata) try { tr.onloadedmetadata(); } catch (e) {} };
+  let pos = 0, t0 = 0, playing = false, dur = NaN, src = null, ready = Promise.resolve(), silent = true, gen = 0;
+  const cur = () => (playing ? pos + (nowMs() - t0) / 1000 : pos);
+  async function writeTrack(url, myGen) {
+    const buf = new Uint8Array(await (await fetch(url)).arrayBuffer());
+    const CH = 3 * 174762; let first = true;
+    for (let i = 0; i < buf.length; i += CH) {
+      if (myGen !== gen) return null;
+      let bin = ''; const part = buf.subarray(i, i + CH);
+      for (let j = 0; j < part.length; j += 0x8000) bin += String.fromCharCode.apply(null, part.subarray(j, j + 0x8000));
+      const data = btoa(bin);
+      if (first) { await Filesystem.writeFile({ path: 'cue-track.wav', data, directory: Directory.Cache }); first = false; }
+      else await Filesystem.appendFile({ path: 'cue-track.wav', data, directory: Directory.Cache });
+    }
+    const { uri } = await Filesystem.getUri({ path: 'cue-track.wav', directory: Directory.Cache });
+    return uri;
+  }
+  const tr = {
+    loop: false, onloadedmetadata: null, playsInline: true,
+    get paused() { return !playing; },
+    get duration() { return dur; },
+    get currentTime() { return cur(); },
+    set currentTime(v) { pos = Math.max(0, +v || 0); if (playing) t0 = nowMs(); AchAudio.seek({ time: pos }).catch(() => {}); },
+    get src() { return src || ''; },
+    set src(u) {
+      src = u; gen++; const myGen = gen; playing = false; pos = 0; dur = NaN;
+      if (!u || /^data:/.test(u)) { silent = true; ready = Promise.resolve(); return; }
+      silent = false;
+      ready = (async () => {
+        const uri = await writeTrack(u, myGen); if (!uri || myGen !== gen) return;
+        const r = await AchAudio.open({ path: uri }); dur = r.duration; emit('loadedmetadata');
+      })().catch((e) => { log('track load failed', e); throw e; });
+    },
+    async play() {
+      await ready; if (silent) return;
+      const r = await AchAudio.play({ time: pos });
+      if (!r.playing) throw new Error('native play refused');
+      pos = r.position; t0 = nowMs(); playing = true; emit('play');
+    },
+    pause() { if (!playing) { return; } pos = cur(); playing = false; AchAudio.pause().catch(() => {}); emit('pause'); },
+    load() {},
+    removeAttribute(a) { if (a === 'src') { gen++; src = null; playing = false; silent = true; AchAudio.stop().catch(() => {}); } },
+    setAttribute() {},
+    addEventListener(t, f) { (L[t] = L[t] || []).push(f); },
+    removeEventListener(t, f) { L[t] = (L[t] || []).filter((x) => x !== f); },
+    async __verify() { try { const s = await AchAudio.status(); return !!s.playing; } catch (e) { return false; } },
+  };
+  AchAudio.addListener('ended', () => { pos = dur || cur(); playing = false; emit('ended'); });
+  AchAudio.addListener('routeLost', () => { if (playing) { pos = cur(); playing = false; } window.dispatchEvent(new Event('ach:routeLost')); });
+  AchAudio.addListener('remote', (e) => window.dispatchEvent(new CustomEvent('ach:remote', { detail: e })));
+  // keep the JS clock honest, and notice if iOS paused the player behind our back
+  setInterval(async () => {
+    if (!playing || silent) return;
+    try { const s = await AchAudio.status(); if (!playing) return;
+      if (!s.playing) { pos = s.position; playing = false; emit('pause'); }
+      else { pos = s.position; t0 = nowMs(); } } catch (e) {}
+  }, 2000);
+  return tr;
+}
+if (Capacitor.isNativePlatform()) {
+  let nativeTrack = null;
+  window.__nativeAudio = () => (nativeTrack = nativeTrack || makeNativeTrack());
+  window.__nativeSpeak = (text, o) => AchAudio.speak({ text, rate: (o && o.rate) || 1.02, voice: (o && o.voice) || '' }).catch(() => {});
+  window.__nativeStopSpeak = () => AchAudio.stopSpeaking().catch(() => {});
+  window.__nativeVoices = () => AchAudio.voices().then((r) => r.voices).catch(() => []);
+  window.__nativeNowPlaying = (title, artist) => AchAudio.nowPlaying({ title, artist }).catch(() => {});
+}
 
 const native = Capacitor.isNativePlatform();
 const log = (...a) => console.log('[native]', ...a);
@@ -141,7 +218,8 @@ async function shareLog() {
 }
 
 // ---- wire up ----
-(async () => {
+const whenReady = (f) => (document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', f) : f());
+whenReady(async () => {
   if (!native) { log('web; bridge idle'); return; }
   document.documentElement.classList.add('native');
   // no zooming in an app: pinch blocked here; double-tap zoom is off via touch-action in the page CSS
@@ -192,4 +270,4 @@ async function shareLog() {
   });
 
   scheduleSoon('launch');
-})();
+});

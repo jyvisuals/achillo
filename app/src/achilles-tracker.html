@@ -172,7 +172,7 @@ html.tabs .hero{padding-bottom:6px}
 .now #nowText{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .now #nowText.open{-webkit-line-clamp:unset}
 #sPickNote{display:none}
-html.tabs #sessionCard:not(.running) #audRow{display:none}
+html.tabs .wrap:not(.focus) #audRow{display:none}
 /* full-screen session */
 .wrap.focus{padding-top:calc(10px + env(safe-area-inset-top))}
 .wrap.focus #sessionCard{min-height:calc(100vh - 60px);border:0;background:transparent;box-shadow:none;justify-content:flex-start;gap:14px}
@@ -181,8 +181,13 @@ html.tabs #sessionCard:not(.running) #audRow{display:none}
 .wrap.focus .ring,.wrap.focus .ring>svg{width:280px;height:280px}
 .wrap.focus .ring .count{font-size:92px}
 .wrap.focus #tCue{text-align:center;font-size:15px}
-.wrap.focus .sctl .ctlb{min-width:64px;min-height:64px;border-radius:50%}
-.wrap.focus #tPause{min-width:84px;min-height:84px}
+.wrap.focus .sctl{display:flex!important;justify-content:center;align-items:center;gap:22px;width:100%}
+.wrap.focus .sctl .ctlb{flex:0 0 auto;width:64px!important;height:64px!important;min-width:0;min-height:0;padding:0;border-radius:50%;display:grid;place-items:center}
+.wrap.focus .sctl .ctlb .l{display:none}
+.wrap.focus #tPause{width:84px!important;height:84px!important}
+.wrap.focus .sctl.aud .ctlb{width:48px!important;height:48px!important}
+.wrap.focus #sName{font-size:30px!important}
+.audwarn{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:14px;background:color-mix(in srgb,var(--warn) 18%,var(--surface));font-size:14px}.audwarn[hidden]{display:none}
 .breathc{position:absolute;inset:16%;border-radius:50%;background:color-mix(in srgb,var(--accent) 22%,transparent);transform:scale(.62);transition-property:transform;transition-timing-function:ease-in-out;pointer-events:none}
 .breathc.big{transform:scale(1)}
 .swipehint{font-size:12.5px;color:var(--muted);text-align:center}
@@ -518,6 +523,7 @@ pre.rtext{display:none}
       </div>
     </div>
     <audio id="track" playsinline preload="auto" hidden></audio>
+    <div class="audwarn" id="audWarn" hidden><span id="audWarnT">Audio didn't start.</span><button id="audRetry">Retry audio</button></div>
     <div class="verdict go" id="sDone" hidden></div>
     <div class="sctl aud" id="audRow"><button id="tAud" class="ctlb" aria-label="Voice and cues"></button><button id="tVol" class="ctlb" aria-label="Cue volume"></button></div>
   </section>
@@ -897,7 +903,7 @@ let timer=null, paused=false, sound=soundPref, ac=null, wake=null, skip=false, s
 const arc=document.getElementById('arc'), C=389.6; const arcEx=document.getElementById('arcEx'), CEX=452.4;
 const $=id=>document.getElementById(id);
 function beep(f,ms){if(!sound||trackOn)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(.15,ac.currentTime);o.start();o.stop(ac.currentTime+ms/1000);}catch(e){}}
-function speak(t){if(!voice||!t)return;try{const u=new SpeechSynthesisUtterance(t);u.rate=prefs.rate||1.02;const pv=pickVoice();if(pv)u.voice=pv;u.onend=u.onerror=()=>{setTimeout(syncTrack,150);};speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
+function speak(t){if(!voice||!t)return;if(window.__nativeSpeak){window.__nativeSpeak(t,{rate:prefs.rate,voice:prefs.voice});return;}try{const u=new SpeechSynthesisUtterance(t);u.rate=prefs.rate||1.02;const pv=pickVoice();if(pv)u.voice=pv;u.onend=u.onerror=()=>{setTimeout(syncTrack,150);};speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
 function sayStep(){const s=sess.steps[sess.i];const e=EX[s.ex];
   // Voice only for instructions; the rhythm is carried by sound cues (see buildTrack).
   if(s.kind==='setup'){speak(e.name.split(' · set')[0].replace(/\(\d of \d\)/,'')+'. '+(s.cue||''));return;}
@@ -973,7 +979,7 @@ function show(){const s=sess.steps[sess.i]; const e=EX[s.ex];
 // you switch apps, or Safari reloads the page. State is saved so a reload resumes mid-session.
 // ---- background beep track: the whole session rendered to one audio file, played like a podcast so iOS keeps it going with the screen locked.
 const SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
-const track=$('track');
+const track=window.__nativeAudio?window.__nativeAudio():$('track');
 function stepOffsetsOf(steps){let t=0;return steps.map(st=>{const o=t;if(st.kind!=='mark')t+=st.secs;return o;});}
 function stepOffsets(){return stepOffsetsOf(sess.steps);}
 function posSeconds(){if(!sess)return 0;const offs=stepOffsets();const st=sess.steps[sess.i];return offs[sess.i]+st.secs-Math.max(0,(sess.stepEnd-Date.now())/1000);}
@@ -1048,7 +1054,7 @@ async function startTrack(){ // call from a user gesture
 // Watchdog: the cue track can be left paused when speech or the system takes the audio and never says it's done
 // (WKWebView often drops the speech 'end' event). Once a second, put it back.
 setInterval(()=>{try{if(!sess||paused||!sound||document.visibilityState!=='visible'&&!window.__nativeApp)return;
-  let speaking=false;try{speaking=speechSynthesis.speaking;}catch(e){}
+  let speaking=false;try{speaking=!window.__nativeAudio&&speechSynthesis.speaking;}catch(e){}
   if(!trackOn){if(!trackStarting)startTrack();return;}
   if(track.paused&&!speaking){const want=posSeconds();try{if(Math.abs(track.currentTime-want)>1)track.currentTime=want;}catch(e){}track.play().catch(()=>{});}}catch(e){}},1000);
 async function startTrack_(){
@@ -1057,6 +1063,10 @@ async function startTrack_(){
   const k=listKey(sess.list); if(pre.url&&pre.key===k){trackURL=pre.url;pre.url=null;pre.key=null;} else trackURL=await buildTrack(); if(!sess)return;
   track.src=trackURL; track.loop=false; track.onloadedmetadata=()=>{try{track.currentTime=posSeconds();}catch(e){}};
   try{await track.play();trackOn=true;}catch(e){trackOn=false;}
+  lockInfo();
+  setTimeout(async()=>{if(!sess||paused||!sound)return;let ok;const t1=track.currentTime;
+    if(track.__verify)ok=await track.__verify();else{await new Promise(r=>setTimeout(r,1200));ok=!track.paused&&track.currentTime>t1;}
+    $('audWarn').hidden=!!ok;},2200);
   // Lock-screen controls: keeps iOS treating this like a podcast, so cues keep playing with the screen off or in another app.
   try{if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:$('isoh').textContent||'Session',artist:'Achilles rehab · sound cues'});
     navigator.mediaSession.setActionHandler('pause',()=>{if(sess&&!paused)$('tPause').click();});
@@ -1073,10 +1083,11 @@ function enter(idx,fromEnd,quiet){ // move to step idx, ending fromEnd + its len
   breathFor(st); lockInfo(); nativeEvt('step',{kind:st.kind,ex:st.ex,rep:st.rep,reps:(EX[st.ex]||{}).reps||1,secs:st.secs,quiet:!!quiet});
 }
 // Lock screen: exercise and set as the title, phase and rep as the subtitle.
-function lockInfo(){try{if(!('mediaSession' in navigator)||!sess)return;const st=sess.steps[sess.i];const e=EX[st.ex]||{};
+function lockInfo(){try{if(!sess)return;if(!('mediaSession' in navigator)&&!window.__nativeNowPlaying)return;const st=sess.steps[sess.i];const e=EX[st.ex]||{};
   const title=(e.name||'Session').replace(/\(\d of \d\)/,'').trim();
   const sub=st.kind==='setup'?'Get set':st.kind==='mark'?'Done':e.speakCue?'Imagery':(st.label||'')+((e.reps||1)>1&&!/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/.test(st.ex)?' · rep '+(st.rep+1)+' of '+e.reps:'');
-  navigator.mediaSession.metadata=new MediaMetadata({title,artist:(paused?'Paused · ':'')+sub,album:'Achilló'});}catch(e){}}
+  if(window.__nativeNowPlaying)window.__nativeNowPlaying(title,(paused?'Paused · ':'')+sub);
+  if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title,artist:(paused?'Paused · ':'')+sub,album:'Achilló'});}catch(e){}}
 // Check exercises off the moment they finish, not at the end of the session.
 function recordDone(key){try{nativeEvt('done',{key});if(sess&&sess.mode&&sess.mode.startsWith('snack:'))return;const d=day();let changed=false;
   const base=EX[key]&&EX[key].base;
@@ -1093,6 +1104,10 @@ window.addEventListener('ach:open',e=>{const k=e.detail&&e.detail.kind;if(sess||
   else if(k==='imagery')startSession(false,false,'imagery');
   else window.scrollTo(0,0);});
 let autoPaused=false;
+window.addEventListener('ach:remote',e=>{const c=e.detail&&e.detail.cmd;if(!sess)return;
+  if(c==='pause'&&!paused)$('tPause').click();else if(c==='play'&&paused)$('tPause').click();else if(c==='toggle')$('tPause').click();
+  else if(c==='next')$('tSkip').click();else if(c==='prev'&&typeof prevEx==='function')prevEx();});
+window.addEventListener('ach:routeLost',()=>{if(sess&&!paused){autoPaused=false;$('tPause').click();}if(sess){$('audWarn').hidden=false;$('audWarnT').textContent='Headphones disconnected. Paused.';}});
 window.addEventListener('ach:interrupt',e=>{const began=!!(e.detail&&e.detail.began);
   if(began){if(sess&&!paused){autoPaused=true;$('tPause').click();}}
   else if(autoPaused){autoPaused=false;if(sess&&paused)$('tPause').click();}});
@@ -1189,8 +1204,8 @@ function renderAnkle(){const el=$('ankList');if(!el)return;el.innerHTML='';const
     r.append(t,b);el.appendChild(r);});}
 $('sImg').onclick=()=>startSession(false,false,'imagery');
 $('tPause').onclick=e=>{if(!sess)return; paused=!paused;
-  if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';try{speechSynthesis.cancel();}catch(e){}}
-  else{sess.stepEnd+=Date.now()-pauseStart;pauseStart=0;lastShown=null;tick();
+  if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';try{speechSynthesis.cancel();}catch(e){}if(window.__nativeStopSpeak)window.__nativeStopSpeak();}
+  else{sess.stepEnd+=Date.now()-pauseStart;pauseStart=0;lastShown=null;tick();$('audWarn').hidden=true;
     const st=sess&&sess.steps[sess.i];if(st&&EX[st.ex]&&EX[st.ex].speakCue){sess.stepEnd=Date.now()+st.secs*1000;sayStep();}}
   setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); lockInfo(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack();};
 // ---- skip / jump: skipping never marks an exercise done; the next Start plays only what's left.
@@ -1542,7 +1557,7 @@ function renderSettings(){
   document.querySelectorAll('#setCard .seg').forEach(seg=>{const key=seg.dataset.pref;const cur=segVal(key);
     seg.querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.v===cur);b.onclick=()=>{setSeg(key,b.dataset.v);renderSettings();};});});
   // voices
-  const sel=$('voiceSel');const fill=()=>{let vs=[];try{vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));}catch(e){}
+  const sel=$('voiceSel');const fill=async()=>{let vs=[];if(window.__nativeVoices){vs=(await window.__nativeVoices()).map(v=>({voiceURI:v.id,name:v.name+(v.quality!=='default'?' ('+v.quality+')':''),lang:v.lang}));}else try{vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));}catch(e){}
     vs.sort((a,b)=>(a.lang===navigator.language?-1:0)-(b.lang===navigator.language?-1:0)||a.name.localeCompare(b.name));
     sel.innerHTML='<option value="">System default</option>'+vs.map(v=>'<option value="'+v.voiceURI.replace(/"/g,'&quot;')+'">'+v.name.replace(/</g,'&lt;')+(/premium|enhanced/i.test(v.name+v.voiceURI)?'':'')+' · '+v.lang+'</option>').join('');
     sel.value=prefs.voice||'';if(sel.value!==(prefs.voice||''))sel.value='';};
@@ -1582,6 +1597,7 @@ function renderRings(){try{const d=day();const g=prefs.snackGoal||8;
   const b=bootFor(today);const hc=$('hChip');const nx=b.next;
   hc.innerHTML=b.cur?'<b>'+(d.hingeSet!=null&&b.changeToday?d.hingeSet:b.cur.deg)+'°</b>'+(nx?' <span>→ '+nx.deg+'° '+nx.from.toLocaleDateString(undefined,{weekday:'short'})+'</span>':''):'';}catch(e){}}
 $('nowText').onclick=()=>$('nowText').classList.toggle('open');
+$('audRetry').onclick=()=>{$('audWarn').hidden=true;$('audWarnT').textContent='Audio didn\'t start.';if(paused)$('tPause').click();stopTrack();startTrack();};
 $('shareLog2').onclick=()=>$('shareLog').click();
 // session: breathing circle follows the phase; tap to pause; swipe to skip/back
 function breathFor(st){const c=$('breathC');if(!c||!st)return;const k=st.kind;const big=(k==='up'||k==='hold');
