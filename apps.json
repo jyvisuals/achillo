@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.11",
+          "buildVersion": "11",
+          "date": "2026-10-17T02:29:25Z",
+          "localizedDescription": "Reminder times are now any time you like (iOS time wheel): morning check, evening round, imagery. Quick-one spacing from 30 min to 3 h, last one up to 11 PM. Evening round and imagery default to 8 and 9 PM.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.11.ipa",
+          "size": 909638,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.10",
           "buildVersion": "10",
           "date": "2026-10-17T02:27:31Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.9.ipa",
           "size": 890269,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.8",
-          "buildVersion": "8",
-          "date": "2026-10-17T01:49:21Z",
-          "localizedDescription": "Cues that stall (often after the voice speaks) now restart within a second, no need to leave the app and come back.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.8.ipa",
-          "size": 886243,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.10",
-      "versionDate": "2026-10-17T02:27:31Z",
-      "versionDescription": "Audio rebuilt on native iOS: cues play through the system audio player and the voice through iOS speech, so they no longer fight or stall. Headphones out pauses the session. If audio fails to start you get a Retry button. Lock-screen shows the exercise with working pause/skip. Session controls are proper circles again, and the sound buttons are back.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.10.ipa",
-      "size": 909267
+      "version": "1.1.11",
+      "versionDate": "2026-10-17T02:29:25Z",
+      "versionDescription": "Reminder times are now any time you like (iOS time wheel): morning check, evening round, imagery. Quick-one spacing from 30 min to 3 h, last one up to 11 PM. Evening round and imagery default to 8 and 9 PM.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.11.ipa",
+      "size": 909638
     }
   ],
   "news": []
