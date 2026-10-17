@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.9",
+          "buildVersion": "9",
+          "date": "2026-10-17T01:56:07Z",
+          "localizedDescription": "New look: tab bar (Today, Trends, Log, Settings), three daily rings, one big Next-up button, full-screen sessions with a breathing circle (tap to pause, swipe to skip or go back), quick-one picker as a bottom sheet, and a round-done screen.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.9.ipa",
+          "size": 890269,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.8",
           "buildVersion": "8",
           "date": "2026-10-17T01:49:21Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.7.ipa",
           "size": 886000,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.6",
-          "buildVersion": "6",
-          "date": "2026-10-16T22:40:10Z",
-          "localizedDescription": "Pick a quick one: every drill, most overdue first, split into Boot on and Boot off.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.6.ipa",
-          "size": 885866,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.8",
-      "versionDate": "2026-10-17T01:49:21Z",
-      "versionDescription": "Cues that stall (often after the voice speaks) now restart within a second, no need to leave the app and come back.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.8.ipa",
-      "size": 886243
+      "version": "1.1.9",
+      "versionDate": "2026-10-17T01:56:07Z",
+      "versionDescription": "New look: tab bar (Today, Trends, Log, Settings), three daily rings, one big Next-up button, full-screen sessions with a breathing circle (tap to pause, swipe to skip or go back), quick-one picker as a bottom sheet, and a round-done screen.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.9.ipa",
+      "size": 890269
     }
   ],
   "news": []
