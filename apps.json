@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.22",
+          "buildVersion": "22",
+          "date": "2026-10-17T13:36:17Z",
+          "localizedDescription": "Stronger swell on push and lower. Settings → Vibrations now shows whether full patterns or basic taps are running.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.22.ipa",
+          "size": 933126,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.21",
           "buildVersion": "21",
           "date": "2026-10-17T13:28:30Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.20.ipa",
           "size": 932944,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.19",
-          "buildVersion": "19",
-          "date": "2026-10-17T13:16:17Z",
-          "localizedDescription": "Ring stays steady through relax, rests and setup: rep notches stay put, only the center circle breathes.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.19.ipa",
-          "size": 932150,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.21",
-      "versionDate": "2026-10-17T13:28:30Z",
-      "versionDescription": "Rest start is now a crisp double-click followed by stillness, so it can't be mistaken for lowering.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.21.ipa",
-      "size": 932990
+      "version": "1.1.22",
+      "versionDate": "2026-10-17T13:36:17Z",
+      "versionDescription": "Stronger swell on push and lower. Settings → Vibrations now shows whether full patterns or basic taps are running.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.22.ipa",
+      "size": 933126
     }
   ],
   "news": []
