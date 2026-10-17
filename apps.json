@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.26",
+          "buildVersion": "26",
+          "date": "2026-10-17T15:38:49Z",
+          "localizedDescription": "The rep you're on now changes color with effort: it brightens to full orange as you push, stays full on hold, and fades back as you lower.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.26.ipa",
+          "size": 933753,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.25",
           "buildVersion": "25",
           "date": "2026-10-17T15:35:59Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.24.ipa",
           "size": 933542,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.23",
-          "buildVersion": "23",
-          "date": "2026-10-17T13:53:27Z",
-          "localizedDescription": "Fix: the app's native module (audio player, native voice, full vibration patterns) now actually loads. Before this, everything was falling back to the web player and basic taps.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.23.ipa",
-          "size": 933176,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.25",
-      "versionDate": "2026-10-17T15:35:59Z",
-      "versionDescription": "Lowering is now a clear beat followed by soft beats that slow down and fade — the mirror of the push.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.25.ipa",
-      "size": 933583
+      "version": "1.1.26",
+      "versionDate": "2026-10-17T15:38:49Z",
+      "versionDescription": "The rep you're on now changes color with effort: it brightens to full orange as you push, stays full on hold, and fades back as you lower.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.26.ipa",
+      "size": 933753
     }
   ],
   "news": []
