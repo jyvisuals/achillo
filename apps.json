@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.14",
+          "buildVersion": "14",
+          "date": "2026-10-17T03:11:56Z",
+          "localizedDescription": "Voice is now recorded into the session's audio file, so instructions can't drop out or talk over cues. The next likely session is prepared ahead on the Today screen, so Start plays right away. Skips land on the next exercise's spoken intro.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.14.ipa",
+          "size": 922175,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.13",
           "buildVersion": "13",
           "date": "2026-10-17T02:45:36Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.12.ipa",
           "size": 911151,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.11",
-          "buildVersion": "11",
-          "date": "2026-10-17T02:29:25Z",
-          "localizedDescription": "Reminder times are now any time you like (iOS time wheel): morning check, evening round, imagery. Quick-one spacing from 30 min to 3 h, last one up to 11 PM. Evening round and imagery default to 8 and 9 PM.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.11.ipa",
-          "size": 909638,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.13",
-      "versionDate": "2026-10-17T02:45:36Z",
-      "versionDescription": "Audio fixes from your diagnostics: the native player now actually switches on (it was being skipped at launch), restarts no longer pile up when you skip, faster start, and a crash when ending a session mid-start is gone. Diagnostics now log timings and whether the native audio module answers.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.13.ipa",
-      "size": 911525
+      "version": "1.1.14",
+      "versionDate": "2026-10-17T03:11:56Z",
+      "versionDescription": "Voice is now recorded into the session's audio file, so instructions can't drop out or talk over cues. The next likely session is prepared ahead on the Today screen, so Start plays right away. Skips land on the next exercise's spoken intro.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.14.ipa",
+      "size": 922175
     }
   ],
   "news": []
