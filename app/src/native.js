@@ -298,8 +298,12 @@ whenReady(async () => {
   if (status) setTimeout(() => { if (/device only/i.test(status.textContent)) status.textContent = 'Saved on this phone. Share log sends it along.'; }, 1200);
 
   window.addEventListener('ach:saved', () => scheduleSoon('saved'));
-  window.addEventListener('ach:done', () => { if (prefs().haptics) Haptics.notification({ type: NotificationType.Success }).catch(() => {}); });
-  document.addEventListener('click', (e) => { if (prefs().haptics && e.target.closest && e.target.closest('button')) Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }, true);
+  // Core Haptics patterns from the native plugin; plain taps if it isn't there.
+  const fallback = (p) => { const st = p === 'up' || p === 'hold' || p === 'go' || p === 'warn' ? ImpactStyle.Heavy : p === 'setup' || p === 'lastrep' ? ImpactStyle.Medium : ImpactStyle.Light; Haptics.impact({ style: st }).catch(() => {}); };
+  const buzz = (pattern, secs) => { AchAudio.haptic({ pattern, secs: secs || 1, strength: 1 }).then((r) => { if (!r || !r.ok) fallback(pattern); }).catch(() => fallback(pattern)); };
+  window.__buzz = buzz;
+  window.addEventListener('ach:done', () => { if (prefs().haptics) buzz('success'); });
+  document.addEventListener('click', (e) => { if (prefs().haptics && e.target.closest && e.target.closest('button') && !e.target.closest('.hapBtns')) Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }, true);
 
   await registerActions();
   await LocalNotifications.addListener('localNotificationActionPerformed', (a) => {
@@ -317,11 +321,26 @@ whenReady(async () => {
   window.addEventListener('ach:step', (e) => {
     const d = e.detail || {}; keep(true);
     if (d.quiet || !prefs().haptics) return;
-    const k = d.kind;
-    if (k === 'setup') Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
-    else if (k === 'up' || k === 'hold') Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
-    else if (k === 'down') Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+    const k = d.kind, s = d.secs || 1;
+    if (k === 'setup') buzz('setup');
+    else if (d.rest) buzz('rest');
+    else if (d.first && d.reps > 1 && d.rep === d.reps - 1) { buzz('lastrep'); setTimeout(() => buzz(k === 'up' ? 'up' : k, Math.max(0.3, s - 0.3)), 280); }
+    else if (k === 'up') buzz('up', s);
+    else if (k === 'down') buzz('down', s);
+    else if (k === 'hold') buzz('hold', s);
+    else if (k === 'rest') buzz('relax');
+    else buzz('tap');
   });
+  // Countdown taps for the last three seconds of rests, setup and long holds; a warning at 8 and 10 minutes under the cuff.
+  let lastTick = '', cuffWarned = 0;
+  window.addEventListener('ach:tick', (e) => {
+    const d = e.detail || {}; if (!prefs().haptics) return;
+    const key = d.i + ':' + d.left; if (key === lastTick) return; lastTick = key;
+    if ((d.rest || d.kind === 'setup') && d.left >= 1 && d.left <= 3) buzz('tick');
+    if (d.cuff != null) { const lvl = d.cuff >= 600 ? 2 : d.cuff >= 480 ? 1 : 0; if (lvl > cuffWarned) { cuffWarned = lvl; buzz('warn'); } }
+  });
+  window.addEventListener('ach:session', (e) => { if (e.detail && e.detail.active === false) { cuffWarned = 0; buzz('stop'); } });
+  window.addEventListener('ach:paused', () => buzz('stop'));
   window.addEventListener('ach:session', (e) => { if (e.detail && e.detail.active === false) keep(false); });
 
   let loadedDay = keyOf(new Date());

@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const p=await b.newPage({viewport:{width:390,height:844},colorScheme:'dark'});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.clock.install({time:new Date('2026-10-17T07:50:00')});
+await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
+await p.evaluate(()=>__t.start(false,false,'home'));await p.waitForTimeout(1000);
+const ix=await p.evaluate(()=>{const S=__t.sess.steps;const r=S.findIndex(s=>s.ex==='srest');const h=S.findIndex(s=>s.kind==='hold');return [r,h];});console.log('idx',ix);await p.evaluate(i=>__t.jump(i),ix[0]);await p.evaluate(()=>{__t.sess.stepEnd=Date.now()+5000;});await p.waitForTimeout(8000);await p.evaluate(i=>__t.jump(i),ix[1]);await p.waitForTimeout(2500);
+await p.click('#tPause');await p.waitForTimeout(500);await p.click('#tPause');await p.waitForTimeout(1500);
+console.log(await p.evaluate(()=>window.__aa.calls.filter(c=>c.startsWith('hap'))));
+await p.evaluate(()=>{document.querySelector('#tabbar button[data-tab=settings]')&&0;});
+console.log('errs',errs);await b.close();})();

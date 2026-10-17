@@ -321,6 +321,10 @@ details.fold>.body{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .wrap.set-mode>:not(#setCard):not(.ver){display:none}
 .dayline{position:relative}.gear{position:absolute;right:0;top:0;width:40px;height:40px;min-height:0;padding:0;border-radius:50%;display:grid;place-items:center}.gear svg{width:22px;height:22px;fill:currentColor}
 .sgrp{padding:12px 0 4px;border-top:1px solid var(--line)}.sgrp:first-of-type{border-top:0}.sgrp h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.hapTry{display:flex;flex-direction:column;gap:8px;padding:4px 0 8px}.hapBtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.hapBtns button{min-height:58px;border-radius:12px;border:1px solid var(--line);background:var(--sunk);color:var(--ink);font:inherit;font-size:13.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px}
+.hapBtns small{font-size:11px;font-weight:500;color:var(--muted);text-align:center}
+html:not(.native) .native-only.hapTry{display:none}
 .srow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;font-size:14.5px}.srow>label,.srow>span:first-child{color:var(--ink)}
 .seg{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.srow.stack{flex-direction:column;align-items:flex-start;gap:6px}.srow.stack .seg{justify-content:flex-start}.seg button{min-height:32px;padding:4px 11px;border-radius:999px;font-size:13px}.seg button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .srow select{max-width:58vw;padding:7px 10px;border-radius:10px;background:var(--card2,transparent);color:var(--ink);border:1px solid var(--line);font-size:14px}
@@ -620,7 +624,11 @@ pre.rtext{display:none}
     <div class="sgrp"><h3>Cues</h3>
       <div class="srow"><span>Sound cues</span><div class="seg" id="soundSeg" data-pref="sound"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
       <div class="srow"><span>Volume</span><div class="seg" id="volSeg" data-pref="vol"><button data-v="0.5">Soft</button><button data-v="1">Normal</button><button data-v="1.8">Loud</button></div></div>
-      <div class="srow native-only"><span>Haptic taps</span><div class="seg" id="hapSeg" data-pref="haptics"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
+      <div class="srow native-only"><span>Vibrations</span><div class="seg" id="hapSeg" data-pref="haptics"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
+      <div class="native-only hapTry"><div class="muted" style="font-size:13px">Feel each one, so you can follow a session with the phone in your pocket:</div><div class="hapBtns">
+        <button data-p="up" data-s="3">Push / up<small>swells</small></button><button data-p="hold" data-s="6">Hold<small>thud, heartbeat, 3 ticks</small></button><button data-p="down" data-s="3">Lower<small>fades</small></button>
+        <button data-p="relax">Relax<small>one soft tap</small></button><button data-p="lastrep" data-s="3">Last rep<small>triple tap</small></button><button data-p="rest">Rest starts<small>two soft taps</small></button>
+        <button data-p="tick">Rest ending<small>3 sharp ticks</small></button><button data-p="setup">Get set<small>one firm tap</small></button><button data-p="warn">Cuff 8 / 10 min<small>three long buzzes</small></button></div></div>
     </div>
 
     <div class="sgrp native-only"><h3>Reminders</h3>
@@ -994,6 +1002,8 @@ function drawSegs(){if(!sess){segKey=null;return;}const ringE=ringEl;if(!ringE)r
   if(L.inner==='count'){segBuild(si,62,1,0);segFill(si,[1-fr(L.t0,L.t1)],-1);}
   else if(L.inner==='bar'){segBuild(si,62,1,0);const r=L.reps;segFill(si,[fr(r[0][0],r[r.length-1][1])],-1);}
   else{const r=L.reps;segBuild(si,62,r.length,r.length>1?(r.length>12?4:6):0);const fl=r.map(([a,b])=>fr(a,b));segFill(si,fl,fl.findIndex(f=>f>0&&f<1));}}
+document.querySelectorAll('.hapBtns button').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.p;if(!window.__buzz)return;
+  if(p==='tick'){[0,1000,2000].forEach(t=>setTimeout(()=>window.__buzz('tick'),t));return;}if(p==='lastrep'){window.__buzz('lastrep');setTimeout(()=>window.__buzz('up',2.5),280);return;}window.__buzz(p,+b.dataset.s||1);}));
 window.__t={start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k]};
 (function loop(){try{if(sess&&document.visibilityState==='visible')drawSegs();}catch(e){}requestAnimationFrame(loop);})();
 function setRing(frac,snap){if(snap){arc.classList.add('snap');}arc.style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,frac))));if(snap){void arc.offsetWidth;arc.classList.remove('snap');}}
@@ -1045,6 +1055,7 @@ function show(){const s=sess.steps[sess.i]; const e=EX[s.ex];
   if(sess.mode&&(sess.mode.startsWith('bfr')||sess.mode==='home')&&/^(bcr|bpi|srest)/.test(s.ex)){const offs=stepOffsets();let st0=0;for(let j=0;j<=sess.i;j++){if(sess.steps[j].ex==='cuffoff'||sess.steps[j].ex==='cuffdown'||sess.steps[j].kind==='setup'||!/^(bcr|bpi|srest)/.test(sess.steps[j].ex))st0=j+1;}const cuffOn=offs[Math.min(st0,sess.steps.length-1)]||0;sess.cuffOn=(s.ex!=='deflate'&&s.ex!=='cuffoff'&&s.kind!=='setup')?cuffOn:null;const cuff=Math.max(0,posSeconds()-cuffOn);
     sess.cuffT=(s.ex!=='deflate'&&s.ex!=='cuffoff'&&s.kind!=='setup')?cuff:null; if(cuff>600)nx='Over 10 minutes under the cuff. Deflate now. '+nx;} else {sess.cuffT=null;sess.cuffOn=null;}
   if(!$('sNext').dataset.keep)$('sNext').textContent=nx; else $('sNext').dataset.keep=nx;
+  if(!paused)nativeEvt('tick',{i:sess.i,left:sess.left,kind:s.kind,secs:s.secs,rest:REST_KEY.test(s.ex)||!!s.long||s.kind==='rest'&&s.secs>=10,cuff:sess.cuffT});
   {const cb=$('cuffBadge');const on=/^(bcr|bpi|srest)/.test(s.ex);const off=/^(cuffdown|cuffoff|deflate)$/.test(s.ex);cb.hidden=!(on||off);const ct=sess.cuffT;cb.textContent=off?'CUFF OFF':ct!=null?'CUFF '+Math.floor(ct/60)+':'+pad(Math.floor(ct%60))+' / 10':'CUFF ON';cb.classList.toggle('off',off);cb.classList.toggle('warn',!off&&ct!=null&&ct>=480);}
   // color follows force: muted at rest, amber at full hold, blending across the ramps
   if(fresh){
@@ -1173,7 +1184,7 @@ let pauseStart=0;
 function enter(idx,fromEnd,quiet){ // move to step idx, ending fromEnd + its length
   sess.i=idx; const st=sess.steps[idx]; sess.stepEnd=fromEnd+st.secs*1000;
   if(!quiet){sayStep();if(st.kind==='setup')beep(620,120);}
-  breathFor(st); lockInfo(); nativeEvt('step',{kind:st.kind,ex:st.ex,rep:st.rep,reps:(EX[st.ex]||{}).reps||1,secs:st.secs,quiet:!!quiet});
+  breathFor(st); lockInfo(); nativeEvt('step',{kind:st.kind,ex:st.ex,rep:st.rep,reps:(EX[st.ex]||{}).reps||1,secs:st.secs,quiet:!!quiet,rest:REST_KEY.test(st.ex)||!!st.long||st.kind==='rest'&&st.secs>=10,first:!!(EX[st.ex]&&EX[st.ex].phases&&EX[st.ex].phases[0]&&EX[st.ex].phases[0][0]===st.kind&&EX[st.ex].phases[0][1]===st.label)});
 }
 // Lock screen: exercise and set as the title, phase and rep as the subtitle.
 function lockInfo(){try{if(!sess)return;if(!('mediaSession' in navigator)&&!window.__nativeNowPlaying)return;const st=sess.steps[sess.i];const e=EX[st.ex]||{};
@@ -1297,8 +1308,9 @@ function renderAnkle(){const el=$('ankList');if(!el)return;el.innerHTML='';const
     r.append(t,b);el.appendChild(r);});}
 $('sImg').onclick=()=>startSession(false,false,'imagery');
 $('tPause').onclick=e=>{if(!sess)return; paused=!paused;
-  if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';try{speechSynthesis.cancel();}catch(e){}if(window.__nativeStopSpeak)window.__nativeStopSpeak();}
+  if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';try{speechSynthesis.cancel();}catch(e){}if(window.__nativeStopSpeak)window.__nativeStopSpeak();nativeEvt('paused');}
   else{sess.stepEnd+=Date.now()-pauseStart;pauseStart=0;lastShown=null;tick();$('audWarn').hidden=true;
+    {const st=sess.steps[sess.i];if(st&&st.kind==='hold')nativeEvt('step',{kind:'hold',ex:st.ex,rep:st.rep,reps:1,secs:Math.max(1,Math.round((sess.stepEnd-Date.now())/1000)),quiet:false,rest:false,first:false});}
     const st=sess&&sess.steps[sess.i];if(st&&EX[st.ex]&&EX[st.ex].speakCue){sess.stepEnd=Date.now()+st.secs*1000;sayStep();}}
   setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); lockInfo(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack();};
 // ---- skip / jump: skipping never marks an exercise done; the next Start plays only what's left.

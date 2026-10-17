@@ -2,6 +2,7 @@ import UIKit
 import Capacitor
 import AVFoundation
 import MediaPlayer
+import CoreHaptics
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -106,6 +107,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         CAPPluginMethod(name: "voices", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "nowPlaying", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "render", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "haptic", returnType: CAPPluginReturnPromise),
     ]
 
     private var player: AVAudioPlayer?
@@ -207,6 +209,74 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         }
         call.resolve(["voices": list])
     }
+
+    // MARK: haptic: Core Haptics patterns shaped like the movement (ramps for up/down, a thud for hold, ticks to count down).
+    private var hEngine: CHHapticEngine?
+    private func engine() -> CHHapticEngine? {
+        if let e = hEngine { return e }
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics, let e = try? CHHapticEngine() else { return nil }
+        e.playsHapticsOnly = true
+        e.isAutoShutdownEnabled = true
+        e.resetHandler = { [weak self] in try? self?.hEngine?.start() }
+        e.stoppedHandler = { [weak self] _ in self?.hEngine = nil }
+        try? e.start()
+        hEngine = e
+        return e
+    }
+    private func tap(_ t: Double, _ i: Float, _ s: Float) -> CHHapticEvent {
+        CHHapticEvent(eventType: .hapticTransient, parameters: [CHHapticEventParameter(parameterID: .hapticIntensity, value: i), CHHapticEventParameter(parameterID: .hapticSharpness, value: s)], relativeTime: t)
+    }
+    private func hum(_ t: Double, _ d: Double, _ i: Float, _ s: Float) -> CHHapticEvent {
+        CHHapticEvent(eventType: .hapticContinuous, parameters: [CHHapticEventParameter(parameterID: .hapticIntensity, value: i), CHHapticEventParameter(parameterID: .hapticSharpness, value: s)], relativeTime: t, duration: d)
+    }
+    @objc func haptic(_ call: CAPPluginCall) {
+        let name = call.getString("pattern") ?? "tap"
+        let raw = call.getDouble("secs") ?? 1
+        let secs = max(0.2, min(raw, 6))
+        let k = Float(max(0.3, min(call.getDouble("strength") ?? 1, 1)))
+        main {
+            guard let e = self.engine() else { call.resolve(["ok": false]); return }
+            var ev: [CHHapticEvent] = []
+            var curves: [CHHapticParameterCurve] = []
+            switch name {
+            case "up": // pressure building: a hum that swells over the push
+                let d = secs * 0.92
+                ev = [self.tap(0, 0.55 * k, 0.5), self.hum(0, d, 1, 0.25)]
+                curves = [CHHapticParameterCurve(parameterID: .hapticIntensityControl, controlPoints: [.init(relativeTime: 0, value: 0.15 * k), .init(relativeTime: d, value: 0.85 * k)], relativeTime: 0)]
+            case "down": // easing off: a hum that fades
+                let d = secs * 0.92
+                ev = [self.hum(0, d, 1, 0.15)]
+                curves = [CHHapticParameterCurve(parameterID: .hapticIntensityControl, controlPoints: [.init(relativeTime: 0, value: 0.6 * k), .init(relativeTime: d, value: 0.05)], relativeTime: 0)]
+            case "hold": // a firm thud, then a soft heartbeat every second ("keep holding"), then three sharp ticks before release
+                let h = max(0.5, min(raw, 90))
+                ev = [self.tap(0, 1 * k, 0.7), self.hum(0.02, 0.25, 0.5 * k, 0.3)]
+                let n = Int(h.rounded())
+                if n >= 2 { for t in 1..<n { let left = n - t; ev.append(left <= 3 && n >= 6 ? self.tap(Double(t), 0.55 * k, 0.95) : self.tap(Double(t), 0.32 * k, 0.15)) } }
+            case "stop":
+                try? self.hPlayer?.stop(atTime: CHHapticTimeImmediate); call.resolve(["ok": true]); return
+            case "tick": ev = [self.tap(0, 0.45 * k, 0.9)]
+            case "go": ev = [self.tap(0, 1 * k, 1), self.tap(0.11, 0.8 * k, 0.8)]
+            case "rest": ev = [self.tap(0, 0.4 * k, 0.2), self.tap(0.2, 0.3 * k, 0.15)]
+            case "setup": ev = [self.tap(0, 0.7 * k, 0.4)]
+            case "relax": ev = [self.tap(0, 0.3 * k, 0.1)]
+            case "lastrep": ev = [self.tap(0, 0.6 * k, 0.9), self.tap(0.09, 0.6 * k, 0.9), self.tap(0.18, 0.6 * k, 0.9)]
+            case "success": ev = [self.tap(0, 0.5 * k, 0.5), self.tap(0.12, 0.75 * k, 0.6), self.tap(0.26, 1 * k, 0.8)]
+            case "warn": ev = [self.hum(0, 0.35, 1 * k, 0.6), self.hum(0.55, 0.35, 1 * k, 0.6), self.hum(1.1, 0.35, 1 * k, 0.6)]
+            default: ev = [self.tap(0, 0.6 * k, 0.5)]
+            }
+            do {
+                try e.start()
+                let pat = try CHHapticPattern(events: ev, parameterCurves: curves)
+                let overlay = ["tick", "warn", "success"].contains(name) // these layer on top; step patterns replace each other
+                if !overlay { try self.hPlayer?.stop(atTime: CHHapticTimeImmediate) }
+                let pl = try e.makePlayer(with: pat)
+                if !overlay { self.hPlayer = pl }
+                try pl.start(atTime: CHHapticTimeImmediate)
+                call.resolve(["ok": true])
+            } catch { call.resolve(["ok": false, "error": error.localizedDescription]) }
+        }
+    }
+    private var hPlayer: CHHapticPatternPlayer?
 
     @objc func nowPlaying(_ call: CAPPluginCall) {
         let title = call.getString("title") ?? "Achilló"
