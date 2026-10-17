@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.10",
+          "buildVersion": "10",
+          "date": "2026-10-17T02:27:31Z",
+          "localizedDescription": "Audio rebuilt on native iOS: cues play through the system audio player and the voice through iOS speech, so they no longer fight or stall. Headphones out pauses the session. If audio fails to start you get a Retry button. Lock-screen shows the exercise with working pause/skip. Session controls are proper circles again, and the sound buttons are back.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.10.ipa",
+          "size": 909267,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.9",
           "buildVersion": "9",
           "date": "2026-10-17T01:56:07Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.8.ipa",
           "size": 886243,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.7",
-          "buildVersion": "7",
-          "date": "2026-10-17T00:18:14Z",
-          "localizedDescription": "No more zooming: double-tap and pinch zoom are off, and fields no longer zoom when tapped.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.7.ipa",
-          "size": 886000,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.9",
-      "versionDate": "2026-10-17T01:56:07Z",
-      "versionDescription": "New look: tab bar (Today, Trends, Log, Settings), three daily rings, one big Next-up button, full-screen sessions with a breathing circle (tap to pause, swipe to skip or go back), quick-one picker as a bottom sheet, and a round-done screen.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.9.ipa",
-      "size": 890269
+      "version": "1.1.10",
+      "versionDate": "2026-10-17T02:27:31Z",
+      "versionDescription": "Audio rebuilt on native iOS: cues play through the system audio player and the voice through iOS speech, so they no longer fight or stall. Headphones out pauses the session. If audio fails to start you get a Retry button. Lock-screen shows the exercise with working pause/skip. Session controls are proper circles again, and the sound buttons are back.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.10.ipa",
+      "size": 909267
     }
   ],
   "news": []
