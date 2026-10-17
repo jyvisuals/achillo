@@ -186,6 +186,21 @@ html.tabs .wrap:not(.focus) #audRow{display:none}
 .wrap.focus .sctl .ctlb .l{display:none}
 .wrap.focus #tPause{width:84px!important;height:84px!important}
 .wrap.focus .sctl.aud .ctlb{width:48px!important;height:48px!important}
+.sstrip{display:none}
+.wrap.focus .sstrip{display:flex;gap:3px;width:100%;max-width:360px;height:8px;margin-top:6px}
+.sstrip>span{position:relative;height:100%;border-radius:3px;background:var(--sunk);overflow:hidden;min-width:3px}
+.sstrip>span.rest{background:transparent;border:1px dashed color-mix(in srgb,var(--muted) 35%,transparent);box-sizing:border-box}
+.sstrip>span>i{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent);display:block}
+.sstrip>span.rest>i{background:color-mix(in srgb,var(--muted) 45%,transparent)}
+.sstrip>span.now{outline:2px solid color-mix(in srgb,var(--ink) 55%,transparent);outline-offset:1px}
+#pocket{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;touch-action:none;user-select:none;-webkit-user-select:none}
+#pocket[hidden]{display:none}
+#pocket .pk-n{font-family:var(--display);font-weight:800;font-size:64px;color:#2a2f2c;letter-spacing:-.03em}
+#pocket .pk-n .of{font-size:.4em;margin-left:.05em}
+#pocket .pk-t{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#2a2f2c;font-weight:600}
+#pocket .pk-h{position:absolute;bottom:calc(30px + env(safe-area-inset-bottom));font-size:12px;color:#262b28;text-align:center;padding:0 24px}
+#pocket .pk-ring{position:absolute;width:120px;height:120px;border-radius:50%;border:3px solid #3a4a42;opacity:0;transform:scale(.6);transition:opacity .2s ease}
+#pocket.holding .pk-ring{opacity:1;transform:scale(1);transition:transform 1.2s linear,opacity .2s ease}
 .wrap.focus #sName{font-size:30px!important}
 .audwarn{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:14px;background:color-mix(in srgb,var(--warn) 18%,var(--surface));font-size:14px}.audwarn[hidden]{display:none}
 .breathc{position:absolute;inset:16%;border-radius:50%;background:color-mix(in srgb,var(--accent) 22%,transparent);transform:scale(.62);transition-property:transform;transition-timing-function:ease-in-out;pointer-events:none}
@@ -540,7 +555,8 @@ pre.rtext{display:none}
     <audio id="track" playsinline preload="auto" hidden></audio>
     <div class="audwarn" id="audWarn" hidden><span id="audWarnT">Audio didn't start.</span><button id="audRetry">Retry audio</button></div>
     <div class="verdict go" id="sDone" hidden></div>
-    <div class="sctl aud" id="audRow"><button id="tAud" class="ctlb" aria-label="Voice and cues"></button><button id="tVol" class="ctlb" aria-label="Cue volume"></button></div>
+    <div class="sctl aud" id="audRow"><button id="tAud" class="ctlb" aria-label="Voice and cues"></button><button id="tVol" class="ctlb" aria-label="Cue volume"></button><button id="tPocket" class="ctlb" aria-label="Pocket mode" title="Pocket mode"><i class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 6.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 10v6m-2.6-2.6L12 16l2.6-2.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button></div>
+    <div class="sstrip" id="sessStrip" aria-hidden="true"></div>
   </section>
 
   <section aria-labelledby="todoh" data-t="log">
@@ -1005,7 +1021,7 @@ function segLayout(){const steps=sess.steps,i=sess.i,s=steps[i],e=EX[s.ex]||{},o
   return lay;}
 function drawSegs(){if(!sess){segKey=null;return;}const ringE=ringEl;if(!ringE)return;ringE.classList.add('segs');
   const sk=sess.i+':'+sess.steps.length+':'+sess.mode;if(segKey!==sk){segKey=sk;segLay=segLayout();}
-  const pos=paused?segPos:(segPos=posSeconds());const L=segLay;const fr=(t0,t1)=>t1>t0?(pos-t0)/(t1-t0):pos>=t1?1:0;
+  const pos=paused?segPos:(segPos=posSeconds());const L=segLay;try{drawStrip(pos);}catch(e){}const fr=(t0,t1)=>t1>t0?(pos-t0)/(t1-t0):pos>=t1?1:0;
   const so=$('segOut'),si=$('segIn');const cuffMode=sess.cuffOn!=null;ringE.classList.toggle('cuffdial',cuffMode);
   if(cuffMode){ // BFR: the outer ring is the 10-minute cuff dial, a notch a minute, last two minutes tinted
     const m=Math.max(0,pos-sess.cuffOn)/60;segBuild(so,72,10,5);segFill(so,Array.from({length:10},(_,k)=>m-k),-1,8);so.classList.toggle('over',m>=8);
@@ -1022,6 +1038,26 @@ window.addEventListener('ach:hapstate',()=>{const el=$('hapState');if(el)el.text
 document.querySelectorAll('#hapSeg button').forEach(b=>b.addEventListener('click',()=>{if(+b.dataset.v>0&&window.__buzz)setTimeout(()=>window.__buzz('up',1.6),60);}));
 document.querySelectorAll('.hapBtns button').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.p;if(!window.__buzz)return;
   if(p==='tick'){[0,1000,2000].forEach(t=>setTimeout(()=>window.__buzz('tick'),t));return;}if(p==='lastrep'){window.__buzz('lastrep');setTimeout(()=>window.__buzz('up',2.5),280);return;}window.__buzz(p,+b.dataset.s||1);}));
+// ---- pocket mode: a black screen that keeps the app in front (so vibrations keep working) and ignores stray touches.
+(function(){const pk=document.createElement('div');pk.id='pocket';pk.hidden=true;
+  pk.innerHTML='<div class="pk-ring"></div><div class="pk-n" id="pkN"></div><div class="pk-t" id="pkT"></div><div class="pk-h">Pocket mode · touches are ignored<br>Press and hold anywhere for 1 second to come back</div>';document.body.appendChild(pk);
+  let timer=null;const stop=e=>{e.preventDefault();e.stopPropagation();};
+  const down=e=>{stop(e);pk.classList.add('holding');clearTimeout(timer);timer=setTimeout(()=>{pk.classList.remove('holding');setPocket(false);if(window.__buzz)window.__buzz('setup');},1200);};
+  const up=e=>{stop(e);pk.classList.remove('holding');clearTimeout(timer);};
+  ['touchstart','mousedown'].forEach(t=>pk.addEventListener(t,down,{passive:false}));['touchend','touchcancel','mouseup','mouseleave'].forEach(t=>pk.addEventListener(t,up,{passive:false}));
+  ['click','touchmove','wheel','contextmenu'].forEach(t=>pk.addEventListener(t,stop,{passive:false}));
+  window.setPocket=on=>{pk.hidden=!on;document.documentElement.classList.toggle('pocket',!!on);dbg('pocket mode',on?'on':'off');if(on&&window.__buzz)window.__buzz('rest');};
+  $('tPocket').addEventListener('click',e=>{e.stopPropagation();if(sess)setPocket(true);});
+  setInterval(()=>{if(pk.hidden)return;if(!sess){setPocket(false);return;}$('pkN').innerHTML=$('tCount').innerHTML;$('pkT').textContent=$('tPhase').textContent;},500);})();
+// ---- whole-session strip: every exercise as a block, sized by its time, filling as you go
+let stripKey=null,stripParts=[];
+function drawStrip(pos){const el=$('sessStrip');if(!el||!sess)return;const k=sess.steps.length+':'+sess.mode+':'+sess.list.join(',');
+  if(stripKey!==k){stripKey=k;el.innerHTML='';stripParts=[];const offs=stepOffsets();let cur=null;
+    sess.steps.forEach((st,i)=>{if(st.kind==='mark')return;const rest=REST_KEY.test(st.ex);const t0=offs[i],t1=offs[i]+st.secs;
+      if(rest&&cur){cur.t1=t1;return;}const g=rest?'~':groupOf(st.ex);if(cur&&cur.g===g)cur.t1=t1;else{cur={g,t0,t1,rest};stripParts.push(cur);}});
+    const total=Math.max(1,stripParts.reduce((a,p)=>a+(p.t1-p.t0),0));
+    stripParts.forEach(p=>{const s=document.createElement('span');if(p.rest)s.className='rest';s.style.flex=Math.max(0.6,100*(p.t1-p.t0)/total)+' 1 0';const f=document.createElement('i');s.appendChild(f);el.appendChild(s);p.el=s;p.fill=f;});}
+  stripParts.forEach(p=>{const f=Math.max(0,Math.min(1,(pos-p.t0)/Math.max(0.01,p.t1-p.t0)));const w=(f*100).toFixed(1)+'%';if(p.w!==w){p.w=w;p.fill.style.width=w;}p.el.classList.toggle('now',f>0&&f<1);});}
 window.__t={start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k]};
 (function loop(){try{if(sess&&document.visibilityState==='visible')drawSegs();}catch(e){}requestAnimationFrame(loop);})();
 function setRing(frac,snap){if(snap){arc.classList.add('snap');}arc.style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,frac))));if(snap){void arc.offsetWidth;arc.classList.remove('snap');}}
@@ -1279,7 +1315,7 @@ function resumeSession(){
   if(sound){$('sNext').textContent='Session resumed. Tap Pause, then Resume, to restart the beeps.';}
   return true;
 }
-function finish(complete){dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});
+function finish(complete){try{if(window.setPocket)setPocket(false);}catch(e){}stripKey=null;dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});
   clearInterval(timer);timer=null; stopTrack(); if(wake){try{wake.release()}catch(e){} wake=null;}
   const d=day(); const w=weekFor(today)||WEEKS[0]; const done=sess?sess.doneEx:[];
   const pressDone=false; const routineDone=false;

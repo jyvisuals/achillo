@@ -1,0 +1,16 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const p=await b.newPage({viewport:{width:390,height:844},colorScheme:'dark',deviceScaleFactor:2,hasTouch:true});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.clock.install({time:new Date('2026-10-17T09:00:00')});
+await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
+await p.evaluate(()=>__t.start(false,false,'home'));await p.waitForTimeout(800);
+await p.evaluate(()=>__t.jump(170));await p.waitForTimeout(1500);
+await p.screenshot({path:'test/out/strip.png'});
+await p.click('#tPocket');await p.waitForTimeout(700);
+const vis=await p.evaluate(()=>!document.getElementById('pocket').hidden);
+const before=await p.evaluate(()=>document.getElementById('tPause').textContent);
+await p.mouse.click(200,400);await p.waitForTimeout(300);
+const paused=await p.evaluate(()=>document.getElementById('tPhase').textContent);
+await p.screenshot({path:'test/out/pocket.png'});
+await p.mouse.move(200,400);await p.mouse.down();await p.waitForTimeout(1400);await p.mouse.up();await p.waitForTimeout(300);
+console.log('pocket on',vis,'| phase after tap',paused,'| off after hold',await p.evaluate(()=>document.getElementById('pocket').hidden),'errs',errs);await b.close();})();
