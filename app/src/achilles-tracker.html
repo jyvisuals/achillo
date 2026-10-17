@@ -982,9 +982,12 @@ function segLayout(){const steps=sess.steps,i=sess.i,s=steps[i],e=EX[s.ex]||{},o
   const sets=[];const byEi={};for(let k=a;k<=b;k++){const st=steps[k];if(st.kind==='mark'||REST_KEY.test(st.ex)||groupOf(st.ex)!==g)continue;
     if(!(st.ei in byEi)){byEi[st.ei]=sets.length;sets.push([offs[k],end(k)]);}else sets[byEi[st.ei]][1]=end(k);}
   const lay={sets,setNow:REST_KEY.test(s.ex)?-1:(byEi[s.ei]??-1)};
-  const isRest=s.kind==='setup'||s.kind==='rest'||s.long||REST_KEY.test(s.ex)||e.speakCue;
-  if(isRest){lay.inner='count';lay.t0=offs[i];lay.t1=end(i);}
-  else{const reps=[];for(let k=0;k<steps.length;k++){const st=steps[k];if(st.ei!==s.ei||st.kind==='mark'||st.kind==='setup'||st.kind==='rest'||st.long)continue;
+  // Inner ring stays the rep notches through relax, rests and setup (the breathing circle shows the easing off);
+  // between sets it shows the next set's empty notches. Only imagery and stand-alone rests get a countdown ring.
+  let refEi=s.ei;if(REST_KEY.test(s.ex)){refEi=null;for(let k=i+1;k<steps.length;k++){const st=steps[k];if(st.kind==='mark'||REST_KEY.test(st.ex))continue;if(groupOf(st.ex)===g)refEi=st.ei;break;}}
+  const refEx=refEi!=null&&EX[(steps.find(st=>st.ei===refEi)||{}).ex];
+  if(e.speakCue||refEi==null||!refEx||(refEx.reps||1)<2){lay.inner='count';lay.t0=offs[i];lay.t1=end(i);}
+  else{const reps=[];for(let k=0;k<steps.length;k++){const st=steps[k];if(st.ei!==refEi||st.kind==='mark'||st.kind==='setup'||st.long||(st.kind==='rest'&&st.secs>=10))continue;
       if(!reps[st.rep])reps[st.rep]=[offs[k],end(k)];else reps[st.rep][1]=end(k);}
     lay.inner=reps.length>40?'bar':'reps';lay.reps=reps;}
   return lay;}

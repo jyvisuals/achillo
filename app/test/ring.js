@@ -12,6 +12,7 @@ const shots={
  srest:pick((s,)=>s[1]==='srest'),
  hold:pick(s=>s[2]==='hold'&&s[3]>=10&&s[4]>1),
  hold1:pick(s=>s[2]==='hold'&&s[4]===1&&!/rest/.test(s[1])),
+ relax:pick(s=>s[2]==='rest'&&s[4]>1&&s[5]===3),
  shortRep:pick(s=>s[2]==='up'&&s[4]>1&&s[4]<=12&&s[5]===2&&!/^b/.test(s[1])),
 };
 for(const [k,v] of Object.entries(shots)){if(!v){console.log('no',k);continue;}
