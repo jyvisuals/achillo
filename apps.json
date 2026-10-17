@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.25",
+          "buildVersion": "25",
+          "date": "2026-10-17T15:35:59Z",
+          "localizedDescription": "Lowering is now a clear beat followed by soft beats that slow down and fade — the mirror of the push.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.25.ipa",
+          "size": 933583,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.24",
           "buildVersion": "24",
           "date": "2026-10-17T14:08:11Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.23.ipa",
           "size": 933176,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.22",
-          "buildVersion": "22",
-          "date": "2026-10-17T13:36:17Z",
-          "localizedDescription": "Stronger swell on push and lower. Settings → Vibrations now shows whether full patterns or basic taps are running.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.22.ipa",
-          "size": 933126,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.24",
-      "versionDate": "2026-10-17T14:08:11Z",
-      "versionDescription": "Vibrations no longer drop out mid-session: the vibration engine recovers by itself if iOS stops it.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.24.ipa",
-      "size": 933542
+      "version": "1.1.25",
+      "versionDate": "2026-10-17T15:35:59Z",
+      "versionDescription": "Lowering is now a clear beat followed by soft beats that slow down and fade — the mirror of the push.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.25.ipa",
+      "size": 933583
     }
   ],
   "news": []
