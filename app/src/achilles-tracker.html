@@ -624,7 +624,7 @@ pre.rtext{display:none}
     <div class="sgrp"><h3>Cues</h3>
       <div class="srow"><span>Sound cues</span><div class="seg" id="soundSeg" data-pref="sound"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
       <div class="srow"><span>Volume</span><div class="seg" id="volSeg" data-pref="vol"><button data-v="0.5">Soft</button><button data-v="1">Normal</button><button data-v="1.8">Loud</button></div></div>
-      <div class="srow native-only"><span>Vibrations</span><div class="seg" id="hapSeg" data-pref="haptics"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
+      <div class="srow stack native-only"><span>Vibrations</span><div class="seg" id="hapSeg" data-pref="haptics"><button data-v="0">Off</button><button data-v="0.55">Subtle</button><button data-v="0.8">Normal</button><button data-v="1">Strong</button></div></div>
       <div class="native-only hapTry"><div class="muted" style="font-size:13px">Feel each one, so you can follow a session with the phone in your pocket:</div><div class="hapBtns">
         <button data-p="up" data-s="3">Push / up<small>swells</small></button><button data-p="hold" data-s="6">Hold<small>thud, heartbeat, 3 ticks</small></button><button data-p="down" data-s="3">Lower<small>fades</small></button>
         <button data-p="relax">Relax<small>one soft tap</small></button><button data-p="lastrep" data-s="3">Last rep<small>triple tap</small></button><button data-p="rest">Rest starts<small>two soft taps</small></button>
@@ -925,7 +925,7 @@ window.__dbg=function(m){try{const d=new Date();const pad=n=>String(n).padStart(
 const dbg=(...a)=>window.__dbg(a.map(x=>typeof x==='object'?JSON.stringify(x):String(x)).join(' '));
 window.addEventListener('error',e=>dbg('js error:',e.message,(e.filename||'').split('/').pop()+':'+e.lineno));
 window.addEventListener('unhandledrejection',e=>dbg('promise rejected:',(e.reason&&(e.reason.message||e.reason))||''));
-const PREF_DEF={rate:1.02,voice:'',haptics:1,remind:1,morning:'7:55',cadence:60,lastHour:21,evening:'20:00',imageryAt:'21:00',pool:['toeyoga2','inviso','eviso','hiprot','pfstraight']};
+const PREF_DEF={rate:1.02,voice:'',haptics:0.8,remind:1,morning:'7:55',cadence:60,lastHour:21,evening:'20:00',imageryAt:'21:00',pool:['toeyoga2','inviso','eviso','hiprot','pfstraight']};
 let prefs=Object.assign({},PREF_DEF,local.get('prefs')||{});
 if(!prefs.v2times){if(prefs.evening==='16:00')prefs.evening='20:00';if(prefs.imageryAt==='20:25')prefs.imageryAt='21:00';prefs.v2times=1;try{local.set('prefs',prefs);}catch(e){}}
 let audRefresh=null,volRefresh=null;
@@ -1005,6 +1005,7 @@ function drawSegs(){if(!sess){segKey=null;return;}const ringE=ringEl;if(!ringE)r
   if(L.inner==='count'){segBuild(si,62,1,0);segFill(si,[1-fr(L.t0,L.t1)],-1);}
   else if(L.inner==='bar'){segBuild(si,62,1,0);const r=L.reps;segFill(si,[fr(r[0][0],r[r.length-1][1])],-1);}
   else{const r=L.reps;segBuild(si,62,r.length,r.length>1?(r.length>12?4:6):0);const fl=r.map(([a,b])=>fr(a,b));segFill(si,fl,fl.findIndex(f=>f>0&&f<1));}}
+document.querySelectorAll('#hapSeg button').forEach(b=>b.addEventListener('click',()=>{if(+b.dataset.v>0&&window.__buzz)setTimeout(()=>window.__buzz('up',1.6),60);}));
 document.querySelectorAll('.hapBtns button').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.p;if(!window.__buzz)return;
   if(p==='tick'){[0,1000,2000].forEach(t=>setTimeout(()=>window.__buzz('tick'),t));return;}if(p==='lastrep'){window.__buzz('lastrep');setTimeout(()=>window.__buzz('up',2.5),280);return;}window.__buzz(p,+b.dataset.s||1);}));
 window.__t={start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k]};
