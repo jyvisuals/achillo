@@ -273,7 +273,9 @@ details.fold>.body{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .ring .cuff.off{background:var(--muted)}.ring .cuff.warn{background:var(--warn)}
 .ring.segs>svg>circle{opacity:0}
 .seg circle{fill:none}.seg.out circle{stroke-width:4}.seg.in circle{stroke-width:12}
-.seg .bg{stroke:var(--sunk)}.seg.out .fg{stroke:var(--accent)}.seg.in .fg{stroke:var(--hold)}.seg.in.rest .fg{stroke:var(--muted)}
+.seg .bg{stroke:var(--sunk)}.seg .bg.warnz{stroke:color-mix(in srgb,var(--warn) 28%,var(--sunk))}
+.ring.cuffdial .seg.out circle{stroke-width:6}.ring.cuffdial .seg.out .fg{stroke:var(--hold)}.ring.cuffdial .seg.out.over .fg{stroke:var(--warn)}
+.setdots{display:flex;gap:6px;margin-top:8px}.setdots[hidden]{display:none}.ring .setdots>span{flex:0 0 8px;width:8px;min-width:0;height:8px;border-radius:50%;background:var(--sunk);display:block;padding:0}.ring .setdots>span.done{background:var(--accent)}.ring .setdots>span.now{background:var(--ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--ink) 18%,transparent)}.seg.out .fg{stroke:var(--accent)}.seg.in .fg{stroke:var(--hold)}.seg.in.rest .fg{stroke:var(--muted)}
 .seg.in .fg.now{stroke:color-mix(in srgb,var(--hold) 80%,var(--ink))}
 .ring.done .seg .fg{stroke:var(--ok)!important;stroke-dasharray:none!important;transition:stroke .4s ease}
 .ring .count .of{font-size:.36em;font-weight:700;letter-spacing:0;color:var(--muted);margin-left:.08em}
@@ -512,7 +514,7 @@ pre.rtext{display:none}
           <g id="segOut" class="seg out"></g><g id="segIn" class="seg in"></g>
         </svg>
         <div class="breathc" id="breathC" aria-hidden="true"></div>
-        <div class="center"><div class="count num" id="tCount">0</div><div class="phase" id="tPhase">Ready</div><div class="breath" id="tBreath"></div></div>
+        <div class="center"><div class="count num" id="tCount">0</div><div class="phase" id="tPhase">Ready</div><div class="setdots" id="setDots" hidden aria-hidden="true"></div><div class="breath" id="tBreath"></div></div>
         <div class="cuff" id="cuffBadge" hidden>CUFF ON</div>
         <div class="check" aria-hidden="true"><svg viewBox="0 0 64 64" width="84" height="84"><path d="M14 34 L27 46 L50 20" fill="none" stroke="var(--ok)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
@@ -960,8 +962,8 @@ const NS='http://www.w3.org/2000/svg';
 function segBuild(g,r,n,gap){if(g.__n===n&&g.__r===r)return;g.__n=n;g.__r=r;g.innerHTML='';const C=2*Math.PI*r;g.__C=C;
   const step=C/n, len=n>1?step-gap:C;g.__parts=[];
   for(let k=0;k<n;k++){const start=n>1?k*step+gap/2:0;const mk=c=>{const el=document.createElementNS(NS,'circle');el.setAttribute('cx','75');el.setAttribute('cy','75');el.setAttribute('r',r);el.setAttribute('class',c);el.style.strokeDashoffset=String(-start);g.appendChild(el);return el;};
-    const bg=mk('bg');bg.style.strokeDasharray=len+' '+C;const fg=mk('fg');g.__parts.push({fg,len});}}
-function segFill(g,fills,nowIdx){const C=g.__C;g.__parts.forEach((p,k)=>{const f=Math.max(0,Math.min(1,fills[k]||0));p.fg.style.strokeDasharray=(p.len*f)+' '+C;p.fg.classList.toggle('now',k===nowIdx);});}
+    const bg=mk('bg');bg.style.strokeDasharray=len+' '+C;const fg=mk('fg');g.__parts.push({fg,bg,len});}}
+function segFill(g,fills,nowIdx,warnFrom){const C=g.__C;g.__parts.forEach((p,k)=>{p.bg.classList.toggle('warnz',warnFrom!=null&&k>=warnFrom);const f=Math.max(0,Math.min(1,fills[k]||0));p.fg.style.strokeDasharray=(p.len*f)+' '+C;p.fg.classList.toggle('now',k===nowIdx);});}
 let segKey=null,segLay=null,segPos=0;
 function segLayout(){const steps=sess.steps,i=sess.i,s=steps[i],e=EX[s.ex]||{},offs=stepOffsets();
   const end=k=>offs[k]+(steps[k].kind==='mark'?0:steps[k].secs);
@@ -976,13 +978,18 @@ function segLayout(){const steps=sess.steps,i=sess.i,s=steps[i],e=EX[s.ex]||{},o
   if(isRest){lay.inner='count';lay.t0=offs[i];lay.t1=end(i);}
   else{const reps=[];for(let k=0;k<steps.length;k++){const st=steps[k];if(st.ei!==s.ei||st.kind==='mark'||st.kind==='setup'||st.kind==='rest'||st.long)continue;
       if(!reps[st.rep])reps[st.rep]=[offs[k],end(k)];else reps[st.rep][1]=end(k);}
-    lay.inner=reps.length>20?'bar':'reps';lay.reps=reps;}
+    lay.inner=reps.length>40?'bar':'reps';lay.reps=reps;}
   return lay;}
 function drawSegs(){if(!sess){segKey=null;return;}const ringE=ringEl;if(!ringE)return;ringE.classList.add('segs');
   const sk=sess.i+':'+sess.steps.length+':'+sess.mode;if(segKey!==sk){segKey=sk;segLay=segLayout();}
   const pos=paused?segPos:(segPos=posSeconds());const L=segLay;const fr=(t0,t1)=>t1>t0?(pos-t0)/(t1-t0):pos>=t1?1:0;
-  const so=$('segOut'),si=$('segIn');
-  const nS=Math.max(1,L.sets.length);segBuild(so,72,nS,nS>1?7:0);segFill(so,L.sets.length?L.sets.map(([a,b])=>fr(a,b)):[1],L.setNow);
+  const so=$('segOut'),si=$('segIn');const cuffMode=sess.cuffOn!=null;ringE.classList.toggle('cuffdial',cuffMode);
+  if(cuffMode){ // BFR: the outer ring is the 10-minute cuff dial, a notch a minute, last two minutes tinted
+    const m=Math.max(0,pos-sess.cuffOn)/60;segBuild(so,72,10,5);segFill(so,Array.from({length:10},(_,k)=>m-k),-1,8);so.classList.toggle('over',m>=8);
+    const d=$('setDots');if(d){const n=L.sets.length;if(d.childElementCount!==n){d.innerHTML='';for(let k=0;k<n;k++)d.appendChild(document.createElement('span'));}
+      [...d.children].forEach((x,k)=>{const f=fr(L.sets[k][0],L.sets[k][1]);x.className=f>=1?'done':k===L.setNow||f>0?'now':'';});d.hidden=n<2;}}
+  else{so.classList.remove('over');const d=$('setDots');if(d)d.hidden=true;
+    const nS=Math.max(1,L.sets.length);segBuild(so,72,nS,nS>1?7:0);segFill(so,L.sets.length?L.sets.map(([a,b])=>fr(a,b)):[1],L.setNow);}
   si.classList.toggle('rest',L.inner==='count');
   if(L.inner==='count'){segBuild(si,62,1,0);segFill(si,[1-fr(L.t0,L.t1)],-1);}
   else if(L.inner==='bar'){segBuild(si,62,1,0);const r=L.reps;segFill(si,[fr(r[0][0],r[r.length-1][1])],-1);}
@@ -1035,8 +1042,8 @@ function show(){const s=sess.steps[sess.i]; const e=EX[s.ex];
     const offs=stepOffsets(); const t0=offs[g0]||0, t1=(offs[g1]||0)+(sess.steps[g1]?sess.steps[g1].secs:0); const span=Math.max(1,t1-t0);
     const fr=Math.max(0,Math.min(1,(posSeconds()-t0)/span)); arcEx.style.strokeDashoffset=String(CEX*(1-fr)); }
   const nxt=sess.list[s.ei+1]; let nx=nxt?'Up next: '+EX[nxt].name:'Last exercise';
-  if(sess.mode&&(sess.mode.startsWith('bfr')||sess.mode==='home')&&/^(bcr|bpi|srest)/.test(s.ex)){const offs=stepOffsets();let st0=0;for(let j=0;j<=sess.i;j++){if(sess.steps[j].ex==='cuffoff'||sess.steps[j].ex==='cuffdown'||sess.steps[j].kind==='setup'||!/^(bcr|bpi|srest)/.test(sess.steps[j].ex))st0=j+1;}const cuffOn=offs[Math.min(st0,sess.steps.length-1)]||0;const cuff=Math.max(0,posSeconds()-cuffOn);
-    sess.cuffT=(s.ex!=='deflate'&&s.ex!=='cuffoff'&&s.kind!=='setup')?cuff:null; if(cuff>600)nx='Over 10 minutes under the cuff. Deflate now. '+nx;} else sess.cuffT=null;
+  if(sess.mode&&(sess.mode.startsWith('bfr')||sess.mode==='home')&&/^(bcr|bpi|srest)/.test(s.ex)){const offs=stepOffsets();let st0=0;for(let j=0;j<=sess.i;j++){if(sess.steps[j].ex==='cuffoff'||sess.steps[j].ex==='cuffdown'||sess.steps[j].kind==='setup'||!/^(bcr|bpi|srest)/.test(sess.steps[j].ex))st0=j+1;}const cuffOn=offs[Math.min(st0,sess.steps.length-1)]||0;sess.cuffOn=(s.ex!=='deflate'&&s.ex!=='cuffoff'&&s.kind!=='setup')?cuffOn:null;const cuff=Math.max(0,posSeconds()-cuffOn);
+    sess.cuffT=(s.ex!=='deflate'&&s.ex!=='cuffoff'&&s.kind!=='setup')?cuff:null; if(cuff>600)nx='Over 10 minutes under the cuff. Deflate now. '+nx;} else {sess.cuffT=null;sess.cuffOn=null;}
   if(!$('sNext').dataset.keep)$('sNext').textContent=nx; else $('sNext').dataset.keep=nx;
   {const cb=$('cuffBadge');const on=/^(bcr|bpi|srest)/.test(s.ex);const off=/^(cuffdown|cuffoff|deflate)$/.test(s.ex);cb.hidden=!(on||off);const ct=sess.cuffT;cb.textContent=off?'CUFF OFF':ct!=null?'CUFF '+Math.floor(ct/60)+':'+pad(Math.floor(ct%60))+' / 10':'CUFF ON';cb.classList.toggle('off',off);cb.classList.toggle('warn',!off&&ct!=null&&ct>=480);}
   // color follows force: muted at rest, amber at full hold, blending across the ramps

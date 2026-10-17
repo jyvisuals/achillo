@@ -1,1 +1,1 @@
-Session ring now has notches: outer ring = sets, inner ring = reps. Big number is the rep you're on for quick reps, seconds for holds and rests. Cuff time moved into the badge and turns red at 8 minutes.
+Ring combines A and D: notches for reps (now up to 40) and sets; during BFR the outer ring becomes the 10-minute cuff dial with set dots in the middle.
