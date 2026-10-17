@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.17",
+          "buildVersion": "17",
+          "date": "2026-10-17T12:13:46Z",
+          "localizedDescription": "Ring combines A and D: notches for reps (now up to 40) and sets; during BFR the outer ring becomes the 10-minute cuff dial with set dots in the middle.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.17.ipa",
+          "size": 924783,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.16",
           "buildVersion": "16",
           "date": "2026-10-17T12:02:13Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.15.ipa",
           "size": 922540,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.14",
-          "buildVersion": "14",
-          "date": "2026-10-17T03:11:56Z",
-          "localizedDescription": "Voice is now recorded into the session's audio file, so instructions can't drop out or talk over cues. The next likely session is prepared ahead on the Today screen, so Start plays right away. Skips land on the next exercise's spoken intro.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.14.ipa",
-          "size": 922175,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.16",
-      "versionDate": "2026-10-17T12:02:13Z",
-      "versionDescription": "Session ring now has notches: outer ring = sets, inner ring = reps. Big number is the rep you're on for quick reps, seconds for holds and rests. Cuff time moved into the badge and turns red at 8 minutes.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.16.ipa",
-      "size": 924332
+      "version": "1.1.17",
+      "versionDate": "2026-10-17T12:13:46Z",
+      "versionDescription": "Ring combines A and D: notches for reps (now up to 40) and sets; during BFR the outer ring becomes the 10-minute cuff dial with set dots in the middle.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.17.ipa",
+      "size": 924783
     }
   ],
   "news": []
