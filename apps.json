@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.27",
+          "buildVersion": "27",
+          "date": "2026-10-17T15:48:56Z",
+          "localizedDescription": "Each rep's notch is now painted as it happens: dull at the start of the push, full orange through the hold, fading as you lower — so finished reps show the history of each one.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.27.ipa",
+          "size": 934159,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.26",
           "buildVersion": "26",
           "date": "2026-10-17T15:38:49Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.25.ipa",
           "size": 933583,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.24",
-          "buildVersion": "24",
-          "date": "2026-10-17T14:08:11Z",
-          "localizedDescription": "Vibrations no longer drop out mid-session: the vibration engine recovers by itself if iOS stops it.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.24.ipa",
-          "size": 933542,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.26",
-      "versionDate": "2026-10-17T15:38:49Z",
-      "versionDescription": "The rep you're on now changes color with effort: it brightens to full orange as you push, stays full on hold, and fades back as you lower.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.26.ipa",
-      "size": 933753
+      "version": "1.1.27",
+      "versionDate": "2026-10-17T15:48:56Z",
+      "versionDescription": "Each rep's notch is now painted as it happens: dull at the start of the push, full orange through the hold, fading as you lower — so finished reps show the history of each one.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.27.ipa",
+      "size": 934159
     }
   ],
   "news": []
