@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.28",
+          "buildVersion": "28",
+          "date": "2026-10-17T16:02:49Z",
+          "localizedDescription": "Letting go after a hold (eversion, inversion, plantarflexion isometrics) now uses the lowering vibration. Before, it was a single faint tap.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.28.ipa",
+          "size": 934173,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.27",
           "buildVersion": "27",
           "date": "2026-10-17T15:48:56Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.26.ipa",
           "size": 933753,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.25",
-          "buildVersion": "25",
-          "date": "2026-10-17T15:35:59Z",
-          "localizedDescription": "Lowering is now a clear beat followed by soft beats that slow down and fade — the mirror of the push.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.25.ipa",
-          "size": 933583,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.27",
-      "versionDate": "2026-10-17T15:48:56Z",
-      "versionDescription": "Each rep's notch is now painted as it happens: dull at the start of the push, full orange through the hold, fading as you lower — so finished reps show the history of each one.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.27.ipa",
-      "size": 934159
+      "version": "1.1.28",
+      "versionDate": "2026-10-17T16:02:49Z",
+      "versionDescription": "Letting go after a hold (eversion, inversion, plantarflexion isometrics) now uses the lowering vibration. Before, it was a single faint tap.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.28.ipa",
+      "size": 934173
     }
   ],
   "news": []
