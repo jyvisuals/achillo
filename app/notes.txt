@@ -1,1 +1,1 @@
-Lowering is now a clear beat followed by soft beats that slow down and fade — the mirror of the push.
+The rep you're on now changes color with effort: it brightens to full orange as you push, stays full on hold, and fades back as you lower.

@@ -1004,7 +1004,11 @@ function drawSegs(){if(!sess){segKey=null;return;}const ringE=ringEl;if(!ringE)r
   si.classList.toggle('rest',L.inner==='count');
   if(L.inner==='count'){segBuild(si,62,1,0);segFill(si,[1-fr(L.t0,L.t1)],-1);}
   else if(L.inner==='bar'){segBuild(si,62,1,0);const r=L.reps;segFill(si,[fr(r[0][0],r[r.length-1][1])],-1);}
-  else{const r=L.reps;segBuild(si,62,r.length,r.length>1?(r.length>12?4:6):0);const fl=r.map(([a,b])=>fr(a,b));segFill(si,fl,fl.findIndex(f=>f>0&&f<1));}}
+  else{const r=L.reps;segBuild(si,62,r.length,r.length>1?(r.length>12?4:6):0);const fl=r.map(([a,b])=>fr(a,b));const ni=fl.findIndex(f=>f>0&&f<1);segFill(si,fl,ni);
+    // the rep you're on is colored by effort: brightens as you push, full on hold, fades back as you lower or relax
+    const st=sess.steps[sess.i];const offs=stepOffsets();const ph=st.secs>0?Math.max(0,Math.min(1,(pos-offs[sess.i])/st.secs)):1;
+    const force=st.kind==='up'?ph:st.kind==='hold'?1:st.kind==='down'?1-ph:0;
+    si.__parts.forEach((p,k)=>{p.fg.style.stroke=k===ni?'color-mix(in srgb,var(--hold) '+Math.round(25+75*force)+'%,var(--muted))':'';});}}
 window.addEventListener('ach:hapstate',()=>{const el=$('hapState');if(el)el.textContent='Vibration engine: '+(window.__hapState||'');});
 document.querySelectorAll('#hapSeg button').forEach(b=>b.addEventListener('click',()=>{if(+b.dataset.v>0&&window.__buzz)setTimeout(()=>window.__buzz('up',1.6),60);}));
 document.querySelectorAll('.hapBtns button').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.p;if(!window.__buzz)return;
