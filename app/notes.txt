@@ -1,1 +1,1 @@
-Pick a quick one: every drill, most overdue first, split into Boot on and Boot off.
+No more zooming: double-tap and pinch zoom are off, and fields no longer zoom when tapped.

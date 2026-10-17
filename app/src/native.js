@@ -144,6 +144,8 @@ async function shareLog() {
 (async () => {
   if (!native) { log('web; bridge idle'); return; }
   document.documentElement.classList.add('native');
+  // no zooming in an app: pinch blocked here; double-tap zoom is off via touch-action in the page CSS
+  ['gesturestart', 'gesturechange'].forEach((t) => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }));
 
   // carry the web log over (idempotent: mergeDay keeps the max of each counter)
   try { window.dispatchEvent(new CustomEvent('ach:seed', { detail: { days: SEED } })); } catch (e) { log('seed failed', e); }
