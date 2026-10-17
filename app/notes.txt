@@ -1,1 +1,1 @@
-Cues that stall (often after the voice speaks) now restart within a second, no need to leave the app and come back.
+New look: tab bar (Today, Trends, Log, Settings), three daily rings, one big Next-up button, full-screen sessions with a breathing circle (tap to pause, swipe to skip or go back), quick-one picker as a bottom sheet, and a round-done screen.

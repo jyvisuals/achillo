@@ -1,0 +1,13 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const p=await b.newPage({viewport:{width:390,height:844},colorScheme:'dark',deviceScaleFactor:1});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{const R=Date;window.__off=new R('2026-10-16T18:40').getTime()-R.now();class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+window.__off);}static now(){return R.now()+window.__off;}};window.Date=D;});
+await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2500);
+await p.screenshot({path:'test/out/s1-today.png'});
+await p.click('#tabbar button[data-tab=trends]');await p.waitForTimeout(500);await p.screenshot({path:'test/out/s2-trends.png'});
+await p.click('#tabbar button[data-tab=log]');await p.waitForTimeout(500);await p.screenshot({path:'test/out/s3-log.png'});
+await p.click('#tabbar button[data-tab=settings]');await p.waitForTimeout(500);await p.screenshot({path:'test/out/s4-set.png'});
+await p.click('#tabbar button[data-tab=today]');await p.waitForTimeout(400);
+await p.evaluate(()=>[...document.querySelectorAll('#nowBtns button')].find(b=>b.textContent==='Pick a quick one').click());await p.waitForTimeout(500);await p.screenshot({path:'test/out/s5-sheet.png'});
+await p.click('#snackPick button[data-k="doming"]');await p.waitForTimeout(1500);await p.screenshot({path:'test/out/s6-session.png'});
+console.log('errors',errs);await b.close();})();
