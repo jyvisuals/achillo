@@ -246,11 +246,11 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
                 while t < d - 0.05 { let f = Float(t / d); ev.append(self.tap(t, (0.12 + 0.35 * f) * k, 0.55 + 0.45 * f)); gapT = max(0.07, gapT * 0.86); t += gapT }
                 curves = [CHHapticParameterCurve(parameterID: .hapticIntensityControl, controlPoints: [.init(relativeTime: 0, value: 0.35 * k), .init(relativeTime: d * 0.6, value: 0.7 * k), .init(relativeTime: d, value: 1.0 * k)], relativeTime: 0),
                           CHHapticParameterCurve(parameterID: .hapticSharpnessControl, controlPoints: [.init(relativeTime: 0, value: -0.4), .init(relativeTime: d, value: 0.35)], relativeTime: 0)]
-            case "down": // easing off: smooth and sinking, no grain, dull and fading
+            case "down": // easing off: the mirror of the push — a clear start beat, then soft beats that slow down and fade, like a ball settling
                 let d = secs * 0.92
-                ev = [self.hum(0, d, 1, 0.3)]
-                curves = [CHHapticParameterCurve(parameterID: .hapticIntensityControl, controlPoints: [.init(relativeTime: 0, value: 0.85 * k), .init(relativeTime: d * 0.5, value: 0.5 * k), .init(relativeTime: d, value: 0.08)], relativeTime: 0),
-                          CHHapticParameterCurve(parameterID: .hapticSharpnessControl, controlPoints: [.init(relativeTime: 0, value: 0), .init(relativeTime: d, value: -0.3)], relativeTime: 0)]
+                ev = [self.tap(0, 0.9 * k, 0.35)]
+                var t = 0.16, gapT = 0.14
+                while t < d - 0.04 { let f = Float(t / d); ev.append(self.tap(t, (0.75 - 0.55 * f) * k, 0.25 - 0.15 * f)); gapT = min(0.5, gapT * 1.3); t += gapT }
             case "hold": // a firm thud, then a soft heartbeat every second ("keep holding"), then three sharp ticks before release
                 let h = max(0.5, min(raw, 90))
                 ev = [self.tap(0, 1 * k, 0.7), self.hum(0.02, 0.25, 0.5 * k, 0.3)]

@@ -1,1 +1,1 @@
-Vibrations no longer drop out mid-session: the vibration engine recovers by itself if iOS stops it.
+Lowering is now a clear beat followed by soft beats that slow down and fade — the mirror of the push.
