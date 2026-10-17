@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.12",
+          "buildVersion": "12",
+          "date": "2026-10-17T02:35:59Z",
+          "localizedDescription": "Audio falls back automatically if the native player fails, and shows the reason. New: Settings > Diagnostics, a log of audio and session events you can share. Fixed: after picking a quick one, the screen could stop responding to taps.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.12.ipa",
+          "size": 911151,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.11",
           "buildVersion": "11",
           "date": "2026-10-17T02:29:25Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.10.ipa",
           "size": 909267,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.9",
-          "buildVersion": "9",
-          "date": "2026-10-17T01:56:07Z",
-          "localizedDescription": "New look: tab bar (Today, Trends, Log, Settings), three daily rings, one big Next-up button, full-screen sessions with a breathing circle (tap to pause, swipe to skip or go back), quick-one picker as a bottom sheet, and a round-done screen.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.9.ipa",
-          "size": 890269,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.11",
-      "versionDate": "2026-10-17T02:29:25Z",
-      "versionDescription": "Reminder times are now any time you like (iOS time wheel): morning check, evening round, imagery. Quick-one spacing from 30 min to 3 h, last one up to 11 PM. Evening round and imagery default to 8 and 9 PM.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.11.ipa",
-      "size": 909638
+      "version": "1.1.12",
+      "versionDate": "2026-10-17T02:35:59Z",
+      "versionDescription": "Audio falls back automatically if the native player fails, and shows the reason. New: Settings > Diagnostics, a log of audio and session events you can share. Fixed: after picking a quick one, the screen could stop responding to taps.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.12.ipa",
+      "size": 911151
     }
   ],
   "news": []
