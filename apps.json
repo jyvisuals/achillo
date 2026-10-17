@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.8",
+          "buildVersion": "8",
+          "date": "2026-10-17T01:49:21Z",
+          "localizedDescription": "Cues that stall (often after the voice speaks) now restart within a second, no need to leave the app and come back.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.8.ipa",
+          "size": 886243,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.7",
           "buildVersion": "7",
           "date": "2026-10-17T00:18:14Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.6.ipa",
           "size": 885866,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.5",
-          "buildVersion": "5",
-          "date": "2026-10-16T18:56:49Z",
-          "localizedDescription": "Settings panel (gear, top right): voice and speed, cues and volume, haptics, reminder times and quick-one cadence, which drills rotate, weight, export/import. Reminders no longer pop while the app is open.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.5.ipa",
-          "size": 885162,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.7",
-      "versionDate": "2026-10-17T00:18:14Z",
-      "versionDescription": "No more zooming: double-tap and pinch zoom are off, and fields no longer zoom when tapped.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.7.ipa",
-      "size": 886000
+      "version": "1.1.8",
+      "versionDate": "2026-10-17T01:49:21Z",
+      "versionDescription": "Cues that stall (often after the voice speaks) now restart within a second, no need to leave the app and come back.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.8.ipa",
+      "size": 886243
     }
   ],
   "news": []
