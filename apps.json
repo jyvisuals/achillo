@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.30",
+          "buildVersion": "30",
+          "date": "2026-10-17T23:35:35Z",
+          "localizedDescription": "Pocket mode now shows the exercise name: what's next during rests, what you're starting during setup. It's brighter for a few seconds when it changes.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.30.ipa",
+          "size": 935866,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.29",
           "buildVersion": "29",
           "date": "2026-10-17T23:31:05Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.28.ipa",
           "size": 934173,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.27",
-          "buildVersion": "27",
-          "date": "2026-10-17T15:48:56Z",
-          "localizedDescription": "Each rep's notch is now painted as it happens: dull at the start of the push, full orange through the hold, fading as you lower — so finished reps show the history of each one.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.27.ipa",
-          "size": 934159,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.29",
-      "versionDate": "2026-10-17T23:31:05Z",
-      "versionDescription": "Pocket mode: tap the phone icon during a session for a black screen that ignores touches (hold 1 second to come back); vibrations keep working. New strip at the bottom shows every exercise in the session and how far you are.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.29.ipa",
-      "size": 935518
+      "version": "1.1.30",
+      "versionDate": "2026-10-17T23:35:35Z",
+      "versionDescription": "Pocket mode now shows the exercise name: what's next during rests, what you're starting during setup. It's brighter for a few seconds when it changes.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.30.ipa",
+      "size": 935866
     }
   ],
   "news": []
