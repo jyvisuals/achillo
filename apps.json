@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.19",
+          "buildVersion": "19",
+          "date": "2026-10-17T13:16:17Z",
+          "localizedDescription": "Ring stays steady through relax, rests and setup: rep notches stay put, only the center circle breathes.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.19.ipa",
+          "size": 932150,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.18",
           "buildVersion": "18",
           "date": "2026-10-17T13:05:23Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.17.ipa",
           "size": 924783,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.16",
-          "buildVersion": "16",
-          "date": "2026-10-17T12:02:13Z",
-          "localizedDescription": "Session ring now has notches: outer ring = sets, inner ring = reps. Big number is the rep you're on for quick reps, seconds for holds and rests. Cuff time moved into the badge and turns red at 8 minutes.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.16.ipa",
-          "size": 924332,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.18",
-      "versionDate": "2026-10-17T13:05:23Z",
-      "versionDescription": "Vibrations you can follow by feel: push swells, hold is a thud plus a heartbeat with 3 ticks before release, lowering fades, rests get countdown ticks, last rep is a triple tap, cuff warnings at 8 and 10 min. Try them all in Settings.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.18.ipa",
-      "size": 931935
+      "version": "1.1.19",
+      "versionDate": "2026-10-17T13:16:17Z",
+      "versionDescription": "Ring stays steady through relax, rests and setup: rep notches stay put, only the center circle breathes.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.19.ipa",
+      "size": 932150
     }
   ],
   "news": []
