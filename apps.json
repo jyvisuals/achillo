@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.7",
+          "buildVersion": "7",
+          "date": "2026-10-17T00:18:14Z",
+          "localizedDescription": "No more zooming: double-tap and pinch zoom are off, and fields no longer zoom when tapped.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.7.ipa",
+          "size": 886000,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.6",
           "buildVersion": "6",
           "date": "2026-10-16T22:40:10Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.5.ipa",
           "size": 885162,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.4",
-          "buildVersion": "4",
-          "date": "2026-10-16T18:47:25Z",
-          "localizedDescription": "Quick ones now run the whole exercise (all sets), not one set.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.4.ipa",
-          "size": 881817,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.6",
-      "versionDate": "2026-10-16T22:40:10Z",
-      "versionDescription": "Pick a quick one: every drill, most overdue first, split into Boot on and Boot off.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.6.ipa",
-      "size": 885866
+      "version": "1.1.7",
+      "versionDate": "2026-10-17T00:18:14Z",
+      "versionDescription": "No more zooming: double-tap and pinch zoom are off, and fields no longer zoom when tapped.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.7.ipa",
+      "size": 886000
     }
   ],
   "news": []
