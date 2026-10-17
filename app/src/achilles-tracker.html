@@ -627,7 +627,7 @@ pre.rtext{display:none}
       <div class="srow stack native-only"><span>Vibrations</span><div class="seg" id="hapSeg" data-pref="haptics"><button data-v="0">Off</button><button data-v="0.55">Subtle</button><button data-v="0.8">Normal</button><button data-v="1">Strong</button></div></div>
       <div class="native-only hapTry"><div class="muted" style="font-size:13px">Feel each one, so you can follow a session with the phone in your pocket:</div><div class="hapBtns">
         <button data-p="up" data-s="3">Push / up<small>swells</small></button><button data-p="hold" data-s="6">Hold<small>thud, heartbeat, 3 ticks</small></button><button data-p="down" data-s="3">Lower<small>beats that slow and fade</small></button>
-        <button data-p="relax">Relax<small>one soft tap</small></button><button data-p="lastrep" data-s="3">Last rep<small>triple tap</small></button><button data-p="rest">Rest starts<small>crisp double-click, then still</small></button>
+        <button data-p="down" data-s="2">Let go<small>after a hold · same as lower</small></button><button data-p="lastrep" data-s="3">Last rep<small>triple tap</small></button><button data-p="rest">Rest starts<small>crisp double-click, then still</small></button>
         <button data-p="tick">Rest ending<small>3 sharp ticks</small></button><button data-p="setup">Get set<small>one firm tap</small></button><button data-p="warn">Cuff 8 / 10 min<small>three long buzzes</small></button></div><div class="muted" id="hapState" style="font-size:12px"></div></div>
     </div>
 
@@ -999,7 +999,7 @@ function segLayout(){const steps=sess.steps,i=sess.i,s=steps[i],e=EX[s.ex]||{},o
     // each rep's notch is painted as a little effort graph: dull at the start of the push, full orange through the hold, fading on the way down
     const per=Math.max(6,Math.floor(240/Math.max(1,reps.length)));
     lay.slices=reps.map(([a,b],r)=>{const out=[];(phs[r]||[]).forEach(([t0,t1,kind])=>{const m=Math.max(1,Math.round(per*(t1-t0)/Math.max(0.01,b-a)));
-      for(let j=0;j<m;j++){const s0=t0+(t1-t0)*j/m,s1=t0+(t1-t0)*(j+1)/m,mid=(j+0.5)/m;const f=kind==='up'?mid:kind==='hold'?1:kind==='down'?1-mid:0;
+      for(let j=0;j<m;j++){const s0=t0+(t1-t0)*j/m,s1=t0+(t1-t0)*(j+1)/m,mid=(j+0.5)/m;const f=kind==='up'?mid:kind==='hold'?1:kind==='down'||kind==='rest'?1-mid:0;
         out.push({t0:s0,t1:s1,c:'color-mix(in srgb,var(--hold) '+Math.round(18+82*f)+'%,var(--sunk))'});}});return out;});
     lay.sig=refEi+':'+reps.length+':'+(reps[0]||[0])[0];}
   return lay;}

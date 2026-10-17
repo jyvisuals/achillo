@@ -332,7 +332,7 @@ whenReady(async () => {
     else if (k === 'up') buzz('up', s);
     else if (k === 'down') buzz('down', s);
     else if (k === 'hold') buzz('hold', s);
-    else if (k === 'rest') buzz('relax');
+    else if (k === 'rest') buzz('down', s); // letting go of a hold (isometrics) feels like lowering
     else buzz('tap');
   });
   // Countdown taps for the last three seconds of rests, setup and long holds; a warning at 8 and 10 minutes under the cuff.

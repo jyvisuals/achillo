@@ -1,1 +1,1 @@
-Each rep's notch is now painted as it happens: dull at the start of the push, full orange through the hold, fading as you lower — so finished reps show the history of each one.
+Letting go after a hold (eversion, inversion, plantarflexion isometrics) now uses the lowering vibration. Before, it was a single faint tap.
