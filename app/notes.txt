@@ -1,1 +1,1 @@
-Audio falls back automatically if the native player fails, and shows the reason. New: Settings > Diagnostics, a log of audio and session events you can share. Fixed: after picking a quick one, the screen could stop responding to taps.
+Audio fixes from your diagnostics: the native player now actually switches on (it was being skipped at launch), restarts no longer pile up when you skip, faster start, and a crash when ending a session mid-start is gone. Diagnostics now log timings and whether the native audio module answers.

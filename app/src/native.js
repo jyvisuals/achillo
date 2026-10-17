@@ -25,7 +25,7 @@ function makeNativeTrack() {
   const fail = (e, where) => { const msg = where + ': ' + ((e && (e.message || e.errorMessage || e.code)) || String(e)); tr.__lastError = msg; log('native audio failed', msg);
     if (!fb) { fb = el(); Object.keys(L).forEach((t) => (L[t] || []).forEach((f) => fb.addEventListener(t, f))); if (tr.onloadedmetadata) fb.onloadedmetadata = tr.onloadedmetadata; } };
   const emit = (t) => { (L[t] || []).forEach((f) => { try { f({ type: t }); } catch (e) {} }); if (t === 'loadedmetadata' && tr.onloadedmetadata) try { tr.onloadedmetadata(); } catch (e) {} };
-  let pos = 0, t0 = 0, playing = false, dur = NaN, src = null, ready = Promise.resolve(), silent = true, gen = 0;
+  let pos = 0, t0 = 0, playing = false, dur = NaN, src = null, ready = Promise.resolve(), silent = true, gen = 0, seekGen = 0, holdPoll = 0;
   const cur = () => (playing ? pos + (nowMs() - t0) / 1000 : pos);
   async function writeTrack(url, myGen) {
     const buf = new Uint8Array(await (await fetch(url)).arrayBuffer());
@@ -46,7 +46,12 @@ function makeNativeTrack() {
     get paused() { return fb ? fb.paused : !playing; },
     get duration() { return fb ? fb.duration : dur; },
     get currentTime() { return fb ? fb.currentTime : cur(); },
-    set currentTime(v) { if (fb) { try { fb.currentTime = v; } catch (e) {} return; } pos = Math.max(0, +v || 0); if (playing) t0 = nowMs(); AchAudio.seek({ time: pos }).catch(() => {}); },
+    set currentTime(v) {
+      if (fb) { try { fb.currentTime = v; } catch (e) {} return; }
+      pos = Math.max(0, +v || 0); seekGen++; const g = seekGen;
+      if (playing) { t0 = nowMs(); holdPoll = nowMs() + 1500; AchAudio.play({ time: pos }).then((r) => { if (g === seekGen && r && r.position != null) { pos = r.position; t0 = nowMs(); } }).catch((e) => log('seek failed', e)); }
+      else AchAudio.seek({ time: pos }).catch(() => {});
+    },
     get src() { return src || ''; },
     set src(u) {
       if (fb) { fb.src = u; src = u; return; }
@@ -82,14 +87,14 @@ function makeNativeTrack() {
   AchAudio.addListener('remote', (e) => window.dispatchEvent(new CustomEvent('ach:remote', { detail: e })));
   // keep the JS clock honest, and notice if iOS paused the player behind our back
   setInterval(async () => {
-    if (fb || !playing || silent) return;
+    if (fb || !playing || silent || nowMs() < holdPoll) return;
     try { const s = await AchAudio.status(); if (!playing) return;
       if (!s.playing) { pos = s.position; playing = false; emit('pause'); }
       else { pos = s.position; t0 = nowMs(); } } catch (e) {}
   }, 2000);
   return tr;
 }
-if (Capacitor.isNativePlatform() && Capacitor.isPluginAvailable('AchAudio')) {
+if (Capacitor.isNativePlatform()) {
   let nativeTrack = null;
   window.__nativeAudio = () => (nativeTrack = nativeTrack || makeNativeTrack());
   window.__nativeSpeak = (text, o) => AchAudio.speak({ text, rate: (o && o.rate) || 1.02, voice: (o && o.voice) || '' }).then(() => true).catch(() => false);
@@ -98,7 +103,14 @@ if (Capacitor.isNativePlatform() && Capacitor.isPluginAvailable('AchAudio')) {
   window.__nativeNowPlaying = (title, artist) => AchAudio.nowPlaying({ title, artist }).catch(() => {});
 }
 
-if (Capacitor.isNativePlatform() && !Capacitor.isPluginAvailable('AchAudio')) window.__nativeAudioMissing = 'native audio module not registered';
+// startup probe: say in the diagnostics whether the native module answers
+if (Capacitor.isNativePlatform()) {
+  setTimeout(() => {
+    let heads = []; try { heads = ((window.Capacitor && window.Capacitor.PluginHeaders) || []).map((h) => h.name); } catch (e) {}
+    log('plugins:', heads.join(',') || '(none listed)', '| AchAudio listed:', heads.includes('AchAudio'));
+    AchAudio.status().then((s) => log('AchAudio answers:', JSON.stringify(s))).catch((e) => { window.__nativeAudioMissing = 'AchAudio: ' + (e && (e.message || e.code)); log('AchAudio does not answer:', e && (e.message || e.code)); });
+  }, 1500);
+}
 const native = Capacitor.isNativePlatform();
 const log = (...a) => { console.log('[native]', ...a); try { window.__dbg && window.__dbg('native: ' + a.map((x) => (x && x.message) ? x.message : (typeof x === 'object' ? JSON.stringify(x) : String(x))).join(' ')); } catch (e) {} };
 

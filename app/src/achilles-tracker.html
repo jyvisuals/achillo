@@ -1050,7 +1050,7 @@ async function buildTrackFor(steps){
   return URL.createObjectURL(wavFromBuffer({length:dst.length,sampleRate:SR,getChannelData:()=>dst}));
 }
 function stopTrack(){trackOn=false;try{track.pause();track.removeAttribute('src');track.load();}catch(e){} if(trackURL){URL.revokeObjectURL(trackURL);trackURL=null;}}
-function syncTrack(){if(!trackOn||!sess)return;const want=posSeconds();if(Math.abs(track.currentTime-want)>1.5){try{track.currentTime=want;}catch(e){}}
+function syncTrack(){if(!trackOn||!sess)return;const want=posSeconds();if(Math.abs(track.currentTime-want)>1.5){dbg('sync: seek',track.currentTime.toFixed(1),'->',want.toFixed(1));try{track.currentTime=want;}catch(e){}}
   if(paused){track.pause();}else if(track.paused){track.play().catch(()=>{});}
   try{if('mediaSession' in navigator){navigator.mediaSession.playbackState=paused?'paused':'playing';
     if(isFinite(track.duration))navigator.mediaSession.setPositionState({duration:track.duration,position:Math.min(track.duration,Math.max(0,track.currentTime)),playbackRate:1});}}catch(e){}}
@@ -1065,7 +1065,7 @@ async function prebuild(mode,wp,wr){try{if(sess||pre.busy||!sound)return;preAssu
 let preHint=null;
 function hint(mode,wp,wr){preHint=[mode,wp,wr];}
 function prebuildNext(){if(!preHint||sess)return;const [m,wp,wr]=preHint;setTimeout(()=>prebuild(m,wp,wr),300);}
-let trackStarting=false;
+let trackStarting=false, trackGen=0;
 async function startTrack(){ // call from a user gesture
   if(!sound||!sess||trackStarting)return; trackStarting=true; try{await startTrack_();}finally{trackStarting=false;}}
 // Watchdog: the cue track can be left paused when speech or the system takes the audio and never says it's done
@@ -1075,13 +1075,18 @@ setInterval(()=>{try{if(!sess||paused||!sound||document.visibilityState!=='visib
   if(!trackOn){if(!trackStarting){dbg('watchdog: track off, restarting');startTrack();}return;}
   if(track.paused&&!speaking){dbg('watchdog: track paused mid-session, resuming at',posSeconds().toFixed(1));const want=posSeconds();try{if(Math.abs(track.currentTime-want)>1)track.currentTime=want;}catch(e){}track.play().catch(()=>{});}}catch(e){}},1000);
 async function startTrack_(){
-  if(!sound||!sess)return; dbg('audio: start', sess.mode, 'steps', sess.steps.length, window.__nativeAudio?'native':'web'); try{track.src=SILENT;await track.play();}catch(e){} // unlock the element
-  if(trackURL){URL.revokeObjectURL(trackURL);}
-  const k=listKey(sess.list); if(pre.url&&pre.key===k){trackURL=pre.url;pre.url=null;pre.key=null;} else trackURL=await buildTrack(); if(!sess)return;
+  if(!sound||!sess)return; const myGen=++trackGen; const T0=performance.now(); const ms=()=>Math.round(performance.now()-T0)+'ms';
+  dbg('audio: start', sess.mode, 'steps', sess.steps.length, window.__nativeAudio?'native':'web');
+  if(!window.__nativeApp){try{track.src=SILENT;await Promise.race([track.play(),new Promise(r=>setTimeout(r,800))]);}catch(e){}} // unlock (browsers only)
+  if(!sess)return;
+  if(trackURL){URL.revokeObjectURL(trackURL);trackURL=null;}
+  const k=listKey(sess.list); if(pre.url&&pre.key===k){trackURL=pre.url;pre.url=null;pre.key=null;dbg('audio: using prebuilt track',ms());} else {trackURL=await buildTrack();dbg('audio: built track',ms());} if(!sess)return;
   track.src=trackURL; track.loop=false; track.onloadedmetadata=()=>{try{track.currentTime=posSeconds();}catch(e){}};
-  try{await track.play();trackOn=true;dbg('audio: playing at',track.currentTime.toFixed(1),'of',track.duration);}catch(e){trackOn=false;dbg('audio: play failed',e&&e.message,track.__lastError||'');}
+  try{track.currentTime=posSeconds();}catch(e){}
+  if(!sess)return;
+  try{await track.play();trackOn=true;dbg('audio: playing at',track.currentTime.toFixed(1),'of',track.duration,ms());}catch(e){trackOn=false;dbg('audio: play failed',e&&e.message,track.__lastError||'');}
   lockInfo();
-  setTimeout(async()=>{if(!sess||paused||!sound)return;let ok;const t1=track.currentTime;
+  setTimeout(async()=>{if(!sess||paused||!sound||myGen!==trackGen)return;let ok;const t1=track.currentTime;
     if(track.__verify)ok=await track.__verify();else{await new Promise(r=>setTimeout(r,1200));ok=!track.paused&&track.currentTime>t1;}
     $('audWarn').hidden=!!ok;dbg('audio: self-test',ok?'ok':'FAILED',track.__lastError||window.__nativeAudioMissing||'');if(!ok)$('audWarnT').textContent='Audio didn\'t start.'+((track.__lastError||window.__nativeAudioMissing)?' ('+(track.__lastError||window.__nativeAudioMissing)+')':'');},2200);
   // Lock-screen controls: keeps iOS treating this like a podcast, so cues keep playing with the screen off or in another app.
@@ -1229,7 +1234,7 @@ $('tPause').onclick=e=>{if(!sess)return; paused=!paused;
 const REST_KEY=/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/;
 const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(k)?'bfrB':k;
 const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);return d?d[2]:g==='bfrA'?'BFR seated calf raise':g==='bfrB'?'BFR band isometric':(EX[g]?EX[g].name:g);};
-function jumpTo(idx){if(!sess)return;$('jumpList').hidden=true;
+function jumpTo(idx){if(!sess)return;$('jumpList').hidden=true;dbg('jump: to step',idx,sess.steps[idx]&&sess.steps[idx].ex);
   while(idx<sess.steps.length&&sess.steps[idx].kind==='mark')idx++;
   if(idx>=sess.steps.length){finish(true);return;}
   if(paused){paused=false;pauseStart=0;setL('tPause','Pause');}
@@ -1242,7 +1247,7 @@ $('tJump').onclick=()=>{if(!sess)return;const el=$('jumpList');if(!el.hidden){el
   sessGroups().forEach(({g,i})=>{const b=document.createElement('button');b.className='jumprow'+(g===cur?' now':'')+(groupDone(g)?' done':'');
     b.textContent=(groupDone(g)?'✓ ':g===cur?'▶ ':'')+groupName(g);b.onclick=()=>jumpTo(i);el.appendChild(b);});
   el.hidden=false;};
-$('tSkip').onclick=()=>{if(!sess)return; const st=sess.steps[sess.i];
+$('tSkip').onclick=()=>{if(!sess)return; const st=sess.steps[sess.i];dbg('skip: from',st.ex,st.kind,'at',posSeconds().toFixed(1),'track',track.currentTime.toFixed(1),track.paused?'paused':'playing');
   if(!(st.kind==='setup'||st.long||st.kind==='rest'||REST_KEY.test(st.ex)||EX[st.ex].speakCue)){ // skip the whole exercise, all its sets, without checking it off
     const cur=groupOf(st.ex);let j=sess.i+1;while(j<sess.steps.length&&(sess.steps[j].kind==='mark'||REST_KEY.test(sess.steps[j].ex)||groupOf(sess.steps[j].ex)===cur))j++;
     jumpTo(j);return;}
