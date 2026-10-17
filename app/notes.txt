@@ -1,1 +1,1 @@
-Stronger swell on push and lower. Settings → Vibrations now shows whether full patterns or basic taps are running.
+Fix: the app's native module (audio player, native voice, full vibration patterns) now actually loads. Before this, everything was falling back to the web player and basic taps.
