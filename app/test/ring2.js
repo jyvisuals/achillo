@@ -4,7 +4,7 @@ const p=await b.newPage({viewport:{width:390,height:844},colorScheme:'dark',devi
 await p.clock.install({time:new Date('2026-10-17T09:00:00')});
 await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
 await p.evaluate(()=>__t.start(false,false,'snack:pfstraight'));await p.waitForTimeout(800);
-const i=await p.evaluate(()=>__t.sess.steps.findIndex(s=>s.kind==='rest'&&s.rep>=3));
+const i=await p.evaluate(()=>__t.sess.steps.findIndex(s=>s.kind==='hold'&&s.rep>=3));
 await p.evaluate(i=>__t.jump(i),i);await p.waitForTimeout(1500);
 console.log(i,await p.textContent('#tCount'),'|',await p.textContent('#tPhase'));
 await p.locator('.ring').screenshot({path:'test/out/ring-long.png'});console.log('errs',errs);await b.close();})();

@@ -967,10 +967,16 @@ function drawReps(total,done){const r=$('reps');
   r.innerHTML='';for(let i=0;i<total;i++){const x=document.createElement('i');if(i<done)x.className='done';r.appendChild(x);}}
 // Notched rings: outer = sets of this exercise, inner = reps of this set (or the rest/setup countdown).
 const NS='http://www.w3.org/2000/svg';
-function segBuild(g,r,n,gap){if(g.__n===n&&g.__r===r)return;g.__n=n;g.__r=r;g.innerHTML='';const C=2*Math.PI*r;g.__C=C;
+function segBuild(g,r,n,gap){if(g.__n===n&&g.__r===r&&!g.__sig)return;g.__sig=null;g.__n=n;g.__r=r;g.innerHTML='';const C=2*Math.PI*r;g.__C=C;
   const step=C/n, len=n>1?step-gap:C;g.__parts=[];
   for(let k=0;k<n;k++){const start=n>1?k*step+gap/2:0;const mk=c=>{const el=document.createElementNS(NS,'circle');el.setAttribute('cx','75');el.setAttribute('cy','75');el.setAttribute('r',r);el.setAttribute('class',c);el.style.strokeDashoffset=String(-start);g.appendChild(el);return el;};
     const bg=mk('bg');bg.style.strokeDasharray=len+' '+C;const fg=mk('fg');g.__parts.push({fg,bg,len});}}
+function sliceBuild(g,r,L){if(g.__sig===L.sig&&g.__r===r)return;g.__sig=L.sig;g.__r=r;g.__n=null;g.innerHTML='';const C=2*Math.PI*r;g.__C=C;g.__slices=[];
+  const n=L.reps.length,gap=n>1?(n>12?4:6):0,step=C/n,len=n>1?step-gap:C;
+  const mk=(c,off,da,stroke)=>{const el=document.createElementNS(NS,'circle');el.setAttribute('cx','75');el.setAttribute('cy','75');el.setAttribute('r',r);el.setAttribute('class',c);el.style.strokeDashoffset=String(-off);if(da)el.style.strokeDasharray=da;if(stroke)el.style.stroke=stroke;g.appendChild(el);return el;};
+  L.reps.forEach(([a,b],k)=>{const base=n>1?k*step+gap/2:0;mk('bg',base,len+' '+C);const span=Math.max(0.01,b-a);
+    (L.slices[k]||[]).forEach(sl=>{const s0=base+len*(sl.t0-a)/span,s1=base+len*(sl.t1-a)/span;const el=mk('fg slice',s0,'0 '+C,sl.c);g.__slices.push({el,len:Math.max(0,s1-s0)+0.35,t0:sl.t0,t1:sl.t1});});});}
+function sliceFill(g,pos){const C=g.__C;g.__slices.forEach(s=>{const f=Math.max(0,Math.min(1,(pos-s.t0)/Math.max(0.001,s.t1-s.t0)));const v=(s.len*f).toFixed(2);if(s.v!==v){s.v=v;s.el.style.strokeDasharray=v+' '+C;}});}
 function segFill(g,fills,nowIdx,warnFrom){const C=g.__C;g.__parts.forEach((p,k)=>{p.bg.classList.toggle('warnz',warnFrom!=null&&k>=warnFrom);const f=Math.max(0,Math.min(1,fills[k]||0));p.fg.style.strokeDasharray=(p.len*f)+' '+C;p.fg.classList.toggle('now',k===nowIdx);});}
 let segKey=null,segLay=null,segPos=0;
 function segLayout(){const steps=sess.steps,i=sess.i,s=steps[i],e=EX[s.ex]||{},offs=stepOffsets();
@@ -984,12 +990,18 @@ function segLayout(){const steps=sess.steps,i=sess.i,s=steps[i],e=EX[s.ex]||{},o
   const lay={sets,setNow:REST_KEY.test(s.ex)?-1:(byEi[s.ei]??-1)};
   // Inner ring stays the rep notches through relax, rests and setup (the breathing circle shows the easing off);
   // between sets it shows the next set's empty notches. Only imagery and stand-alone rests get a countdown ring.
-  let refEi=s.ei;if(REST_KEY.test(s.ex)){refEi=null;for(let k=i+1;k<steps.length;k++){const st=steps[k];if(st.kind==='mark'||REST_KEY.test(st.ex))continue;if(groupOf(st.ex)===g)refEi=st.ei;break;}}
+  const phs=[];let refEi=s.ei;if(REST_KEY.test(s.ex)){refEi=null;for(let k=i+1;k<steps.length;k++){const st=steps[k];if(st.kind==='mark'||REST_KEY.test(st.ex))continue;if(groupOf(st.ex)===g)refEi=st.ei;break;}}
   const refEx=refEi!=null&&EX[(steps.find(st=>st.ei===refEi)||{}).ex];
   if(e.speakCue||refEi==null||!refEx||(refEx.reps||1)<2){lay.inner='count';lay.t0=offs[i];lay.t1=end(i);}
   else{const reps=[];for(let k=0;k<steps.length;k++){const st=steps[k];if(st.ei!==refEi||st.kind==='mark'||st.kind==='setup'||st.long||(st.kind==='rest'&&st.secs>=10))continue;
-      if(!reps[st.rep])reps[st.rep]=[offs[k],end(k)];else reps[st.rep][1]=end(k);}
-    lay.inner=reps.length>40?'bar':'reps';lay.reps=reps;}
+      if(!reps[st.rep])reps[st.rep]=[offs[k],end(k)];else reps[st.rep][1]=end(k);(phs[st.rep]=phs[st.rep]||[]).push([offs[k],end(k),st.kind]);}
+    lay.inner=reps.length>40?'bar':'reps';lay.reps=reps;
+    // each rep's notch is painted as a little effort graph: dull at the start of the push, full orange through the hold, fading on the way down
+    const per=Math.max(6,Math.floor(240/Math.max(1,reps.length)));
+    lay.slices=reps.map(([a,b],r)=>{const out=[];(phs[r]||[]).forEach(([t0,t1,kind])=>{const m=Math.max(1,Math.round(per*(t1-t0)/Math.max(0.01,b-a)));
+      for(let j=0;j<m;j++){const s0=t0+(t1-t0)*j/m,s1=t0+(t1-t0)*(j+1)/m,mid=(j+0.5)/m;const f=kind==='up'?mid:kind==='hold'?1:kind==='down'?1-mid:0;
+        out.push({t0:s0,t1:s1,c:'color-mix(in srgb,var(--hold) '+Math.round(18+82*f)+'%,var(--sunk))'});}});return out;});
+    lay.sig=refEi+':'+reps.length+':'+(reps[0]||[0])[0];}
   return lay;}
 function drawSegs(){if(!sess){segKey=null;return;}const ringE=ringEl;if(!ringE)return;ringE.classList.add('segs');
   const sk=sess.i+':'+sess.steps.length+':'+sess.mode;if(segKey!==sk){segKey=sk;segLay=segLayout();}
@@ -1004,11 +1016,8 @@ function drawSegs(){if(!sess){segKey=null;return;}const ringE=ringEl;if(!ringE)r
   si.classList.toggle('rest',L.inner==='count');
   if(L.inner==='count'){segBuild(si,62,1,0);segFill(si,[1-fr(L.t0,L.t1)],-1);}
   else if(L.inner==='bar'){segBuild(si,62,1,0);const r=L.reps;segFill(si,[fr(r[0][0],r[r.length-1][1])],-1);}
-  else{const r=L.reps;segBuild(si,62,r.length,r.length>1?(r.length>12?4:6):0);const fl=r.map(([a,b])=>fr(a,b));const ni=fl.findIndex(f=>f>0&&f<1);segFill(si,fl,ni);
-    // the rep you're on is colored by effort: brightens as you push, full on hold, fades back as you lower or relax
-    const st=sess.steps[sess.i];const offs=stepOffsets();const ph=st.secs>0?Math.max(0,Math.min(1,(pos-offs[sess.i])/st.secs)):1;
-    const force=st.kind==='up'?ph:st.kind==='hold'?1:st.kind==='down'?1-ph:0;
-    si.__parts.forEach((p,k)=>{p.fg.style.stroke=k===ni?'color-mix(in srgb,var(--hold) '+Math.round(25+75*force)+'%,var(--muted))':'';});}}
+  else{sliceBuild(si,62,L);sliceFill(si,pos);
+  }}
 window.addEventListener('ach:hapstate',()=>{const el=$('hapState');if(el)el.textContent='Vibration engine: '+(window.__hapState||'');});
 document.querySelectorAll('#hapSeg button').forEach(b=>b.addEventListener('click',()=>{if(+b.dataset.v>0&&window.__buzz)setTimeout(()=>window.__buzz('up',1.6),60);}));
 document.querySelectorAll('.hapBtns button').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.p;if(!window.__buzz)return;
