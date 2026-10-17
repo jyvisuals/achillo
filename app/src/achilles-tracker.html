@@ -196,6 +196,8 @@ html.tabs .wrap:not(.focus) #audRow{display:none}
 #pocket{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;touch-action:none;user-select:none;-webkit-user-select:none}
 #pocket[hidden]{display:none}
 #pocket .pk-n{font-family:var(--display);font-weight:800;font-size:64px;color:#2a2f2c;letter-spacing:-.03em}
+#pocket .pk-x{font-size:17px;font-weight:600;color:#2e3532;text-align:center;padding:0 28px;max-width:340px;line-height:1.3;transition:color .6s ease}
+#pocket .pk-x.between{color:#4a5650}#pocket .pk-x.fresh{color:#6b7a72}
 #pocket .pk-n .of{font-size:.4em;margin-left:.05em}
 #pocket .pk-t{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#2a2f2c;font-weight:600}
 #pocket .pk-h{position:absolute;bottom:calc(30px + env(safe-area-inset-bottom));font-size:12px;color:#262b28;text-align:center;padding:0 24px}
@@ -1040,7 +1042,7 @@ document.querySelectorAll('.hapBtns button').forEach(b=>b.addEventListener('clic
   if(p==='tick'){[0,1000,2000].forEach(t=>setTimeout(()=>window.__buzz('tick'),t));return;}if(p==='lastrep'){window.__buzz('lastrep');setTimeout(()=>window.__buzz('up',2.5),280);return;}window.__buzz(p,+b.dataset.s||1);}));
 // ---- pocket mode: a black screen that keeps the app in front (so vibrations keep working) and ignores stray touches.
 (function(){const pk=document.createElement('div');pk.id='pocket';pk.hidden=true;
-  pk.innerHTML='<div class="pk-ring"></div><div class="pk-n" id="pkN"></div><div class="pk-t" id="pkT"></div><div class="pk-h">Pocket mode · touches are ignored<br>Press and hold anywhere for 1 second to come back</div>';document.body.appendChild(pk);
+  pk.innerHTML='<div class="pk-ring"></div><div class="pk-x" id="pkX"></div><div class="pk-n" id="pkN"></div><div class="pk-t" id="pkT"></div><div class="pk-h">Pocket mode · touches are ignored<br>Press and hold anywhere for 1 second to come back</div>';document.body.appendChild(pk);
   let timer=null;const stop=e=>{e.preventDefault();e.stopPropagation();};
   const down=e=>{stop(e);pk.classList.add('holding');clearTimeout(timer);timer=setTimeout(()=>{pk.classList.remove('holding');setPocket(false);if(window.__buzz)window.__buzz('setup');},1200);};
   const up=e=>{stop(e);pk.classList.remove('holding');clearTimeout(timer);};
@@ -1048,7 +1050,13 @@ document.querySelectorAll('.hapBtns button').forEach(b=>b.addEventListener('clic
   ['click','touchmove','wheel','contextmenu'].forEach(t=>pk.addEventListener(t,stop,{passive:false}));
   window.setPocket=on=>{pk.hidden=!on;document.documentElement.classList.toggle('pocket',!!on);dbg('pocket mode',on?'on':'off');if(on&&window.__buzz)window.__buzz('rest');};
   $('tPocket').addEventListener('click',e=>{e.stopPropagation();if(sess)setPocket(true);});
-  setInterval(()=>{if(pk.hidden)return;if(!sess){setPocket(false);return;}$('pkN').innerHTML=$('tCount').innerHTML;$('pkT').textContent=$('tPhase').textContent;},500);})();
+  setInterval(()=>{if(pk.hidden)return;if(!sess){setPocket(false);return;}$('pkN').innerHTML=$('tCount').innerHTML;$('pkT').textContent=$('tPhase').textContent;
+    // what to switch to: during setup the exercise you're starting, during rests the one coming up; brighter for a few seconds when it changes
+    const st=sess.steps[sess.i];const between=st.kind==='setup'||REST_KEY.test(st.ex);
+    let t=between&&REST_KEY.test(st.ex)?($('sNext').dataset.keep||$('sNext').textContent).replace(/^.*Up next:\s*/,'Next: ').replace(/^Last exercise$/,'Last one'):$('sName').textContent;
+    t=t.replace(/\s*·\s*set \d+ of \d+$/i,'').replace(/\s*\(\d+ of \d+\)$/,'');
+    const x=$('pkX');if(x.textContent!==t){x.textContent=t;x.classList.add('fresh');clearTimeout(x.__t);x.__t=setTimeout(()=>x.classList.remove('fresh'),5000);}
+    x.classList.toggle('between',between);},500);})();
 // ---- whole-session strip: every exercise as a block, sized by its time, filling as you go
 let stripKey=null,stripParts=[];
 function drawStrip(pos){const el=$('sessStrip');if(!el||!sess)return;const k=sess.steps.length+':'+sess.mode+':'+sess.list.join(',');

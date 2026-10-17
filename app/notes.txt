@@ -1,1 +1,1 @@
-Pocket mode: tap the phone icon during a session for a black screen that ignores touches (hold 1 second to come back); vibrations keep working. New strip at the bottom shows every exercise in the session and how far you are.
+Pocket mode now shows the exercise name: what's next during rests, what you're starting during setup. It's brighter for a few seconds when it changes.

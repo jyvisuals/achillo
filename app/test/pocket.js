@@ -4,7 +4,7 @@ const p=await b.newPage({viewport:{width:390,height:844},colorScheme:'dark',devi
 await p.clock.install({time:new Date('2026-10-17T09:00:00')});
 await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
 await p.evaluate(()=>__t.start(false,false,'home'));await p.waitForTimeout(800);
-await p.evaluate(()=>__t.jump(170));await p.waitForTimeout(1500);
+await p.evaluate(()=>__t.jump(__t.sess.steps.findIndex(s=>s.ex==='srest')));await p.waitForTimeout(1500);
 await p.screenshot({path:'test/out/strip.png'});
 await p.click('#tPocket');await p.waitForTimeout(700);
 const vis=await p.evaluate(()=>!document.getElementById('pocket').hidden);
