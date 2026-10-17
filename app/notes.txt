@@ -1,1 +1,1 @@
-Reminder times are now any time you like (iOS time wheel): morning check, evening round, imagery. Quick-one spacing from 30 min to 3 h, last one up to 11 PM. Evening round and imagery default to 8 and 9 PM.
+Audio falls back automatically if the native player fails, and shows the reason. New: Settings > Diagnostics, a log of audio and session events you can share. Fixed: after picking a quick one, the screen could stop responding to taps.

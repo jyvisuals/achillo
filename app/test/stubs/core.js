@@ -1,10 +1,10 @@
-export const Capacitor={isNativePlatform:()=>true,getPlatform:()=>'ios'};
+export const Capacitor={isNativePlatform:()=>true,getPlatform:()=>'ios',isPluginAvailable:()=>true};
 window.__aa={calls:[],L:{},playing:false,pos:0,t:0,dur:0};
 export function registerPlugin(name){const a=window.__aa;const now=()=>performance.now();
  const cur=()=>a.playing?a.pos+(now()-a.t)/1000:a.pos;
  return {
   open:async(o)=>{a.calls.push('open');a.dur=60;a.pos=0;return {duration:a.dur};},
-  play:async(o)=>{a.calls.push('play');if(o&&o.time!=null)a.pos=o.time;a.playing=true;a.t=now();return {playing:true,position:a.pos};},
+  play:async(o)=>{a.calls.push('play');if(window.__failNative)throw new Error('simulated native failure');if(o&&o.time!=null)a.pos=o.time;a.playing=true;a.t=now();return {playing:true,position:a.pos};},
   pause:async()=>{a.calls.push('pause');a.pos=cur();a.playing=false;return {position:a.pos};},
   seek:async(o)=>{a.calls.push('seek');a.pos=o.time;a.t=now();},
   stop:async()=>{a.calls.push('stop');a.playing=false;},

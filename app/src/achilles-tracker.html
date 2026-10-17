@@ -638,6 +638,12 @@ pre.rtext{display:none}
       <textarea id="impBox" hidden placeholder="Paste a log export here, then tap Import again." style="min-height:90px;margin-top:8px"></textarea>
       <div class="shint" id="dataHint"></div>
     </div>
+
+    <div class="sgrp"><h3>Diagnostics</h3>
+      <div class="btns"><button id="diagShare">Share diagnostics</button><button id="diagView">Show</button><button id="diagClear">Clear</button></div>
+      <pre id="diagBox" hidden style="max-height:260px;overflow:auto;font-size:11px;line-height:1.35;white-space:pre-wrap;background:var(--sunk);padding:10px;border-radius:10px;margin:8px 0 0"></pre>
+      <div class="shint">A running record of audio and session events on this phone. Send it to Claude when something misbehaves.</div>
+    </div>
   </section>
   <div class="ver" id="ver" data-t="settings">Achilló · web</div>
 </div>
@@ -893,6 +899,14 @@ function homeList(){const d=day();const left=homeLeft(d);
   const after=left.filter(k=>k!=='scar').flatMap(k=>ANK_KEYS[k]);
   const calf=d.bfrA?[]:['bcr30','srest','bcr15a','srest','bcr15b','srest','bcr15c','cuffdown'];
   return calf.concat(d.bfrA&&!left.includes('scar')?[]:gap,['bpi1','srest','bpi2','srest','bpi3','srest','bpi4','deflate'],after);}
+// ---- diagnostics: a rolling log of audio/session events, kept on the device ----
+const DBG_MAX=400;let dbgBuf=[];try{dbgBuf=JSON.parse(localStorage.getItem('ach:dbg')||'[]');}catch(e){}
+let dbgT=null;
+window.__dbg=function(m){try{const d=new Date();const pad=n=>String(n).padStart(2,'0');dbgBuf.push((d.getMonth()+1)+'/'+d.getDate()+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())+' '+String(m).slice(0,300));if(dbgBuf.length>DBG_MAX)dbgBuf=dbgBuf.slice(-DBG_MAX);
+  clearTimeout(dbgT);dbgT=setTimeout(()=>{try{localStorage.setItem('ach:dbg',JSON.stringify(dbgBuf));}catch(e){}},400);}catch(e){}};
+const dbg=(...a)=>window.__dbg(a.map(x=>typeof x==='object'?JSON.stringify(x):String(x)).join(' '));
+window.addEventListener('error',e=>dbg('js error:',e.message,(e.filename||'').split('/').pop()+':'+e.lineno));
+window.addEventListener('unhandledrejection',e=>dbg('promise rejected:',(e.reason&&(e.reason.message||e.reason))||''));
 const PREF_DEF={rate:1.02,voice:'',haptics:1,remind:1,morning:'7:55',cadence:60,lastHour:21,evening:'20:00',imageryAt:'21:00',pool:['toeyoga2','inviso','eviso','hiprot','pfstraight']};
 let prefs=Object.assign({},PREF_DEF,local.get('prefs')||{});
 if(!prefs.v2times){if(prefs.evening==='16:00')prefs.evening='20:00';if(prefs.imageryAt==='20:25')prefs.imageryAt='21:00';prefs.v2times=1;try{local.set('prefs',prefs);}catch(e){}}
@@ -906,7 +920,7 @@ let timer=null, paused=false, sound=soundPref, ac=null, wake=null, skip=false, s
 const arc=document.getElementById('arc'), C=389.6; const arcEx=document.getElementById('arcEx'), CEX=452.4;
 const $=id=>document.getElementById(id);
 function beep(f,ms){if(!sound||trackOn)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(.15,ac.currentTime);o.start();o.stop(ac.currentTime+ms/1000);}catch(e){}}
-function speak(t){if(!voice||!t)return;if(window.__nativeSpeak){window.__nativeSpeak(t,{rate:prefs.rate,voice:prefs.voice});return;}try{const u=new SpeechSynthesisUtterance(t);u.rate=prefs.rate||1.02;const pv=pickVoice();if(pv)u.voice=pv;u.onend=u.onerror=()=>{setTimeout(syncTrack,150);};speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
+function speak(t){if(!voice||!t)return;if(window.__nativeSpeak&&!window.__nativeSpeakBroken){window.__nativeSpeak(t,{rate:prefs.rate,voice:prefs.voice}).then(ok=>{if(!ok){window.__nativeSpeakBroken=true;speak(t);}});return;}try{const u=new SpeechSynthesisUtterance(t);u.rate=prefs.rate||1.02;const pv=pickVoice();if(pv)u.voice=pv;u.onend=u.onerror=()=>{setTimeout(syncTrack,150);};speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
 function sayStep(){const s=sess.steps[sess.i];const e=EX[s.ex];
   // Voice only for instructions; the rhythm is carried by sound cues (see buildTrack).
   if(s.kind==='setup'){speak(e.name.split(' · set')[0].replace(/\(\d of \d\)/,'')+'. '+(s.cue||''));return;}
@@ -1058,18 +1072,18 @@ async function startTrack(){ // call from a user gesture
 // (WKWebView often drops the speech 'end' event). Once a second, put it back.
 setInterval(()=>{try{if(!sess||paused||!sound||document.visibilityState!=='visible'&&!window.__nativeApp)return;
   let speaking=false;try{speaking=!window.__nativeAudio&&speechSynthesis.speaking;}catch(e){}
-  if(!trackOn){if(!trackStarting)startTrack();return;}
-  if(track.paused&&!speaking){const want=posSeconds();try{if(Math.abs(track.currentTime-want)>1)track.currentTime=want;}catch(e){}track.play().catch(()=>{});}}catch(e){}},1000);
+  if(!trackOn){if(!trackStarting){dbg('watchdog: track off, restarting');startTrack();}return;}
+  if(track.paused&&!speaking){dbg('watchdog: track paused mid-session, resuming at',posSeconds().toFixed(1));const want=posSeconds();try{if(Math.abs(track.currentTime-want)>1)track.currentTime=want;}catch(e){}track.play().catch(()=>{});}}catch(e){}},1000);
 async function startTrack_(){
-  if(!sound||!sess)return; try{track.src=SILENT;await track.play();}catch(e){} // unlock the element
+  if(!sound||!sess)return; dbg('audio: start', sess.mode, 'steps', sess.steps.length, window.__nativeAudio?'native':'web'); try{track.src=SILENT;await track.play();}catch(e){} // unlock the element
   if(trackURL){URL.revokeObjectURL(trackURL);}
   const k=listKey(sess.list); if(pre.url&&pre.key===k){trackURL=pre.url;pre.url=null;pre.key=null;} else trackURL=await buildTrack(); if(!sess)return;
   track.src=trackURL; track.loop=false; track.onloadedmetadata=()=>{try{track.currentTime=posSeconds();}catch(e){}};
-  try{await track.play();trackOn=true;}catch(e){trackOn=false;}
+  try{await track.play();trackOn=true;dbg('audio: playing at',track.currentTime.toFixed(1),'of',track.duration);}catch(e){trackOn=false;dbg('audio: play failed',e&&e.message,track.__lastError||'');}
   lockInfo();
   setTimeout(async()=>{if(!sess||paused||!sound)return;let ok;const t1=track.currentTime;
     if(track.__verify)ok=await track.__verify();else{await new Promise(r=>setTimeout(r,1200));ok=!track.paused&&track.currentTime>t1;}
-    $('audWarn').hidden=!!ok;},2200);
+    $('audWarn').hidden=!!ok;dbg('audio: self-test',ok?'ok':'FAILED',track.__lastError||window.__nativeAudioMissing||'');if(!ok)$('audWarnT').textContent='Audio didn\'t start.'+((track.__lastError||window.__nativeAudioMissing)?' ('+(track.__lastError||window.__nativeAudioMissing)+')':'');},2200);
   // Lock-screen controls: keeps iOS treating this like a podcast, so cues keep playing with the screen off or in another app.
   try{if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:$('isoh').textContent||'Session',artist:'Achilles rehab · sound cues'});
     navigator.mediaSession.setActionHandler('pause',()=>{if(sess&&!paused)$('tPause').click();});
@@ -1110,8 +1124,8 @@ let autoPaused=false;
 window.addEventListener('ach:remote',e=>{const c=e.detail&&e.detail.cmd;if(!sess)return;
   if(c==='pause'&&!paused)$('tPause').click();else if(c==='play'&&paused)$('tPause').click();else if(c==='toggle')$('tPause').click();
   else if(c==='next')$('tSkip').click();else if(c==='prev'&&typeof prevEx==='function')prevEx();});
-window.addEventListener('ach:routeLost',()=>{if(sess&&!paused){autoPaused=false;$('tPause').click();}if(sess){$('audWarn').hidden=false;$('audWarnT').textContent='Headphones disconnected. Paused.';}});
-window.addEventListener('ach:interrupt',e=>{const began=!!(e.detail&&e.detail.began);
+window.addEventListener('ach:routeLost',()=>{dbg('audio: headphones/route lost');if(sess&&!paused){autoPaused=false;$('tPause').click();}if(sess){$('audWarn').hidden=false;$('audWarnT').textContent='Headphones disconnected. Paused.';}});
+window.addEventListener('ach:interrupt',e=>{const began=!!(e.detail&&e.detail.began);dbg('audio: interruption',began?'began':'ended');
   if(began){if(sess&&!paused){autoPaused=true;$('tPause').click();}}
   else if(autoPaused){autoPaused=false;if(sess&&paused)$('tPause').click();}});
 window.addEventListener('ach:markRound',()=>{const d=day();if((d.ankle||0)>=2)return;d.ankle=(d.ankle||0)+1;d.ankleDone=[];d.foot=1;queueSave(TODAY);renderAll();setStatus('Round logged from the reminder.');});
@@ -1140,7 +1154,7 @@ function beginRun(){ $('jumpList').hidden=true; ringEl.classList.remove('done','
   setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused;
   clearInterval(timer); timer=setInterval(tick,250); tick();
 }
-function startSession(withPress,withRoutine,mode){
+function startSession(withPress,withRoutine,mode){dbg('session: start',mode||'');snackPickOpen=false;try{const sp=$('snackPick');if(sp)sp.hidden=true;$('sheetBack').hidden=true;}catch(e){}
   if((mode==='ankle'||mode==='foot')&&!ankList().length){const d=day();d.ankleDone=[];}
   if(mode==='home'&&!homeList().length){$('nowDone').hidden=false;$('nowDone').textContent='Barefoot PT already done today.';return;}
   if(mode==='gym'&&!gymLeft(day()).length){$('nowDone').hidden=false;$('nowDone').textContent='Boot-on PT already done today.';return;}
@@ -1160,7 +1174,7 @@ function resumeSession(){
   if(sound){$('sNext').textContent='Session resumed. Tap Pause, then Resume, to restart the beeps.';}
   return true;
 }
-function finish(complete){nativeEvt('session',{active:false});
+function finish(complete){dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});
   clearInterval(timer);timer=null; stopTrack(); if(wake){try{wake.release()}catch(e){} wake=null;}
   const d=day(); const w=weekFor(today)||WEEKS[0]; const done=sess?sess.doneEx:[];
   const pressDone=false; const routineDone=false;
@@ -1237,7 +1251,7 @@ $('tSkip').onclick=()=>{if(!sess)return; const st=sess.steps[sess.i];
     let i=sess.i; while(i+1<sess.steps.length&&sess.steps[i+1].kind!=='mark')i++; sess.i=i;}
   sess.stepEnd=Date.now(); if(paused){paused=false;pauseStart=0;setL('tPause','Pause');} lastShown=null; tick(); syncTrack();};
 $('tStop').onclick=()=>finish(false);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){persist();if(sess&&!paused&&trackOn&&track.paused)track.play().catch(()=>{});}
+document.addEventListener('visibilitychange',()=>{dbg('app:',document.visibilityState,sess?'(in session)':'');if(document.visibilityState==='hidden'){persist();if(sess&&!paused&&trackOn&&track.paused)track.play().catch(()=>{});}
   if(document.visibilityState==='visible'){lastShown=null;tick();syncTrack();
   if(sess&&navigator.wakeLock&&!wake){navigator.wakeLock.request('screen').then(w=>wake=w).catch(()=>{});}}});
 (function(){const AUD={both:'<svg viewBox="0 0 48 24"><g><path d="M3 4h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-5 4v-4H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></g><g transform="translate(25 0)"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></g></svg>',cues:'<svg viewBox="0 0 24 24"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></svg>',voice:'<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>',off:'<svg viewBox="0 0 24 24"><g opacity=".45"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></g><path d="M4 20L20 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'};const NAMES={both:'Voice and cues',cues:'Cues only',voice:'Voice only',off:'Silent'};
@@ -1576,6 +1590,11 @@ function renderSettings(){
     b.onclick=()=>{let pool=(prefs.pool||SNACK_POOL).slice();if(on){if(pool.length<=1)return;pool=pool.filter(x=>x!==k);}else pool.push(k);prefs.pool=pool;savePrefs();renderSettings();renderNow();};pc.appendChild(b);});
   // weight
   const bw2=$('bw2');bw2.value=settings.bodyWeight||'';bw2.onchange=()=>{settings.bodyWeight=parseFloat(bw2.value)||null;$('bw').value=bw2.value;renderWB();saveSettings();};
+  // diagnostics
+  const diagText=()=>{const v=($('ver')||{}).textContent||'';return ['Achilló diagnostics',v,'UA: '+navigator.userAgent,'mode: '+(window.__nativeAudio?'native audio':'web audio')+(window.__nativeAudioMissing?' ('+window.__nativeAudioMissing+')':''),'prefs: '+JSON.stringify(prefs),'sound '+sound+' voice '+voice+' vol '+vol,'',...dbgBuf].join('\n');};
+  $('diagView').onclick=()=>{const b=$('diagBox');b.hidden=!b.hidden;b.textContent=diagText();b.scrollTop=b.scrollHeight;};
+  $('diagClear').onclick=()=>{dbgBuf=[];try{localStorage.removeItem('ach:dbg');}catch(e){}$('diagBox').textContent='';};
+  $('diagShare').onclick=()=>{const t=diagText();if(window.__shareDiag)window.__shareDiag(t);else{try{navigator.clipboard.writeText(t);$('dataHint').textContent='Diagnostics copied to the clipboard.';}catch(e){}}};
   // data
   $('expBtn').onclick=()=>{if(window.__nativeApp&&!$('shareLog').hidden){$('shareLog').click();return;}
     const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),app:'Achilló',days,settings,prefs},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='achillo-log-'+TODAY+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);$('dataHint').textContent='Exported.';};

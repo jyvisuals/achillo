@@ -20,6 +20,10 @@ const AchAudio = registerPlugin('AchAudio');
 const nowMs = () => performance.now();
 function makeNativeTrack() {
   const L = {};
+  let fb = null; // the real <audio> element once native playback has failed
+  const el = () => document.getElementById('track');
+  const fail = (e, where) => { const msg = where + ': ' + ((e && (e.message || e.errorMessage || e.code)) || String(e)); tr.__lastError = msg; log('native audio failed', msg);
+    if (!fb) { fb = el(); Object.keys(L).forEach((t) => (L[t] || []).forEach((f) => fb.addEventListener(t, f))); if (tr.onloadedmetadata) fb.onloadedmetadata = tr.onloadedmetadata; } };
   const emit = (t) => { (L[t] || []).forEach((f) => { try { f({ type: t }); } catch (e) {} }); if (t === 'loadedmetadata' && tr.onloadedmetadata) try { tr.onloadedmetadata(); } catch (e) {} };
   let pos = 0, t0 = 0, playing = false, dur = NaN, src = null, ready = Promise.resolve(), silent = true, gen = 0;
   const cur = () => (playing ? pos + (nowMs() - t0) / 1000 : pos);
@@ -39,57 +43,64 @@ function makeNativeTrack() {
   }
   const tr = {
     loop: false, onloadedmetadata: null, playsInline: true,
-    get paused() { return !playing; },
-    get duration() { return dur; },
-    get currentTime() { return cur(); },
-    set currentTime(v) { pos = Math.max(0, +v || 0); if (playing) t0 = nowMs(); AchAudio.seek({ time: pos }).catch(() => {}); },
+    get paused() { return fb ? fb.paused : !playing; },
+    get duration() { return fb ? fb.duration : dur; },
+    get currentTime() { return fb ? fb.currentTime : cur(); },
+    set currentTime(v) { if (fb) { try { fb.currentTime = v; } catch (e) {} return; } pos = Math.max(0, +v || 0); if (playing) t0 = nowMs(); AchAudio.seek({ time: pos }).catch(() => {}); },
     get src() { return src || ''; },
     set src(u) {
+      if (fb) { fb.src = u; src = u; return; }
       src = u; gen++; const myGen = gen; playing = false; pos = 0; dur = NaN;
       if (!u || /^data:/.test(u)) { silent = true; ready = Promise.resolve(); return; }
       silent = false;
       ready = (async () => {
         const uri = await writeTrack(u, myGen); if (!uri || myGen !== gen) return;
         const r = await AchAudio.open({ path: uri }); dur = r.duration; emit('loadedmetadata');
-      })().catch((e) => { log('track load failed', e); throw e; });
+      })().catch((e) => { fail(e, 'load'); if (fb) fb.src = u; });
     },
     async play() {
-      await ready; if (silent) return;
-      const r = await AchAudio.play({ time: pos });
-      if (!r.playing) throw new Error('native play refused');
-      pos = r.position; t0 = nowMs(); playing = true; emit('play');
+      await ready;
+      if (fb) return fb.play();
+      if (silent) return;
+      try {
+        const r = await AchAudio.play({ time: pos });
+        if (!r.playing) throw new Error('player refused to start');
+        pos = r.position; t0 = nowMs(); playing = true; emit('play');
+      } catch (e) { fail(e, 'play'); fb.src = src; try { fb.currentTime = pos; } catch (x) {} return fb.play(); }
     },
-    pause() { if (!playing) { return; } pos = cur(); playing = false; AchAudio.pause().catch(() => {}); emit('pause'); },
-    load() {},
-    removeAttribute(a) { if (a === 'src') { gen++; src = null; playing = false; silent = true; AchAudio.stop().catch(() => {}); } },
+    pause() { if (fb) { fb.pause(); return; } if (!playing) { return; } pos = cur(); playing = false; AchAudio.pause().catch(() => {}); emit('pause'); },
+    load() { if (fb) fb.load(); },
+    removeAttribute(a) { if (fb) { fb.removeAttribute(a); return; } if (a === 'src') { gen++; src = null; playing = false; silent = true; AchAudio.stop().catch(() => {}); } },
     setAttribute() {},
     addEventListener(t, f) { (L[t] = L[t] || []).push(f); },
     removeEventListener(t, f) { L[t] = (L[t] || []).filter((x) => x !== f); },
-    async __verify() { try { const s = await AchAudio.status(); return !!s.playing; } catch (e) { return false; } },
+    async __verify() { if (fb) return !fb.paused; try { const s = await AchAudio.status(); return !!s.playing; } catch (e) { tr.__lastError = 'status: ' + (e && e.message); return false; } },
+    __lastError: '',
   };
   AchAudio.addListener('ended', () => { pos = dur || cur(); playing = false; emit('ended'); });
   AchAudio.addListener('routeLost', () => { if (playing) { pos = cur(); playing = false; } window.dispatchEvent(new Event('ach:routeLost')); });
   AchAudio.addListener('remote', (e) => window.dispatchEvent(new CustomEvent('ach:remote', { detail: e })));
   // keep the JS clock honest, and notice if iOS paused the player behind our back
   setInterval(async () => {
-    if (!playing || silent) return;
+    if (fb || !playing || silent) return;
     try { const s = await AchAudio.status(); if (!playing) return;
       if (!s.playing) { pos = s.position; playing = false; emit('pause'); }
       else { pos = s.position; t0 = nowMs(); } } catch (e) {}
   }, 2000);
   return tr;
 }
-if (Capacitor.isNativePlatform()) {
+if (Capacitor.isNativePlatform() && Capacitor.isPluginAvailable('AchAudio')) {
   let nativeTrack = null;
   window.__nativeAudio = () => (nativeTrack = nativeTrack || makeNativeTrack());
-  window.__nativeSpeak = (text, o) => AchAudio.speak({ text, rate: (o && o.rate) || 1.02, voice: (o && o.voice) || '' }).catch(() => {});
+  window.__nativeSpeak = (text, o) => AchAudio.speak({ text, rate: (o && o.rate) || 1.02, voice: (o && o.voice) || '' }).then(() => true).catch(() => false);
   window.__nativeStopSpeak = () => AchAudio.stopSpeaking().catch(() => {});
   window.__nativeVoices = () => AchAudio.voices().then((r) => r.voices).catch(() => []);
   window.__nativeNowPlaying = (title, artist) => AchAudio.nowPlaying({ title, artist }).catch(() => {});
 }
 
+if (Capacitor.isNativePlatform() && !Capacitor.isPluginAvailable('AchAudio')) window.__nativeAudioMissing = 'native audio module not registered';
 const native = Capacitor.isNativePlatform();
-const log = (...a) => console.log('[native]', ...a);
+const log = (...a) => { console.log('[native]', ...a); try { window.__dbg && window.__dbg('native: ' + a.map((x) => (x && x.message) ? x.message : (typeof x === 'object' ? JSON.stringify(x) : String(x))).join(' ')); } catch (e) {} };
 
 // ---- hinge ladder (mirrors the page) ----
 const LADDER = [['2026-10-16', 25], ['2026-10-20', 20], ['2026-10-23', 15], ['2026-10-27', 10], ['2026-10-30', 5], ['2026-11-03', 0]];
@@ -202,6 +213,12 @@ async function reschedule(reason) {
 let tmr = null;
 const scheduleSoon = (why) => { clearTimeout(tmr); tmr = setTimeout(() => reschedule(why).catch((e) => log('schedule failed', e)), 1500); };
 
+// ---- share diagnostics ----
+window.__shareDiag = async (text) => {
+  try { const f = await Filesystem.writeFile({ path: 'achillo-diagnostics.txt', data: text, directory: Directory.Cache, encoding: Encoding.UTF8 });
+    await Share.share({ title: 'Achilló diagnostics', url: f.uri, dialogTitle: 'Share diagnostics' }); }
+  catch (e) { try { await Share.share({ title: 'Achilló diagnostics', text }); } catch (_) {} }
+};
 // ---- share log ----
 async function shareLog() {
   const st = await askState();
