@@ -1,1 +1,1 @@
-Audio rebuilt on native iOS: cues play through the system audio player and the voice through iOS speech, so they no longer fight or stall. Headphones out pauses the session. If audio fails to start you get a Retry button. Lock-screen shows the exercise with working pause/skip. Session controls are proper circles again, and the sound buttons are back.
+Reminder times are now any time you like (iOS time wheel): morning check, evening round, imagery. Quick-one spacing from 30 min to 3 h, last one up to 11 PM. Evening round and imagery default to 8 and 9 PM.

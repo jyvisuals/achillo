@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const p=await b.newPage({viewport:{width:390,height:844},colorScheme:'dark'});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{const R=Date;window.__off=new R('2026-10-16T05:20').getTime()-R.now();class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+window.__off);}static now(){return R.now()+window.__off;}};window.Date=D;});
+await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
+await p.click('#tabbar button[data-tab=settings]');await p.waitForTimeout(300);
+console.log('values:',await p.$$eval('.tpick',e=>e.map(x=>x.id+'='+x.value)));
+await p.fill('#tMorning','05:30');await p.dispatchEvent('#tMorning','change');await p.selectOption('#tCad','90');await p.waitForTimeout(2200);
+console.log('prefs:',await p.evaluate(()=>localStorage.getItem('ach:prefs')));
+console.log('notes:',await p.evaluate(()=>window.__ln.pending.filter(n=>new Date(n.schedule.at).getDate()<=17).map(n=>new Date(n.schedule.at).toLocaleString('en-US',{weekday:'short',hour:'numeric',minute:'2-digit'})+' '+n.title).slice(0,14)),errs);
+await b.close();})();

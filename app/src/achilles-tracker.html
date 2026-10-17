@@ -315,6 +315,7 @@ details.fold>.body{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .srow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;font-size:14.5px}.srow>label,.srow>span:first-child{color:var(--ink)}
 .seg{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.srow.stack{flex-direction:column;align-items:flex-start;gap:6px}.srow.stack .seg{justify-content:flex-start}.seg button{min-height:32px;padding:4px 11px;border-radius:999px;font-size:13px}.seg button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .srow select{max-width:58vw;padding:7px 10px;border-radius:10px;background:var(--card2,transparent);color:var(--ink);border:1px solid var(--line);font-size:14px}
+.tpick{min-height:40px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--sunk);color:var(--ink);font:inherit;font-size:16px;color-scheme:inherit}
 .shint{font-size:12.5px;color:var(--muted);line-height:1.4;margin:2px 0 8px}
 .chk{display:flex;flex-wrap:wrap;gap:6px}.chk button{min-height:32px;padding:4px 12px;border-radius:999px;font-size:13px}.chk button.on{background:var(--ok);border-color:var(--ok);color:#fff}
 html:not(.native) .native-only{display:none}
@@ -614,11 +615,11 @@ pre.rtext{display:none}
 
     <div class="sgrp native-only"><h3>Reminders</h3>
       <div class="srow"><span>Reminders</span><div class="seg" id="remSeg" data-pref="remind"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
-      <div class="srow stack"><span>Morning check</span><div class="seg" id="mornSeg" data-pref="morning"><button data-v="7:30">7:30</button><button data-v="7:55">7:55</button><button data-v="8:30">8:30</button><button data-v="9:00">9:00</button></div></div>
-      <div class="srow stack"><span>Quick ones every</span><div class="seg" id="cadSeg" data-pref="cadence"><button data-v="45">45 min</button><button data-v="60">60 min</button><button data-v="90">90 min</button><button data-v="120">2 h</button></div></div>
-      <div class="srow stack"><span>Last quick one</span><div class="seg" id="lastSeg" data-pref="lastHour"><button data-v="19">7 PM</button><button data-v="20">8 PM</button><button data-v="21">9 PM</button><button data-v="22">10 PM</button></div></div>
-      <div class="srow stack"><span>Evening round</span><div class="seg" id="eveSeg" data-pref="evening"><button data-v="15:00">3:00</button><button data-v="16:00">4:00</button><button data-v="17:00">5:00</button><button data-v="18:00">6:00</button></div></div>
-      <div class="srow stack"><span>Imagery</span><div class="seg" id="imgSeg" data-pref="imageryAt"><button data-v="20:00">8:00</button><button data-v="20:25">8:25</button><button data-v="21:00">9:00</button><button data-v="21:30">9:30</button></div></div>
+      <div class="srow"><label for="tMorning">Morning check</label><input type="time" id="tMorning" data-pref="morning" class="tpick"></div>
+      <div class="srow"><label for="tCad">Quick ones every</label><select id="tCad" data-pref="cadence" class="tpick"><option value="30">30 min</option><option value="45">45 min</option><option value="60">1 hour</option><option value="75">75 min</option><option value="90">90 min</option><option value="120">2 hours</option><option value="180">3 hours</option></select></div>
+      <div class="srow"><label for="tLast">Last quick one</label><select id="tLast" data-pref="lastHour" class="tpick"><option value="15">3 PM</option><option value="16">4 PM</option><option value="17">5 PM</option><option value="18">6 PM</option><option value="19">7 PM</option><option value="20">8 PM</option><option value="21">9 PM</option><option value="22">10 PM</option><option value="23">11 PM</option></select></div>
+      <div class="srow"><label for="tEve">Evening round</label><input type="time" id="tEve" data-pref="evening" class="tpick"></div>
+      <div class="srow"><label for="tImg">Imagery</label><input type="time" id="tImg" data-pref="imageryAt" class="tpick"></div>
       <div class="shint">Reminders rebuild themselves whenever you log something, so anything already done stays quiet.</div>
     </div>
 
@@ -892,9 +893,11 @@ function homeList(){const d=day();const left=homeLeft(d);
   const after=left.filter(k=>k!=='scar').flatMap(k=>ANK_KEYS[k]);
   const calf=d.bfrA?[]:['bcr30','srest','bcr15a','srest','bcr15b','srest','bcr15c','cuffdown'];
   return calf.concat(d.bfrA&&!left.includes('scar')?[]:gap,['bpi1','srest','bpi2','srest','bpi3','srest','bpi4','deflate'],after);}
-const PREF_DEF={rate:1.02,voice:'',haptics:1,remind:1,morning:'7:55',cadence:60,lastHour:21,evening:'16:00',imageryAt:'20:25',pool:['toeyoga2','inviso','eviso','hiprot','pfstraight']};
+const PREF_DEF={rate:1.02,voice:'',haptics:1,remind:1,morning:'7:55',cadence:60,lastHour:21,evening:'20:00',imageryAt:'21:00',pool:['toeyoga2','inviso','eviso','hiprot','pfstraight']};
 let prefs=Object.assign({},PREF_DEF,local.get('prefs')||{});
+if(!prefs.v2times){if(prefs.evening==='16:00')prefs.evening='20:00';if(prefs.imageryAt==='20:25')prefs.imageryAt='21:00';prefs.v2times=1;try{local.set('prefs',prefs);}catch(e){}}
 let audRefresh=null,volRefresh=null;
+function fmtHM(v){const [h,m]=String(v||'20:00').split(':').map(Number);return ((h%12)||12)+(m?':'+String(m).padStart(2,'0'):'')+(h<12?' AM':' PM');}
 function savePrefs(){local.set('prefs',prefs);nativeEvt('saved',{day:TODAY,prefs:true});}
 function pickVoice(){try{if(!prefs.voice)return null;return speechSynthesis.getVoices().find(v=>v.voiceURI===prefs.voice)||null;}catch(e){return null;}}
 let voice=true, soundPref=true, vol=1; try{voice=localStorage.getItem('ach:voice')!=='0';soundPref=localStorage.getItem('ach:sound')!=='0';vol=parseFloat(localStorage.getItem('ach:vol')||'1')||1;}catch(e){}
@@ -1419,12 +1422,12 @@ function _renderNow(){
     if(false){txt.textContent='BFR first: cuff high on the thigh, seated calf raises 30/15/15/15, cuff off 2 min, then knee-bent isometric 30/15/15/15. About 15 minutes.';btn('Start BFR',()=>startSession(false,false,'bfrpress'),true);img();return;}
     if(rounds===0&&h<23){txt.textContent=(partial?'Chris’s program, '+L+' exercises left. Picks up where you stopped.':'Chris’s program: barefoot first, boot-on at the gym. About 35 minutes; stop anytime.')+(v==='back'?' Easy day: one round only, lighter effort.':'')+(bfrPlanned()&&v==='go'?' BFR covers the calf raise and knee-bent isometric today.':v&&v!=='go'&&bfrDay(today)?' No BFR today (morning wasn\'t quiet); the calf raise and knee-bent isometric are back in, no cuff.':'');
       btn(partial?'Resume Chris’s program':'Start Chris’s program',()=>startSession(false,false,'ankle'),true);img();return;}
-    if(rounds===1&&h>=16&&h<23&&v!=='back'){const HL=homeLeft(d).length,GL=gymLeft(d).length;txt.textContent='Evening round: '+(HL?'Barefoot PT (no cuff)'+(GL?', then Boot-on PT.':'.'):'Boot-on PT.')+(partial?' Picks up where you stopped.':'');
+    if(rounds===1&&h>=Math.min(16,parseInt(prefs.evening)||16)&&h<23&&v!=='back'){const HL=homeLeft(d).length,GL=gymLeft(d).length;txt.textContent='Evening round: '+(HL?'Barefoot PT (no cuff)'+(GL?', then Boot-on PT.':'.'):'Boot-on PT.')+(partial?' Picks up where you stopped.':'');
       hint(homeLeft(d).length?'home':'gym',false,false);btn(partial?'Resume evening round':'Start evening round',()=>startSession(false,false,homeLeft(d).length?'home':'gym'),true);snackBtn(btn);img();return;}
     // between rounds: one quick exercise an hour, rotating
     if(rounds>=1&&h>=7&&h<23){const sn=snackNext();if(sn){const due=snackDue();const nm=ANK_DEF.find(x=>x[0]===sn)[2].split(' · ')[0];
       if(due){txt.textContent=(rounds>=2?'Both rounds done. ':(h<16?'Morning round done. ':''))+'Quick one: '+nm+', all sets, a few minutes. Boot on. Chris: one drill every hour or so between rounds.';hint('snack:'+sn,false,false);btn('Quick one · '+nm,()=>startSession(false,false,'snack:'+sn),true);img();return;}
-      else{const last=snackLast();txt.textContent=(rounds>=2?'Both rounds done. ':'')+'Next quick one around '+new Date(last+55*60000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+(rounds===1?'; evening round from 4.':'.');btn('Quick one · '+nm,()=>startSession(false,false,'snack:'+sn));img();return;}}}
+      else{const last=snackLast();txt.textContent=(rounds>=2?'Both rounds done. ':'')+'Next quick one around '+new Date(last+55*60000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+(rounds===1?'; evening round '+fmtHM(prefs.evening)+'.':'.');btn('Quick one · '+nm,()=>startSession(false,false,'snack:'+sn));img();return;}}}
   }
   const isoN=isoTarget(),isoK=d.iso||0;
   const pressTime=isoN===1?h>=17:isoN===2?(isoK===0?h>=11:h>=17):(isoK===0?h>=7:isoK===1?h>=14:h>=19);
@@ -1556,6 +1559,10 @@ function setSeg(key,v){
 function renderSettings(){
   document.querySelectorAll('#setCard .seg').forEach(seg=>{const key=seg.dataset.pref;const cur=segVal(key);
     seg.querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.v===cur);b.onclick=()=>{setSeg(key,b.dataset.v);renderSettings();};});});
+  // time and interval pickers (any value)
+  document.querySelectorAll('#setCard .tpick').forEach(el=>{const key=el.dataset.pref;let v=prefs[key];
+    if(el.type==='time'){const [h,m]=String(v).split(':');v=String(+h).padStart(2,'0')+':'+String(+m||0).padStart(2,'0');}
+    el.value=String(v);el.onchange=()=>{let nv=el.value;if(!nv)return;if(el.type==='time'){const [h,m]=nv.split(':');nv=(+h)+':'+m;}else nv=parseFloat(nv);prefs[key]=nv;savePrefs();renderNow();};});
   // voices
   const sel=$('voiceSel');const fill=async()=>{let vs=[];if(window.__nativeVoices){vs=(await window.__nativeVoices()).map(v=>({voiceURI:v.id,name:v.name+(v.quality!=='default'?' ('+v.quality+')':''),lang:v.lang}));}else try{vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));}catch(e){}
     vs.sort((a,b)=>(a.lang===navigator.language?-1:0)-(b.lang===navigator.language?-1:0)||a.name.localeCompare(b.name));

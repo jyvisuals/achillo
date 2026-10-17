@@ -99,7 +99,7 @@ const at = (dayKey, h, m = 0) => { const [y, mo, d] = dayKey.split('-').map(Numb
 const addDays = (dayKey, n) => { const t = at(dayKey, 12); t.setDate(t.getDate() + n); return keyOf(t); };
 
 // ---- user prefs (written by the page's Settings panel) ----
-const PREF_DEF = { remind: 1, morning: '7:55', cadence: 60, lastHour: 21, evening: '16:00', imageryAt: '20:25', haptics: 1 };
+const PREF_DEF = { remind: 1, morning: '7:55', cadence: 60, lastHour: 21, evening: '20:00', imageryAt: '21:00', haptics: 1 };
 function prefs() { try { return Object.assign({}, PREF_DEF, JSON.parse(localStorage.getItem('ach:prefs') || '{}')); } catch (e) { return { ...PREF_DEF }; } }
 const hm = (str) => { const [h, m] = String(str).split(':').map(Number); return [h || 0, m || 0]; };
 
@@ -187,7 +187,7 @@ async function reschedule(reason) {
     // Evening round
     if (rounds < 2) {
       note(L, at(dk, eH, eM), 'Evening round', 'Barefoot PT (no cuff), then Boot-on PT.', 'round');
-      note(L, new Date(at(dk, eH, eM).getTime() + 150 * 60000), 'Evening round', 'Still time for round two.', 'round');
+      { const n2 = new Date(at(dk, eH, eM).getTime() + 90 * 60000); if (n2.getHours() < 23) note(L, n2, 'Evening round', 'Still time for round two.', 'round'); }
     }
     // Imagery
     if (imagery < 2) note(L, at(dk, iH, iM), 'Evening imagery', 'Five minutes, eyes closed, voice-led.', 'imagery');
