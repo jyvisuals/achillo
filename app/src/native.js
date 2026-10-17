@@ -303,7 +303,7 @@ whenReady(async () => {
   let hapState = '';
   const hapNote = (st) => { if (st === hapState) return; hapState = st; log('vibration engine:', st); window.__hapState = st; window.dispatchEvent(new Event('ach:hapstate')); };
   const buzz = (pattern, secs) => AchAudio.haptic({ pattern, secs: secs || 1, strength: Math.min(1, +prefs().haptics || 0.8) })
-    .then((r) => { if (!r || !r.ok) { hapNote('basic taps only (' + ((r && r.error) || 'Core Haptics unavailable') + ')'); fallback(pattern); } else hapNote('full patterns'); })
+    .then((r) => { if (!r || !r.ok) { hapNote('basic taps only (' + pattern + ': ' + ((r && r.error) || 'Core Haptics unavailable') + ')'); fallback(pattern); } else hapNote(r.retried ? 'full patterns (engine restarted)' : 'full patterns'); })
     .catch((e) => { hapNote('basic taps only (' + ((e && (e.message || e.code)) || 'native module missing') + ')'); fallback(pattern); });
   window.__buzz = buzz;
   window.addEventListener('ach:done', () => { if (prefs().haptics) buzz('success'); });

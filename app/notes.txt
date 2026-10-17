@@ -1,1 +1,1 @@
-Fix: the app's native module (audio player, native voice, full vibration patterns) now actually loads. Before this, everything was falling back to the web player and basic taps.
+Vibrations no longer drop out mid-session: the vibration engine recovers by itself if iOS stops it.

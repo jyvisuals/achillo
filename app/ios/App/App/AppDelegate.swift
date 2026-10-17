@@ -216,7 +216,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         if let e = hEngine { return e }
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics, let e = try? CHHapticEngine() else { return nil }
         e.playsHapticsOnly = true
-        e.isAutoShutdownEnabled = true
+        e.isAutoShutdownEnabled = false // sessions fire patterns every second or two; keep it running
         e.resetHandler = { [weak self] in try? self?.hEngine?.start() }
         e.stoppedHandler = { [weak self] _ in self?.hEngine = nil }
         try? e.start()
@@ -257,7 +257,9 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
                 let n = Int(h.rounded())
                 if n >= 2 { for t in 1..<n { let left = n - t; ev.append(left <= 3 && n >= 6 ? self.tap(Double(t), 0.55 * k, 0.95) : self.tap(Double(t), 0.32 * k, 0.15)) } }
             case "stop":
-                try? self.hPlayer?.stop(atTime: CHHapticTimeImmediate); call.resolve(["ok": true]); return
+                try? self.hPlayer?.stop(atTime: CHHapticTimeImmediate); self.hPlayer = nil
+                self.hEngine?.stop(completionHandler: nil); self.hEngine = nil // rebuilt on the next pattern
+                call.resolve(["ok": true]); return
             case "tick": ev = [self.tap(0, 0.45 * k, 0.9)]
             case "go": ev = [self.tap(0, 1 * k, 1), self.tap(0.11, 0.8 * k, 0.8)]
             case "rest": ev = [self.tap(0, 0.75 * k, 1), self.tap(0.13, 0.75 * k, 1)] // a crisp double-click, then stillness: nothing like the smooth lowering
@@ -268,16 +270,23 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
             case "warn": ev = [self.hum(0, 0.35, 1 * k, 0.6), self.hum(0.55, 0.35, 1 * k, 0.6), self.hum(1.1, 0.35, 1 * k, 0.6)]
             default: ev = [self.tap(0, 0.6 * k, 0.5)]
             }
-            do {
-                try e.start()
-                let pat = try CHHapticPattern(events: ev, parameterCurves: curves)
-                let overlay = ["tick", "warn", "success"].contains(name) // these layer on top; step patterns replace each other
-                if !overlay { try self.hPlayer?.stop(atTime: CHHapticTimeImmediate) }
-                let pl = try e.makePlayer(with: pat)
+            let overlay = ["tick", "warn", "success"].contains(name) // these layer on top; step patterns replace each other
+            let pat: CHHapticPattern
+            do { pat = try CHHapticPattern(events: ev, parameterCurves: curves) } catch { call.resolve(["ok": false, "error": "pattern \(name): \(error.localizedDescription)"]); return }
+            func play(_ eng: CHHapticEngine) throws {
+                try eng.start()
+                if !overlay { try? self.hPlayer?.stop(atTime: CHHapticTimeImmediate) } // an old player from a stopped engine can throw; ignore
+                let pl = try eng.makePlayer(with: pat)
                 if !overlay { self.hPlayer = pl }
                 try pl.start(atTime: CHHapticTimeImmediate)
-                call.resolve(["ok": true])
-            } catch { call.resolve(["ok": false, "error": error.localizedDescription]) }
+            }
+            do { try play(e); call.resolve(["ok": true]) }
+            catch {
+                // the engine idles out between phases; rebuild it once and try again
+                self.hEngine?.stop(completionHandler: nil); self.hEngine = nil; self.hPlayer = nil
+                if let e2 = self.engine(), (try? play(e2)) != nil { call.resolve(["ok": true, "retried": true]) }
+                else { call.resolve(["ok": false, "error": error.localizedDescription]) }
+            }
         }
     }
     private var hPlayer: CHHapticPatternPlayer?
