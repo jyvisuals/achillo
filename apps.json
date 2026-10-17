@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.18",
+          "buildVersion": "18",
+          "date": "2026-10-17T13:05:23Z",
+          "localizedDescription": "Vibrations you can follow by feel: push swells, hold is a thud plus a heartbeat with 3 ticks before release, lowering fades, rests get countdown ticks, last rep is a triple tap, cuff warnings at 8 and 10 min. Try them all in Settings.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.18.ipa",
+          "size": 931935,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.17",
           "buildVersion": "17",
           "date": "2026-10-17T12:13:46Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.16.ipa",
           "size": 924332,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.15",
-          "buildVersion": "15",
-          "date": "2026-10-17T03:25:26Z",
-          "localizedDescription": "Skipping now cuts off whatever is being said. Spoken lines stop where the next exercise (or your skip) lands.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.15.ipa",
-          "size": 922540,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.17",
-      "versionDate": "2026-10-17T12:13:46Z",
-      "versionDescription": "Ring combines A and D: notches for reps (now up to 40) and sets; during BFR the outer ring becomes the 10-minute cuff dial with set dots in the middle.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.17.ipa",
-      "size": 924783
+      "version": "1.1.18",
+      "versionDate": "2026-10-17T13:05:23Z",
+      "versionDescription": "Vibrations you can follow by feel: push swells, hold is a thud plus a heartbeat with 3 ticks before release, lowering fades, rests get countdown ticks, last rep is a triple tap, cuff warnings at 8 and 10 min. Try them all in Settings.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.18.ipa",
+      "size": 931935
     }
   ],
   "news": []
