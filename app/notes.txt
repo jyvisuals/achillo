@@ -1,1 +1,1 @@
-Skipping now cuts off whatever is being said. Spoken lines stop where the next exercise (or your skip) lands.
+Session ring now has notches: outer ring = sets, inner ring = reps. Big number is the rep you're on for quick reps, seconds for holds and rests. Cuff time moved into the badge and turns red at 8 minutes.
