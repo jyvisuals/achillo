@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.31",
+          "buildVersion": "31",
+          "date": "2026-10-18T15:48:57Z",
+          "localizedDescription": "Boot schedule: 20° today (Oct 18), 15° Wed Oct 21, 10° Sat Oct 24, 5° Tue Oct 27, neutral Fri Oct 30. Hinge-day reminders follow it.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.31.ipa",
+          "size": 935892,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.30",
           "buildVersion": "30",
           "date": "2026-10-17T23:35:35Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.29.ipa",
           "size": 935518,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.28",
-          "buildVersion": "28",
-          "date": "2026-10-17T16:02:49Z",
-          "localizedDescription": "Letting go after a hold (eversion, inversion, plantarflexion isometrics) now uses the lowering vibration. Before, it was a single faint tap.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.28.ipa",
-          "size": 934173,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.30",
-      "versionDate": "2026-10-17T23:35:35Z",
-      "versionDescription": "Pocket mode now shows the exercise name: what's next during rests, what you're starting during setup. It's brighter for a few seconds when it changes.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.30.ipa",
-      "size": 935866
+      "version": "1.1.31",
+      "versionDate": "2026-10-18T15:48:57Z",
+      "versionDescription": "Boot schedule: 20° today (Oct 18), 15° Wed Oct 21, 10° Sat Oct 24, 5° Tue Oct 27, neutral Fri Oct 30. Hinge-day reminders follow it.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.31.ipa",
+      "size": 935892
     }
   ],
   "news": []
