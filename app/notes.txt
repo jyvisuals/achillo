@@ -1,1 +1,1 @@
-Pocket mode now shows the exercise name: what's next during rests, what you're starting during setup. It's brighter for a few seconds when it changes.
+Boot schedule: 20° today (Oct 18), 15° Wed Oct 21, 10° Sat Oct 24, 5° Tue Oct 27, neutral Fri Oct 30. Hinge-day reminders follow it.

@@ -148,7 +148,7 @@ const native = Capacitor.isNativePlatform();
 const log = (...a) => { console.log('[native]', ...a); try { window.__dbg && window.__dbg('native: ' + a.map((x) => (x && x.message) ? x.message : (typeof x === 'object' ? JSON.stringify(x) : String(x))).join(' ')); } catch (e) {} };
 
 // ---- hinge ladder (mirrors the page) ----
-const LADDER = [['2026-10-16', 25], ['2026-10-20', 20], ['2026-10-23', 15], ['2026-10-27', 10], ['2026-10-30', 5], ['2026-11-03', 0]];
+const LADDER = [['2026-10-16', 25], ['2026-10-18', 20], ['2026-10-21', 15], ['2026-10-24', 10], ['2026-10-27', 5], ['2026-10-30', 0]];
 const VISIT = { day: '2026-10-30', h: 12, m: 15, body: 'Duke at 1:15 today. Tap Share log before you go in.' };
 const keyOf = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const at = (dayKey, h, m = 0) => { const [y, mo, d] = dayKey.split('-').map(Number); return new Date(y, mo - 1, d, h, m, 0, 0); };

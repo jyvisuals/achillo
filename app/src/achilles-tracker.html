@@ -713,7 +713,7 @@ const WEEKS=[
  {n:4,range:'Days 22–28 · Oct 23–29',title:'Hinge coming down',wb:100,iso:2,legExt:2,
   points:['Full weight in the boot, walking more. Swelling is the limiter.','Boot: 15° Oct 23, 10° Oct 27. Arrive at the Oct 30 visit at 10°.','Hold the week-3 dose. Add nothing new.','Goal: arrive Oct 30 with a calm ankle and a clean incision.','Questions for Oct 30: boot wean timeline, straight-knee holds, scar massage, PT start, driving, BFR, stopping aspirin.']},
  {n:5,range:'Days 29–35 · Oct 30–Nov 5',title:'After the visit',wb:100,iso:2,legExt:2,
-  points:['Oct 30 visit, 1:15 PM. Aspirin course ends.','Boot: 5° Oct 30 (after the visit), 0° Nov 3. Whatever he says at the visit replaces this.','Walking volume up as swelling allows.','Pencil-in version until the visit.']},
+  points:['Oct 30 visit, 1:15 PM. Aspirin course ends.','Boot: neutral (0°) by Oct 30, visit day. Whatever he says at the visit replaces this.','Walking volume up as swelling allows.','Pencil-in version until the visit.']},
  {n:6,range:'Days 36–42 · Nov 6–12',title:'Neutral in the boot',wb:100,iso:2,legExt:2,
   points:['Boot: settled at neutral. Shoes with a heel lift come at 8 weeks (~Nov 10) per the written protocol. Never past neutral until Dec 15.','Full weight, longer walks, routine and press continue.','Boot wean and PT start come from Murawski, not from this app.']}
 ];
@@ -741,16 +741,16 @@ function thriceNote(d){const k=d.iso||0,n=isoTarget();let why='';
   if(thriceOn()&&n<3){if(today<THRICE_FROM)why='';else if(bfrDay(today))why=' · BFR day, two max';else if(verdictKind(TODAY)==='back'||verdictKind(TODAY)==='hold')why=' · easy day';else if(!verdictKind(TODAY))why=' · morning check first';else why=' · quiet mornings '+Math.min(quietStreak(),4)+'/4';}
   return 'Calf presses · '+k+' of '+n+why;}
 const ASPIRIN_END=new Date(2026,9,30);
-// Hinge: fixed at 30° through Oct 15, then 10° a week (5° every Fri and Tue) to neutral Nov 3, per the written protocol's one-wedge-a-week pace. Shoes with heel lift ~Nov 10.
+// Hinge: fixed at 30° through Oct 15, then 5° every 3 days from 20° on Oct 18 to neutral Fri Oct 30 (Jon's call), visit day. Shoes with heel lift ~Nov 10.
 const BOOT=[
  {from:new Date(2026,9,2), deg:30,hinge:'30° (fixed through week 2)',label:'No change until Oct 16'},
  {from:new Date(2026,9,16),deg:25,hinge:'25°',label:'Down one notch to 25°'},
- {from:new Date(2026,9,20),deg:20,hinge:'20°',label:'Down one notch to 20°'},
- {from:new Date(2026,9,23),deg:15,hinge:'15°',label:'Down one notch to 15°'},
- {from:new Date(2026,9,27),deg:10,hinge:'10°',label:'Down one notch to 10°'},
- {from:new Date(2026,9,30),deg:5, hinge:'5°', label:'Down one notch to 5° (after the visit)'},
- {from:new Date(2026,10,3),deg:0, hinge:'0° (neutral)',label:'Down one notch to 0°'},
- {from:new Date(2026,10,4),deg:0, hinge:'0° (neutral)',label:'Settle at neutral'},
+ {from:new Date(2026,9,18),deg:20,hinge:'20°',label:'Down one notch to 20°'},
+ {from:new Date(2026,9,21),deg:15,hinge:'15°',label:'Down one notch to 15°'},
+ {from:new Date(2026,9,24),deg:10,hinge:'10°',label:'Down one notch to 10°'},
+ {from:new Date(2026,9,27),deg:5, hinge:'5°', label:'Down one notch to 5°'},
+ {from:new Date(2026,9,30),deg:0, hinge:'0° (neutral)',label:'Down to neutral (visit day)'},
+ {from:new Date(2026,9,31),deg:0, hinge:'0° (neutral)',label:'Settle at neutral'},
 ];
 function bootFor(d){let cur=BOOT[0],next=null;for(let i=0;i<BOOT.length;i++){if(d>=BOOT[i].from)cur=BOOT[i];else{next=BOOT[i];break;}}return {cur,next,changeToday:cur.from.getTime()===d.getTime()};}
 
@@ -1607,7 +1607,7 @@ function _renderNow(){
   txt.textContent='All done for today. Keep the leg up when you can and judge it tomorrow morning.';
 }
 function renderBoot(){const b=bootFor(today);
-  $('booth').textContent=b.cur.hinge; $('bootPad').textContent=b.cur.deg===30?'Fixed at 30° through Oct 15. First notch comes with full weight on Oct 16.':(b.next&&b.cur.deg>0?'10° a week: one notch Fri and Tue until neutral Nov 3.':'');
+  $('booth').textContent=b.cur.hinge; $('bootPad').textContent=b.cur.deg===30?'Fixed at 30° through Oct 15. First notch comes with full weight on Oct 16.':(b.next&&b.cur.deg>0?'One 5° notch every 3 days until neutral Fri Oct 30.':'');
   const frac=(30-b.cur.deg)/30; const n=$('needle'), f=$('dialFill');
   n.style.transformOrigin='56px 62px'; n.removeAttribute('transform');
   if(!n.dataset.init){n.dataset.init='1';n.style.transform='rotate(-90deg)';f.style.strokeDashoffset='144.5';
@@ -1645,7 +1645,7 @@ function renderReport(){const r=buildReport();
   const prog=$('rprog');prog.innerHTML='';
   const row=(k,t)=>{const e=document.createElement('div');e.className='row';e.innerHTML='<div class="k"></div><div></div>';e.children[0].textContent=k;e.children[1].textContent=t;prog.appendChild(e);};
   row('Weight','Cleared Oct 2: ramp to 50% through Oct 15, then full weight in the boot from Oct 16. Today\'s ceiling: '+ceilingToday()+'%'+(settings.bodyWeight?' (~'+Math.round(settings.bodyWeight*ceilingToday()/100)+' lb)':'')+'.');
-  const b=bootFor(today);row('Hinge','VACOped '+b.cur.hinge+'. Fixed at 30° through Oct 15; then 10° a week (5° Fri and Tue) from Oct 16, neutral Nov 3.');
+  const b=bootFor(today);row('Hinge','VACOped '+b.cur.hinge+'. Fixed at 30° through Oct 15; then 5° notches: 25° Oct 16, 20° Oct 18, 15° Oct 21, 10° Oct 24, 5° Oct 27, neutral Oct 30.');
   row('Press','Isometric plantarflexion in the boot, knee bent, ~50% effort, 4 × 30 s, 3 s ramps. Once daily Oct 2–5; twice daily from Oct 6 when mornings were quiet; up to 3 from Oct 11. Dropped Oct 15 in favor of Chris\'s program (25% band isometrics, knee straight and bent).');
   row('BFR','Thigh cuff (pressure not yet measured). Mon/Wed/Fri evenings Oct 5–14: 30/15/15/15 light in-boot plantarflexion squeezes. From Oct 15, per Chris: daily, mornings after a quiet check — seated calf raise 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15 × 3 s squeezes, each block under 10 min.');
   row('Foot / imagery','From Oct 11: foot intrinsics boot off in the splint (toe yoga, short-foot holds, toe spreads, towel scrunches), ~6 min, 5×/week ('+Object.values(days).filter(x=>x&&x.foot).length+' sessions). Motor imagery of calf raises and walking, 5 min, up to 2×/day ('+Object.values(days).reduce((a,x)=>a+((x&&x.imagery)||0),0)+' sessions).');
@@ -1666,7 +1666,7 @@ function reportText(){const r=buildReport();const b=bootFor(today);
   const L=[];L.push('ACHILLES RECOVERY REPORT — Jon Youngpenn');L.push('Left Achilles PARS repair Sept 15, 2026 (Dr. Murawski). Covers '+fmt(START)+' – '+fmt(r.end)+' ('+r.n+' days).');L.push('');
   L.push('SUMMARY');L.push('- Calf press sessions: '+r.pressDone+' of '+r.pressPlanned+' planned');L.push('- BFR sessions: '+r.bfr);L.push('- Morning checks: '+r.checked+' ('+r.quiet+' quiet, '+r.held+' held, '+r.back+' backed off)');
   L.push('- Gym days: '+r.gymDays+'; bike '+r.bikeDays+' days / '+r.bikeMin+' min; leg extension sessions: '+r.legExt+'; routine days: '+r.routine);L.push('- Aspirin both doses: '+r.aspirin+' of '+r.aspirinDays+' days');L.push('- Weight ceiling today: '+ceilingToday()+'%; hinge: '+b.cur.hinge);L.push('');
-  L.push('PROTOCOL AS RUN');L.push('- Weight: ramp to 50% through Oct 15, then full weight in boot from Oct 16.');L.push('- Hinge: 30° fixed through Oct 15, then 10° a week (5° Fri and Tue) from Oct 16, neutral Nov 3.');
+  L.push('PROTOCOL AS RUN');L.push('- Weight: ramp to 50% through Oct 15, then full weight in boot from Oct 16.');L.push('- Hinge: 30° fixed through Oct 15, then 5° notches: 25° Oct 16, 20° Oct 18, 15° Oct 21, 10° Oct 24, 5° Oct 27, neutral Oct 30.');
   L.push('- Press: isometric plantarflexion in boot, knee bent, ~50% effort, 4x30s, 3s ramps. 1x/day Oct 2–5, 2x/day from Oct 6 when mornings quiet. Dropped Oct 15 for Chris\'s program.');L.push('- BFR: thigh cuff, Mon/Wed/Fri evenings Oct 5–14 (30/15/15/15 in-boot squeezes); daily mornings from Oct 15 per Chris: seated calf raise 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15 x 3s squeezes. Pressure not yet measured.');L.push('- Also: quad sets, glute squeezes, SLR, side-lying abduction; leg extensions with ankle pointed. No leg press, inversion/eversion, stretching, dorsiflexion.');L.push('');
   L.push('FLAGGED MORNINGS / NOTES');if(!r.flagged.length)L.push('- none');r.flagged.forEach(f=>L.push('- '+f.d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+': '+[f.v==='back'?'backed off':f.v==='hold'?'held':'',f.inc?'incision flagged':'',f.notes||''].filter(Boolean).join('; ')));L.push('');
   L.push('DAY LOG');r.list.forEach(d=>{const k=keyOf(d),x=days[k]||{};const v=verdictKind(k);const gg=x.gym||{};L.push('- '+d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+': press '+(x.iso||0)+'/'+isoPlanned(d)+(x.bfr?', BFR':'')+(x.routine?', routine':'')+(gg.bike&&gg.bike.min?', bike '+gg.bike.min+'m'+(gg.bike.watts?' @'+gg.bike.watts+'W':''):'')+(x.legExt?', leg ext'+(gg.legExt&&gg.legExt.wt?' '+gg.legExt.wt+'lb':''):'')+(gg.notes?' ['+gg.notes+']':'')+(v?', morning '+v:'')+(x.notes?' — '+x.notes:''));});L.push('');
