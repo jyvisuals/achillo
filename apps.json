@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.35",
+          "buildVersion": "35",
+          "date": "2026-10-19T20:13:47Z",
+          "localizedDescription": "Readable names in the Calf map jump list (no more map_tp).",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.35.ipa",
+          "size": 940387,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.34",
           "buildVersion": "34",
           "date": "2026-10-19T20:10:44Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.33.ipa",
           "size": 939437,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.32",
-          "buildVersion": "32",
-          "date": "2026-10-19T18:22:52Z",
-          "localizedDescription": "Strap hamstring stretch added to Barefoot PT right after lower trunk rotation (2 × 30 s each leg; strap behind the heel on the left). BFR isometric is now the ball press into the wall.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.32.ipa",
-          "size": 936144,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.34",
-      "versionDate": "2026-10-19T20:10:44Z",
-      "versionDescription": "Calf map now shows the leg from the side you actually see (inner or outer), with bony landmarks and a measured line to each spot. During Get set the dot slides from the landmark to the spot.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.34.ipa",
-      "size": 940323
+      "version": "1.1.35",
+      "versionDate": "2026-10-19T20:13:47Z",
+      "versionDescription": "Readable names in the Calf map jump list (no more map_tp).",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.35.ipa",
+      "size": 940387
     }
   ],
   "news": []
