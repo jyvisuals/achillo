@@ -1,1 +1,1 @@
-Calf map: Skip now goes right → left → rate, one step at a time (it used to jump past the left leg). Tibialis posterior target moved to the cord between the inner ankle bone and the arch bump, where it's easier to feel.
+Calf map names in plain words: inner calf (medial gastroc), outer calf (lateral gastroc), deep calf (soleus), inner ankle, outer shin.

@@ -217,7 +217,7 @@ html.tabs .wrap:not(.focus) #audRow{display:none}
 .cmap .cm-btns button small{font-size:10.5px;font-weight:600;color:var(--muted)}
 .cmap .cm-btns button.picked{background:var(--accent);color:#0d1512;border-color:var(--accent)}
 .mapbars{display:flex;flex-direction:column;gap:8px;margin-top:6px}
-.mapbars .mb{display:grid;grid-template-columns:120px 1fr 44px;align-items:center;gap:10px;font-size:13.5px}
+.mapbars .mb{display:grid;grid-template-columns:150px 1fr 40px;align-items:center;gap:10px;font-size:13.5px}
 .mapbars .mb .bar{height:10px;border-radius:5px;background:var(--sunk);overflow:hidden}.mapbars .mb .bar i{display:block;height:100%;background:var(--hold);border-radius:5px}
 .mapbars .mb .v{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
 .sstrip{display:none}
@@ -573,7 +573,7 @@ pre.rtext{display:none}
               <path class="mus" data-m="sol" d="M98,104 C108,150 114,196 110,238 C98,234 86,216 80,192 C94,166 100,136 98,104 Z"/>
               <path class="ghost" d="M54,40 C46,72 48,112 58,142 C63,110 63,72 60,40 Z"/>
               <path class="mus" data-m="mg" d="M62,24 C38,72 40,144 84,196 C106,162 112,96 102,28 C92,20 74,18 62,24 Z"/>
-              <text class="mlab" x="104" y="196"><tspan x="104">medial head:</tspan><tspan x="104" dy="10">big, reaches lower</tspan></text>
+              <text class="mlab" x="104" y="196"><tspan x="104">inner head:</tspan><tspan x="104" dy="10">big, reaches lower</tspan></text>
               <path class="ten" d="M70,186 C76,220 80,250 82,282 L92,282 C92,250 90,220 86,186 Z" fill="url(#cmTen)" opacity=".85"/>
               <path class="mus tpline" data-m="tp" d="M116,206 C120,236 120,256 128,270 C134,276 142,278 150,278" fill="none" stroke-linecap="round"/>
               <line class="lm" x1="147" y1="22" x2="141" y2="246" stroke-dasharray="4 4"/>
@@ -589,7 +589,7 @@ pre.rtext{display:none}
               <path class="mus" data-m="sol2" d="M96,110 C104,150 106,190 102,232 C92,228 84,212 78,190 C92,166 98,138 96,110 Z" style="opacity:.3"/>
               <path class="ghost" d="M52,64 C40,104 46,154 66,194 C66,154 62,104 58,66 Z"/>
               <path class="mus" data-m="lg" d="M70,30 C58,64 60,108 78,146 C90,124 94,82 92,34 C86,26 78,24 70,30 Z"/>
-              <text class="mlab" x="86" y="168"><tspan x="86">lateral head:</tspan><tspan x="86" dy="10">smaller, higher</tspan></text>
+              <text class="mlab" x="86" y="168"><tspan x="86">outer head:</tspan><tspan x="86" dy="10">smaller, higher</tspan></text>
               <path class="mus" data-m="per" d="M112,52 C120,110 120,190 118,252 L110,252 C108,190 108,110 102,58 Z"/>
               <path class="ten" d="M70,186 C76,220 80,250 82,282 L92,282 C92,250 90,220 86,186 Z" fill="url(#cmTen)" opacity=".85"/>
               <circle class="lm bone" cx="128" cy="40" r="8"/><text class="lmt" x="140" y="36">knee bump</text>
@@ -969,11 +969,11 @@ const ANK_DEF=[
 
 // ---- Calf map: learn to find each muscle. Right leg first (what "found it" feels like), then left, then rate the left 0–3.
 const MAP_M=[
- {m:'sol',name:'Soleus',pos:'Sit, knee bent, ball of the foot on the floor, heel up on a book so the foot stays pointed.',touch:'Find the inner edge of your shin bone. Slide your fingertips just behind it, about four fingers above the inner ankle bone.',find:'Press the ball of the foot down, a quarter of effort.',feel:'Feel the deep, low part of the calf firm up under your fingers.'},
- {m:'mg',name:'Medial gastroc',pos:'Sit with the leg out straight, ball of the foot against the ball on the wall, foot pointed.',touch:'From the crease at the back of the knee, go two to three fingers down, on the inner side, onto the fullest part of the bulge.',find:'Press through the big toe, a quarter of effort.',feel:'Feel the inner calf harden under your fingers.'},
- {m:'lg',name:'Lateral gastroc',pos:'Leg out straight, ball of the foot on the ball, toes turned slightly in.',touch:'From the knee crease, two to three fingers down on the outer side, a thumb in from the edge.',find:'Press through the little-toe side, a quarter of effort.',feel:'Feel the outer calf harden.'},
- {m:'tp',name:'Tibialis posterior',pos:'Sit, foot pointed a little, other hand against the inside of the foot.',touch:'Find the inner ankle bone, then the bony bump on the inner arch about an inch below and in front of it. Rest a fingertip halfway between the two. When you press, a cord pops up under it. That\'s the tendon.',find:'Press the inside of the foot into your hand, turning the sole in. The ankle doesn\'t move.',feel:'Feel the cord stand up between the ankle bone and the arch bump.'},
- {m:'per',name:'Peroneals',pos:'Sit, foot pointed a little, hand against the outside of the foot.',touch:'Find the bony bump on the outside of the knee, then go one hand down the outer shin toward the outer ankle bone.',find:'Press the outside of the foot out into your hand. The ankle doesn\'t move.',feel:'Feel the outer shin firm up.'}];
+ {m:'sol',name:'Deep calf (soleus)',pos:'Sit, knee bent, ball of the foot on the floor, heel up on a book so the foot stays pointed.',touch:'Find the inner edge of your shin bone. Slide your fingertips just behind it, about four fingers above the inner ankle bone.',find:'Press the ball of the foot down, a quarter of effort.',feel:'Feel the deep, low part of the calf firm up under your fingers.'},
+ {m:'mg',name:'Inner calf (medial gastroc)',pos:'Sit with the leg out straight, ball of the foot against the ball on the wall, foot pointed.',touch:'From the crease at the back of the knee, go two to three fingers down, on the inner side, onto the fullest part of the bulge.',find:'Press through the big toe, a quarter of effort.',feel:'Feel the inner calf harden under your fingers.'},
+ {m:'lg',name:'Outer calf (lateral gastroc)',pos:'Leg out straight, ball of the foot on the ball, toes turned slightly in.',touch:'From the knee crease, two to three fingers down on the outer side, a thumb in from the edge.',find:'Press through the little-toe side, a quarter of effort.',feel:'Feel the outer calf harden.'},
+ {m:'tp',name:'Inner ankle (tibialis posterior)',pos:'Sit, foot pointed a little, other hand against the inside of the foot.',touch:'Find the inner ankle bone, then the bony bump on the inner arch about an inch below and in front of it. Rest a fingertip halfway between the two. When you press, a cord pops up under it. That\'s the tendon.',find:'Press the inside of the foot into your hand, turning the sole in. The ankle doesn\'t move.',feel:'Feel the cord stand up between the ankle bone and the arch bump.'},
+ {m:'per',name:'Outer shin (peroneals)',pos:'Sit, foot pointed a little, hand against the outside of the foot.',touch:'Find the bony bump on the outside of the knee, then go one hand down the outer shin toward the outer ankle bone.',find:'Press the outside of the foot out into your hand. The ankle doesn\'t move.',feel:'Feel the outer shin firm up.'}];
 const MAP_LIST=[];
 MAP_M.forEach(x=>{
   const ph=[['up','Find it',1,x.find],['hold','Feel it',4,x.feel],['rest','Let go',3,'Let it go. Feel it soften.']];
