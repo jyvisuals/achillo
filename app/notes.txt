@@ -1,1 +1,1 @@
-Calf map names in plain words: inner calf (medial gastroc), outer calf (lateral gastroc), deep calf (soleus), inner ankle, outer shin.
+Calf map: swap between the side view and a view from behind with the buttons next to the model. Your choice sticks.

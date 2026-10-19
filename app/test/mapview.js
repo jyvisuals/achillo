@@ -1,0 +1,10 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});const p=await b.newPage({viewport:{width:390,height:844},deviceScaleFactor:2,colorScheme:'dark'});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.clock.install({time:new Date('2026-10-19T15:00:00')});await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(1500);
+await p.click('#sMap');await p.waitForTimeout(800);
+const go=async(ex,k)=>{const i=await p.evaluate(([ex,k])=>__t.sess.steps.findIndex(s=>s.ex===ex&&s.kind===k),[ex,k]);await p.evaluate(i=>__t.jump(i),i);await p.waitForTimeout(1200);};
+await go('map_mg_L','hold');await p.screenshot({path:'test/out/v1.png'});
+await p.click('#cmViews button[data-v="back"]');await p.waitForTimeout(500);await p.screenshot({path:'test/out/v2.png'});
+await go('map_lg_R','hold');await p.screenshot({path:'test/out/v3.png'});
+const paused=await p.evaluate(()=>document.getElementById('tPhase').textContent);
+console.log('phase',paused,'errs',errs);await b.close();})();
