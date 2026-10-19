@@ -1,1 +1,1 @@
-Readable names in the Calf map jump list (no more map_tp).
+Medial and lateral gastroc now look different: the medial head is bigger and reaches lower; the lateral head is smaller and ends higher. The other head shows faintly for comparison.

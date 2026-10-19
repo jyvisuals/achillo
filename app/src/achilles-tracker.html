@@ -195,6 +195,9 @@ html.tabs .wrap:not(.focus) #audRow{display:none}
 .cmap .mus.on{fill:url(#cmHot);opacity:var(--g,.6);filter:url(#cmGlow)}
 .cmap .mus.tpline.on{fill:none;stroke:#f0a24a}
 .cmap .mus.dim{opacity:.22}
+.cmap .ghost{fill:#5a3530;opacity:.28}
+.cmap .mlab{font-size:8.5px;fill:#c9a27a;font-weight:700;font-family:var(--body,system-ui);display:none}
+.cmap .mlab.show{display:inline}
 .cmap .lm{fill:none;stroke:#7d8c84;stroke-width:1.4}.cmap .lm.bone{fill:#3a4a42;stroke:#9aa9a1}
 .cmap .lmt{font-size:8.5px;fill:#8d9c94;font-family:var(--body,system-ui);font-weight:600;letter-spacing:.02em}
 .cmap .meas{display:none}.cmap .meas.on{display:inline}
@@ -568,7 +571,9 @@ pre.rtext{display:none}
             <path d="M62,10 C40,60 38,120 58,172 C70,204 78,232 80,262 C78,286 90,300 112,300 L192,300 C208,300 210,286 198,279 C172,268 152,262 142,250 L146,200 C150,140 152,80 150,10 Z" fill="url(#cmSkin)" stroke="#33443c" stroke-width="1.5"/>
             <g id="cmMed">
               <path class="mus" data-m="sol" d="M98,104 C108,150 114,196 110,238 C98,234 86,216 80,192 C94,166 100,136 98,104 Z"/>
-              <path class="mus" data-m="mg" d="M64,26 C44,68 46,130 78,176 C98,150 106,90 98,30 C88,22 74,20 64,26 Z"/>
+              <path class="ghost" d="M54,40 C46,72 48,112 58,142 C63,110 63,72 60,40 Z"/>
+              <path class="mus" data-m="mg" d="M62,24 C38,72 40,144 84,196 C106,162 112,96 102,28 C92,20 74,18 62,24 Z"/>
+              <text class="mlab" x="104" y="196"><tspan x="104">medial head:</tspan><tspan x="104" dy="10">big, reaches lower</tspan></text>
               <path class="ten" d="M70,186 C76,220 80,250 82,282 L92,282 C92,250 90,220 86,186 Z" fill="url(#cmTen)" opacity=".85"/>
               <path class="mus tpline" data-m="tp" d="M116,206 C120,236 120,256 128,270 C134,276 142,278 150,278" fill="none" stroke-linecap="round"/>
               <line class="lm" x1="147" y1="22" x2="141" y2="246" stroke-dasharray="4 4"/>
@@ -576,18 +581,20 @@ pre.rtext{display:none}
               <circle class="lm bone" cx="130" cy="258" r="8"/><text class="lmt" x="142" y="246">ankle bone</text>
               <path class="lm" d="M58,30 C70,34 84,34 96,30"/><text class="lmt" x="20" y="22">knee crease</text>
               <g class="meas" data-m="sol"><line x1="130" y1="250" x2="116" y2="210"/><text x="126" y="226">4 fingers</text></g>
-              <g class="meas" data-m="mg"><line x1="76" y1="33" x2="72" y2="70"/><text x="80" y="54">2–3 fingers</text></g>
+              <g class="meas" data-m="mg"><line x1="74" y1="33" x2="70" y2="84"/><text x="80" y="60">2–3 fingers</text></g>
               <g class="meas" data-m="tp"><line x1="130" y1="258" x2="119" y2="249"/><text x="70" y="262">1 thumb behind</text></g>
             </g>
             <g id="cmLat">
               <path class="mus" data-m="sol2" d="M96,110 C104,150 106,190 102,232 C92,228 84,212 78,190 C92,166 98,138 96,110 Z" style="opacity:.3"/>
-              <path class="mus" data-m="lg" d="M66,28 C50,70 52,122 76,162 C92,136 98,86 94,32 C86,24 74,22 66,28 Z"/>
+              <path class="ghost" d="M52,64 C40,104 46,154 66,194 C66,154 62,104 58,66 Z"/>
+              <path class="mus" data-m="lg" d="M70,30 C58,64 60,108 78,146 C90,124 94,82 92,34 C86,26 78,24 70,30 Z"/>
+              <text class="mlab" x="86" y="168"><tspan x="86">lateral head:</tspan><tspan x="86" dy="10">smaller, higher</tspan></text>
               <path class="mus" data-m="per" d="M112,52 C120,110 120,190 118,252 L110,252 C108,190 108,110 102,58 Z"/>
               <path class="ten" d="M70,186 C76,220 80,250 82,282 L92,282 C92,250 90,220 86,186 Z" fill="url(#cmTen)" opacity=".85"/>
               <circle class="lm bone" cx="128" cy="40" r="8"/><text class="lmt" x="140" y="36">knee bump</text>
               <circle class="lm bone" cx="126" cy="262" r="8"/><text class="lmt" x="138" y="250">outer ankle bone</text>
               <path class="lm" d="M58,30 C70,34 84,34 96,30"/><text class="lmt" x="20" y="22">knee crease</text>
-              <g class="meas" data-m="lg"><line x1="76" y1="33" x2="74" y2="72"/><text x="84" y="56">2–3 fingers</text></g>
+              <g class="meas" data-m="lg"><line x1="78" y1="33" x2="78" y2="70"/><text x="86" y="54">2–3 fingers</text></g>
               <g class="meas" data-m="per"><line x1="126" y1="48" x2="116" y2="120"/><text x="128" y="92">1 hand</text></g>
             </g>
             <g id="cmDot"><circle class="ring1" r="9"/><circle class="core" r="4.2"/></g>
@@ -1158,7 +1165,7 @@ function drawStrip(pos){const el=$('sessStrip');if(!el||!sess)return;const k=ses
   stripParts.forEach(p=>{const f=Math.max(0,Math.min(1,(pos-p.t0)/Math.max(0.01,p.t1-p.t0)));const w=(f*100).toFixed(1)+'%';if(p.w!==w){p.w=w;p.fill.style.width=w;}p.el.classList.toggle('now',f>0&&f<1);});}
 
 // ---- Calf map model: the target muscle glows with effort (brightens on the press, full on the hold, fades on let-go)
-const CM_DOT={sol:[116,210],mg:[72,70],tp:[119,249],lg:[74,72],per:[116,120]};
+const CM_DOT={sol:[116,210],mg:[70,84],tp:[119,249],lg:[78,70],per:[116,120]};
 const CM_FROM={sol:[130,250],mg:[76,33],tp:[130,258],lg:[76,33],per:[126,48]};
 const CM_VIEW={sol:'med',mg:'med',tp:'med',lg:'lat',per:'lat'};
 let mapLog=[];try{mapLog=local.get('mapLog')||[];}catch(e){}
@@ -1167,6 +1174,7 @@ function drawMap(pos){const w=document.querySelector('.wrap');const on=!!(sess&&
   const view=CM_VIEW[m]||'med';$('cmMed').style.display=view==='med'?'':'none';$('cmLat').style.display=view==='lat'?'':'none';
   $('cmSide').textContent=(view==='med'?'Inner side':'Outer side')+' · '+(side==='R'?'right':'left')+' leg';
   document.querySelectorAll('#cmapSvg .meas').forEach(g=>g.classList.toggle('on',g.dataset.m===m));
+  document.querySelectorAll('#cmapSvg .mlab').forEach(t=>t.classList.toggle('show',(m==='mg'&&t.closest('#cmMed'))||(m==='lg'&&t.closest('#cmLat'))));
   const offs=stepOffsets();const ph=st.secs>0?Math.max(0,Math.min(1,(pos-offs[sess.i])/st.secs)):1;
   const force=st.kind==='up'?ph:st.kind==='hold'?1:st.kind==='rest'&&!e.rate?Math.max(0,1-ph*1.4):st.kind==='setup'?0.15+0.15*Math.sin(pos*3):0.35;
   document.querySelectorAll('#cmapSvg .mus').forEach(el=>{const t=el.dataset.m===m;el.classList.toggle('on',t);el.classList.toggle('dim',!t);if(t)el.style.setProperty('--g',(0.35+0.65*force).toFixed(2));});
