@@ -188,13 +188,17 @@ html.tabs .wrap:not(.focus) #audRow{display:none}
 .wrap.focus .sctl.aud .ctlb{width:48px!important;height:48px!important}
 .cmap{display:none}
 .wrap.mapmode .ring{display:none!important}
-.wrap.mapmode .cmap{display:block;position:relative;width:240px;height:380px;margin:0 auto}
-.cmap svg{width:100%;height:316px;margin-top:14px}
+.wrap.mapmode .cmap{display:block;position:relative;width:260px;height:390px;margin:0 auto}
+.cmap svg{width:100%;height:326px;margin-top:14px}
 .cmap .mus{fill:url(#cmMus);opacity:.55;transition:opacity .25s ease}
 .cmap .mus.tpline{fill:none;stroke:#8a4a40;stroke-width:6}
 .cmap .mus.on{fill:url(#cmHot);opacity:var(--g,.6);filter:url(#cmGlow)}
 .cmap .mus.tpline.on{fill:none;stroke:#f0a24a}
 .cmap .mus.dim{opacity:.22}
+.cmap .lm{fill:none;stroke:#7d8c84;stroke-width:1.4}.cmap .lm.bone{fill:#3a4a42;stroke:#9aa9a1}
+.cmap .lmt{font-size:8.5px;fill:#8d9c94;font-family:var(--body,system-ui);font-weight:600;letter-spacing:.02em}
+.cmap .meas{display:none}.cmap .meas.on{display:inline}
+.cmap .meas line{stroke:#fff;stroke-width:1.6;stroke-dasharray:3 3}.cmap .meas text{font-size:10px;fill:#fff;font-weight:700;font-family:var(--body,system-ui)}
 .cmap #cmDot .core{fill:#fff}.cmap #cmDot .ring1{fill:none;stroke:#fff;stroke-width:2;opacity:.8;transform-box:fill-box;transform-origin:center;animation:cmpulse 1.6s ease-out infinite}
 @keyframes cmpulse{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.9);opacity:0}}
 .cmap .cm-side{position:absolute;top:0;left:0;right:0;text-align:center;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
@@ -553,25 +557,40 @@ pre.rtext{display:none}
     <div class="muted" id="sPickNote" style="font-size:12.5px">Guided, with voice and beeps. Checks itself off. BFR daily from Oct 15, first thing after a quiet morning check (seated calf raise 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15); Chris’s program then skips those two. BFR quad is a separate cuff bout for gym days. Barefoot PT (boot off: BFR calf raises → scar massage → BFR isometric → the rest) in the morning; Boot-on PT between sets at the gym. Stop anytime; it picks up where you left off. Imagery: after a press and at bedtime.</div>
     <div class="timer" id="sRun" hidden>
       <div class="cmap" id="cmap" aria-hidden="true">
-          <svg viewBox="0 0 200 300" id="cmapSvg">
+          <svg viewBox="0 0 220 320" id="cmapSvg">
             <defs>
               <radialGradient id="cmMus" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#8a4a40"/><stop offset="1" stop-color="#3f2421"/></radialGradient>
               <radialGradient id="cmHot" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#ffd59a"/><stop offset=".55" stop-color="#f0a24a"/><stop offset="1" stop-color="#b8661f"/></radialGradient>
-              <linearGradient id="cmSkin" x1="0" x2="1"><stop offset="0" stop-color="#1c2622"/><stop offset=".5" stop-color="#26332d"/><stop offset="1" stop-color="#1c2622"/></linearGradient>
+              <linearGradient id="cmSkin" x1="0" x2="1"><stop offset="0" stop-color="#1b2521"/><stop offset=".45" stop-color="#28362f"/><stop offset="1" stop-color="#1d2823"/></linearGradient>
               <linearGradient id="cmTen" x1="0" x2="1"><stop offset="0" stop-color="#b9b2a2"/><stop offset=".5" stop-color="#e8e2d2"/><stop offset="1" stop-color="#b9b2a2"/></linearGradient>
               <filter id="cmGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
-            <g id="cmLeg">
-              <path d="M58,8 C52,60 48,112 56,162 C62,204 72,238 78,262 L76,284 C90,294 112,294 126,284 L122,262 C128,238 138,204 144,162 C152,112 148,60 142,8 Z" fill="url(#cmSkin)" stroke="#33443c" stroke-width="1.5"/>
-              <path class="mus" data-m="per" d="M55,40 C49,100 52,170 64,238 L71,236 C61,170 59,100 63,42 Z"/>
-              <path class="mus" data-m="sol" d="M60,118 C58,162 68,202 84,234 L116,234 C132,202 142,162 140,118 C126,152 74,152 60,118 Z"/>
-              <path class="mus" data-m="lg" d="M65,26 C55,70 57,124 82,174 C94,152 99,100 98,36 C88,26 74,22 65,26 Z"/>
-              <path class="mus" data-m="mg" d="M102,36 C102,108 108,166 126,190 C150,132 146,66 135,26 C124,20 110,24 102,36 Z"/>
-              <path class="ten" d="M86,178 C91,212 93,242 94,274 L106,274 C107,242 109,212 114,178 C105,184 95,184 86,178 Z" fill="url(#cmTen)"/>
-              <path class="mus tpline" data-m="tp" d="M121,196 C127,226 131,252 124,278" fill="none" stroke-linecap="round"/>
-              <ellipse cx="100" cy="283" rx="24" ry="9" fill="#2c3a33"/>
-              <g id="cmDot"><circle class="ring1" r="9"/><circle class="core" r="4.2"/></g>
+            <path d="M62,10 C40,60 38,120 58,172 C70,204 78,232 80,262 C78,286 90,300 112,300 L192,300 C208,300 210,286 198,279 C172,268 152,262 142,250 L146,200 C150,140 152,80 150,10 Z" fill="url(#cmSkin)" stroke="#33443c" stroke-width="1.5"/>
+            <g id="cmMed">
+              <path class="mus" data-m="sol" d="M98,104 C108,150 114,196 110,238 C98,234 86,216 80,192 C94,166 100,136 98,104 Z"/>
+              <path class="mus" data-m="mg" d="M64,26 C44,68 46,130 78,176 C98,150 106,90 98,30 C88,22 74,20 64,26 Z"/>
+              <path class="ten" d="M70,186 C76,220 80,250 82,282 L92,282 C92,250 90,220 86,186 Z" fill="url(#cmTen)" opacity=".85"/>
+              <path class="mus tpline" data-m="tp" d="M116,206 C120,236 120,256 128,270 C134,276 142,278 150,278" fill="none" stroke-linecap="round"/>
+              <line class="lm" x1="147" y1="22" x2="141" y2="246" stroke-dasharray="4 4"/>
+              <text class="lmt" x="158" y="120" transform="rotate(90 158 120)">shin bone edge</text>
+              <circle class="lm bone" cx="130" cy="258" r="8"/><text class="lmt" x="142" y="246">ankle bone</text>
+              <path class="lm" d="M58,30 C70,34 84,34 96,30"/><text class="lmt" x="20" y="22">knee crease</text>
+              <g class="meas" data-m="sol"><line x1="130" y1="250" x2="116" y2="210"/><text x="126" y="226">4 fingers</text></g>
+              <g class="meas" data-m="mg"><line x1="76" y1="33" x2="72" y2="70"/><text x="80" y="54">2–3 fingers</text></g>
+              <g class="meas" data-m="tp"><line x1="130" y1="258" x2="119" y2="249"/><text x="70" y="262">1 thumb behind</text></g>
             </g>
+            <g id="cmLat">
+              <path class="mus" data-m="sol2" d="M96,110 C104,150 106,190 102,232 C92,228 84,212 78,190 C92,166 98,138 96,110 Z" style="opacity:.3"/>
+              <path class="mus" data-m="lg" d="M66,28 C50,70 52,122 76,162 C92,136 98,86 94,32 C86,24 74,22 66,28 Z"/>
+              <path class="mus" data-m="per" d="M112,52 C120,110 120,190 118,252 L110,252 C108,190 108,110 102,58 Z"/>
+              <path class="ten" d="M70,186 C76,220 80,250 82,282 L92,282 C92,250 90,220 86,186 Z" fill="url(#cmTen)" opacity=".85"/>
+              <circle class="lm bone" cx="128" cy="40" r="8"/><text class="lmt" x="140" y="36">knee bump</text>
+              <circle class="lm bone" cx="126" cy="262" r="8"/><text class="lmt" x="138" y="250">outer ankle bone</text>
+              <path class="lm" d="M58,30 C70,34 84,34 96,30"/><text class="lmt" x="20" y="22">knee crease</text>
+              <g class="meas" data-m="lg"><line x1="76" y1="33" x2="74" y2="72"/><text x="84" y="56">2–3 fingers</text></g>
+              <g class="meas" data-m="per"><line x1="126" y1="48" x2="116" y2="120"/><text x="128" y="92">1 hand</text></g>
+            </g>
+            <g id="cmDot"><circle class="ring1" r="9"/><circle class="core" r="4.2"/></g>
           </svg>
           <div class="cm-side" id="cmSide"></div>
           <div class="cm-c"><div class="cm-n" id="cmN"></div><div class="cm-t" id="cmT"></div></div>
@@ -942,11 +961,11 @@ const ANK_DEF=[
 
 // ---- Calf map: learn to find each muscle. Right leg first (what "found it" feels like), then left, then rate the left 0–3.
 const MAP_M=[
- {m:'sol',name:'Soleus',pos:'Sit, knee bent, ball of the foot on the floor, heel up on a book so the foot stays pointed.',touch:'Fingertips on the outer side of the lower calf, below where the big calf bulge ends.',find:'Press the ball of the foot down, a quarter of effort.',feel:'Feel the deep, low part of the calf firm up under your fingers.'},
- {m:'mg',name:'Medial gastroc',pos:'Sit with the leg out straight, ball of the foot against the ball on the wall, foot pointed.',touch:'Fingertips on the upper inner calf, the bulge just below the back of the knee.',find:'Press through the big toe, a quarter of effort.',feel:'Feel the inner calf harden under your fingers.'},
- {m:'lg',name:'Lateral gastroc',pos:'Leg out straight, ball of the foot on the ball, toes turned slightly in.',touch:'Fingertips on the upper outer calf.',find:'Press through the little-toe side, a quarter of effort.',feel:'Feel the outer calf harden.'},
- {m:'tp',name:'Tibialis posterior',pos:'Sit, foot pointed a little, other hand against the inside of the foot.',touch:'Fingertips just behind and above the inner ankle bone.',find:'Press the inside of the foot into your hand, turning the sole in. The ankle doesn\'t move.',feel:'Feel the tendon tighten behind the inner ankle bone.'},
- {m:'per',name:'Peroneals',pos:'Sit, foot pointed a little, hand against the outside of the foot.',touch:'Fingertips on the outside of the shin, a hand\'s width below the knee.',find:'Press the outside of the foot out into your hand. The ankle doesn\'t move.',feel:'Feel the outer shin firm up.'}];
+ {m:'sol',name:'Soleus',pos:'Sit, knee bent, ball of the foot on the floor, heel up on a book so the foot stays pointed.',touch:'Find the inner edge of your shin bone. Slide your fingertips just behind it, about four fingers above the inner ankle bone.',find:'Press the ball of the foot down, a quarter of effort.',feel:'Feel the deep, low part of the calf firm up under your fingers.'},
+ {m:'mg',name:'Medial gastroc',pos:'Sit with the leg out straight, ball of the foot against the ball on the wall, foot pointed.',touch:'From the crease at the back of the knee, go two to three fingers down, on the inner side, onto the fullest part of the bulge.',find:'Press through the big toe, a quarter of effort.',feel:'Feel the inner calf harden under your fingers.'},
+ {m:'lg',name:'Lateral gastroc',pos:'Leg out straight, ball of the foot on the ball, toes turned slightly in.',touch:'From the knee crease, two to three fingers down on the outer side, a thumb in from the edge.',find:'Press through the little-toe side, a quarter of effort.',feel:'Feel the outer calf harden.'},
+ {m:'tp',name:'Tibialis posterior',pos:'Sit, foot pointed a little, other hand against the inside of the foot.',touch:'Fingertips a thumb behind and just above the inner ankle bone. You\'re feeling for a tendon, not a bulge.',find:'Press the inside of the foot into your hand, turning the sole in. The ankle doesn\'t move.',feel:'Feel the tendon tighten behind the inner ankle bone.'},
+ {m:'per',name:'Peroneals',pos:'Sit, foot pointed a little, hand against the outside of the foot.',touch:'Find the bony bump on the outside of the knee, then go one hand down the outer shin toward the outer ankle bone.',find:'Press the outside of the foot out into your hand. The ankle doesn\'t move.',feel:'Feel the outer shin firm up.'}];
 const MAP_LIST=[];
 MAP_M.forEach(x=>{
   const ph=[['up','Find it',1,x.find],['hold','Feel it',4,x.feel],['rest','Let go',3,'Let it go. Feel it soften.']];
@@ -1139,16 +1158,21 @@ function drawStrip(pos){const el=$('sessStrip');if(!el||!sess)return;const k=ses
   stripParts.forEach(p=>{const f=Math.max(0,Math.min(1,(pos-p.t0)/Math.max(0.01,p.t1-p.t0)));const w=(f*100).toFixed(1)+'%';if(p.w!==w){p.w=w;p.fill.style.width=w;}p.el.classList.toggle('now',f>0&&f<1);});}
 
 // ---- Calf map model: the target muscle glows with effort (brightens on the press, full on the hold, fades on let-go)
-const CM_DOT={sol:[70,204],mg:[124,84],lg:[76,84],tp:[127,246],per:[58,112]};
+const CM_DOT={sol:[116,210],mg:[72,70],tp:[119,249],lg:[74,72],per:[116,120]};
+const CM_FROM={sol:[130,250],mg:[76,33],tp:[130,258],lg:[76,33],per:[126,48]};
+const CM_VIEW={sol:'med',mg:'med',tp:'med',lg:'lat',per:'lat'};
 let mapLog=[];try{mapLog=local.get('mapLog')||[];}catch(e){}
 function drawMap(pos){const w=document.querySelector('.wrap');const on=!!(sess&&sess.mode==='map');w.classList.toggle('mapmode',on);if(!on)return;
   const st=sess.steps[sess.i];const e=EX[st.ex]||{};const m=e.muscle;const side=e.side||'L';
-  $('cmLeg').setAttribute('transform',side==='R'?'translate(200,0) scale(-1,1)':'');
-  $('cmSide').textContent=(side==='R'?'Right':'Left')+' leg · from behind';
+  const view=CM_VIEW[m]||'med';$('cmMed').style.display=view==='med'?'':'none';$('cmLat').style.display=view==='lat'?'':'none';
+  $('cmSide').textContent=(view==='med'?'Inner side':'Outer side')+' · '+(side==='R'?'right':'left')+' leg';
+  document.querySelectorAll('#cmapSvg .meas').forEach(g=>g.classList.toggle('on',g.dataset.m===m));
   const offs=stepOffsets();const ph=st.secs>0?Math.max(0,Math.min(1,(pos-offs[sess.i])/st.secs)):1;
   const force=st.kind==='up'?ph:st.kind==='hold'?1:st.kind==='rest'&&!e.rate?Math.max(0,1-ph*1.4):st.kind==='setup'?0.15+0.15*Math.sin(pos*3):0.35;
   document.querySelectorAll('#cmapSvg .mus').forEach(el=>{const t=el.dataset.m===m;el.classList.toggle('on',t);el.classList.toggle('dim',!t);if(t)el.style.setProperty('--g',(0.35+0.65*force).toFixed(2));});
-  const d=CM_DOT[m]||[100,120];$('cmDot').setAttribute('transform','translate('+d[0]+','+d[1]+')');
+  // during "get set" the dot slides from the landmark to the spot, so you can trace it on your own leg
+  let d=CM_DOT[m]||[100,120];if(st.kind==='setup'){const f0=CM_FROM[m]||d;const k=Math.min(1,((pos-offs[sess.i])%3)/2.2);const e2=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;d=[f0[0]+(d[0]-f0[0])*e2,f0[1]+(d[1]-f0[1])*e2];}
+  $('cmDot').setAttribute('transform','translate('+d[0].toFixed(1)+','+d[1].toFixed(1)+')');
   $('cmN').innerHTML=$('tCount').innerHTML;$('cmT').textContent=$('tPhase').textContent;
   const r=$('cmRate');const rating=!!e.rate;if(r.hidden===rating){r.hidden=!rating;if(rating){$('cmQ').textContent='How clearly did you feel the '+(MAP_M.find(x=>x.m===m)||{}).name+' on the left?';r.querySelectorAll('button').forEach(b=>b.classList.remove('picked'));}}}
 document.querySelectorAll('#cmRate button').forEach(b=>b.addEventListener('click',ev=>{ev.stopPropagation();if(!sess)return;const e=EX[sess.steps[sess.i].ex]||{};if(!e.rate)return;

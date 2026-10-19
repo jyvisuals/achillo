@@ -1,1 +1,1 @@
-New: Calf map (10 min) on the Today screen. Finds each muscle — soleus, medial and lateral gastroc, tibialis posterior, peroneals — right leg first, then left, with a glowing model and where to put your fingers. Rate the left 0–3; scores show in Trends.
+Calf map now shows the leg from the side you actually see (inner or outer), with bony landmarks and a measured line to each spot. During Get set the dot slides from the landmark to the spot.
