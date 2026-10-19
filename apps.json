@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.34",
+          "buildVersion": "34",
+          "date": "2026-10-19T20:10:44Z",
+          "localizedDescription": "Calf map now shows the leg from the side you actually see (inner or outer), with bony landmarks and a measured line to each spot. During Get set the dot slides from the landmark to the spot.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.34.ipa",
+          "size": 940323,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.33",
           "buildVersion": "33",
           "date": "2026-10-19T19:52:10Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.32.ipa",
           "size": 936144,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.31",
-          "buildVersion": "31",
-          "date": "2026-10-18T15:48:57Z",
-          "localizedDescription": "Boot schedule: 20° today (Oct 18), 15° Wed Oct 21, 10° Sat Oct 24, 5° Tue Oct 27, neutral Fri Oct 30. Hinge-day reminders follow it.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.31.ipa",
-          "size": 935892,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.33",
-      "versionDate": "2026-10-19T19:52:10Z",
-      "versionDescription": "New: Calf map (10 min) on the Today screen. Finds each muscle — soleus, medial and lateral gastroc, tibialis posterior, peroneals — right leg first, then left, with a glowing model and where to put your fingers. Rate the left 0–3; scores show in Trends.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.33.ipa",
-      "size": 939437
+      "version": "1.1.34",
+      "versionDate": "2026-10-19T20:10:44Z",
+      "versionDescription": "Calf map now shows the leg from the side you actually see (inner or outer), with bony landmarks and a measured line to each spot. During Get set the dot slides from the landmark to the spot.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.34.ipa",
+      "size": 940323
     }
   ],
   "news": []
