@@ -579,10 +579,11 @@ pre.rtext{display:none}
               <line class="lm" x1="147" y1="22" x2="141" y2="246" stroke-dasharray="4 4"/>
               <text class="lmt" x="158" y="120" transform="rotate(90 158 120)">shin bone edge</text>
               <circle class="lm bone" cx="130" cy="258" r="8"/><text class="lmt" x="142" y="246">ankle bone</text>
+              <circle class="lm bone" cx="166" cy="282" r="6"/><text class="lmt" x="176" y="278">arch</text><text class="lmt" x="176" y="288">bump</text>
               <path class="lm" d="M58,30 C70,34 84,34 96,30"/><text class="lmt" x="20" y="22">knee crease</text>
               <g class="meas" data-m="sol"><line x1="130" y1="250" x2="116" y2="210"/><text x="126" y="226">4 fingers</text></g>
               <g class="meas" data-m="mg"><line x1="74" y1="33" x2="70" y2="84"/><text x="80" y="60">2–3 fingers</text></g>
-              <g class="meas" data-m="tp"><line x1="130" y1="258" x2="119" y2="249"/><text x="70" y="262">1 thumb behind</text></g>
+              <g class="meas" data-m="tp"><line x1="136" y1="264" x2="160" y2="279"/><text x="40" y="314">halfway between the two bones</text></g>
             </g>
             <g id="cmLat">
               <path class="mus" data-m="sol2" d="M96,110 C104,150 106,190 102,232 C92,228 84,212 78,190 C92,166 98,138 96,110 Z" style="opacity:.3"/>
@@ -971,7 +972,7 @@ const MAP_M=[
  {m:'sol',name:'Soleus',pos:'Sit, knee bent, ball of the foot on the floor, heel up on a book so the foot stays pointed.',touch:'Find the inner edge of your shin bone. Slide your fingertips just behind it, about four fingers above the inner ankle bone.',find:'Press the ball of the foot down, a quarter of effort.',feel:'Feel the deep, low part of the calf firm up under your fingers.'},
  {m:'mg',name:'Medial gastroc',pos:'Sit with the leg out straight, ball of the foot against the ball on the wall, foot pointed.',touch:'From the crease at the back of the knee, go two to three fingers down, on the inner side, onto the fullest part of the bulge.',find:'Press through the big toe, a quarter of effort.',feel:'Feel the inner calf harden under your fingers.'},
  {m:'lg',name:'Lateral gastroc',pos:'Leg out straight, ball of the foot on the ball, toes turned slightly in.',touch:'From the knee crease, two to three fingers down on the outer side, a thumb in from the edge.',find:'Press through the little-toe side, a quarter of effort.',feel:'Feel the outer calf harden.'},
- {m:'tp',name:'Tibialis posterior',pos:'Sit, foot pointed a little, other hand against the inside of the foot.',touch:'Fingertips a thumb behind and just above the inner ankle bone. You\'re feeling for a tendon, not a bulge.',find:'Press the inside of the foot into your hand, turning the sole in. The ankle doesn\'t move.',feel:'Feel the tendon tighten behind the inner ankle bone.'},
+ {m:'tp',name:'Tibialis posterior',pos:'Sit, foot pointed a little, other hand against the inside of the foot.',touch:'Find the inner ankle bone, then the bony bump on the inner arch about an inch below and in front of it. Rest a fingertip halfway between the two. When you press, a cord pops up under it. That\'s the tendon.',find:'Press the inside of the foot into your hand, turning the sole in. The ankle doesn\'t move.',feel:'Feel the cord stand up between the ankle bone and the arch bump.'},
  {m:'per',name:'Peroneals',pos:'Sit, foot pointed a little, hand against the outside of the foot.',touch:'Find the bony bump on the outside of the knee, then go one hand down the outer shin toward the outer ankle bone.',find:'Press the outside of the foot out into your hand. The ankle doesn\'t move.',feel:'Feel the outer shin firm up.'}];
 const MAP_LIST=[];
 MAP_M.forEach(x=>{
@@ -1165,8 +1166,8 @@ function drawStrip(pos){const el=$('sessStrip');if(!el||!sess)return;const k=ses
   stripParts.forEach(p=>{const f=Math.max(0,Math.min(1,(pos-p.t0)/Math.max(0.01,p.t1-p.t0)));const w=(f*100).toFixed(1)+'%';if(p.w!==w){p.w=w;p.fill.style.width=w;}p.el.classList.toggle('now',f>0&&f<1);});}
 
 // ---- Calf map model: the target muscle glows with effort (brightens on the press, full on the hold, fades on let-go)
-const CM_DOT={sol:[116,210],mg:[70,84],tp:[119,249],lg:[78,70],per:[116,120]};
-const CM_FROM={sol:[130,250],mg:[76,33],tp:[130,258],lg:[76,33],per:[126,48]};
+const CM_DOT={sol:[116,210],mg:[70,84],tp:[148,272],lg:[78,70],per:[116,120]};
+const CM_FROM={sol:[130,250],mg:[76,33],tp:[134,262],lg:[76,33],per:[126,48]};
 const CM_VIEW={sol:'med',mg:'med',tp:'med',lg:'lat',per:'lat'};
 let mapLog=[];try{mapLog=local.get('mapLog')||[];}catch(e){}
 function drawMap(pos){const w=document.querySelector('.wrap');const on=!!(sess&&sess.mode==='map');w.classList.toggle('mapmode',on);if(!on)return;
@@ -1520,6 +1521,7 @@ $('tJump').onclick=()=>{if(!sess)return;const el=$('jumpList');if(!el.hidden){el
     b.textContent=(groupDone(g)?'✓ ':g===cur?'▶ ':'')+groupName(g);b.onclick=()=>jumpTo(i);el.appendChild(b);});
   el.hidden=false;};
 $('tSkip').onclick=()=>{if(!sess)return; hush(); const st=sess.steps[sess.i];dbg('skip: from',st.ex,st.kind,'at',posSeconds().toFixed(1),'track',track.currentTime.toFixed(1),track.paused?'paused':'playing');
+  if(sess.mode==='map'){let j=sess.i+1;while(j<sess.steps.length&&sess.steps[j].ei===st.ei)j++;jumpTo(j);return;} // calf map: right → left → rate, one block at a time
   if(!(st.kind==='setup'||st.long||st.kind==='rest'||REST_KEY.test(st.ex)||EX[st.ex].speakCue)){ // skip the whole exercise, all its sets, without checking it off
     const cur=groupOf(st.ex);let j=sess.i+1;while(j<sess.steps.length&&(sess.steps[j].kind==='mark'||REST_KEY.test(sess.steps[j].ex)||groupOf(sess.steps[j].ex)===cur))j++;
     jumpTo(j);return;}

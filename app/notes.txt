@@ -1,1 +1,1 @@
-Medial and lateral gastroc now look different: the medial head is bigger and reaches lower; the lateral head is smaller and ends higher. The other head shows faintly for comparison.
+Calf map: Skip now goes right → left → rate, one step at a time (it used to jump past the left leg). Tibialis posterior target moved to the cord between the inner ankle bone and the arch bump, where it's easier to feel.
