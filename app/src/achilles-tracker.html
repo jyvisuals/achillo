@@ -1497,7 +1497,7 @@ $('tPause').onclick=e=>{if(!sess)return; paused=!paused;
 // ---- skip / jump: skipping never marks an exercise done; the next Start plays only what's left.
 const REST_KEY=/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/;
 const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(k)?'bfrB':k;
-const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);return d?d[2]:g==='bfrA'?'BFR seated calf raise':g==='bfrB'?'BFR band isometric':(EX[g]?EX[g].name:g);};
+const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);if(d)return d[2];if(g==='bfrA')return 'BFR seated calf raise';if(g==='bfrB')return 'BFR ball press';if(/^map_/.test(g)){const m=MAP_M.find(x=>'map_'+x.m===g);if(m)return 'Calf map · '+m.name;}return EX[g]?EX[g].name:g;};
 function jumpTo(idx){if(!sess)return;hush();$('jumpList').hidden=true;dbg('jump: to step',idx,sess.steps[idx]&&sess.steps[idx].ex);
   while(idx<sess.steps.length&&sess.steps[idx].kind==='mark')idx++;
   if(idx>=sess.steps.length){finish(true);return;}

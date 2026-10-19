@@ -1,1 +1,1 @@
-Calf map now shows the leg from the side you actually see (inner or outer), with bony landmarks and a measured line to each spot. During Get set the dot slides from the landmark to the spot.
+Readable names in the Calf map jump list (no more map_tp).
