@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.39",
+          "buildVersion": "39",
+          "date": "2026-10-19T22:36:27Z",
+          "localizedDescription": "Calf map: swap between the side view and a view from behind with the buttons next to the model. Your choice sticks.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.39.ipa",
+          "size": 941666,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.38",
           "buildVersion": "38",
           "date": "2026-10-19T22:31:40Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.37.ipa",
           "size": 940815,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.36",
-          "buildVersion": "36",
-          "date": "2026-10-19T20:49:52Z",
-          "localizedDescription": "Medial and lateral gastroc now look different: the medial head is bigger and reaches lower; the lateral head is smaller and ends higher. The other head shows faintly for comparison.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.36.ipa",
-          "size": 940642,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.38",
-      "versionDate": "2026-10-19T22:31:40Z",
-      "versionDescription": "Calf map names in plain words: inner calf (medial gastroc), outer calf (lateral gastroc), deep calf (soleus), inner ankle, outer shin.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.38.ipa",
-      "size": 940828
+      "version": "1.1.39",
+      "versionDate": "2026-10-19T22:36:27Z",
+      "versionDescription": "Calf map: swap between the side view and a view from behind with the buttons next to the model. Your choice sticks.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.39.ipa",
+      "size": 941666
     }
   ],
   "news": []
