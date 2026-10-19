@@ -186,6 +186,33 @@ html.tabs .wrap:not(.focus) #audRow{display:none}
 .wrap.focus .sctl .ctlb .l{display:none}
 .wrap.focus #tPause{width:84px!important;height:84px!important}
 .wrap.focus .sctl.aud .ctlb{width:48px!important;height:48px!important}
+.cmap{display:none}
+.wrap.mapmode .ring{display:none!important}
+.wrap.mapmode .cmap{display:block;position:relative;width:240px;height:380px;margin:0 auto}
+.cmap svg{width:100%;height:316px;margin-top:14px}
+.cmap .mus{fill:url(#cmMus);opacity:.55;transition:opacity .25s ease}
+.cmap .mus.tpline{fill:none;stroke:#8a4a40;stroke-width:6}
+.cmap .mus.on{fill:url(#cmHot);opacity:var(--g,.6);filter:url(#cmGlow)}
+.cmap .mus.tpline.on{fill:none;stroke:#f0a24a}
+.cmap .mus.dim{opacity:.22}
+.cmap #cmDot .core{fill:#fff}.cmap #cmDot .ring1{fill:none;stroke:#fff;stroke-width:2;opacity:.8;transform-box:fill-box;transform-origin:center;animation:cmpulse 1.6s ease-out infinite}
+@keyframes cmpulse{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+.cmap .cm-side{position:absolute;top:0;left:0;right:0;text-align:center;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.cmap .cm-c{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:2px}
+.cmap .cm-n{font-family:var(--display);font-weight:800;font-size:44px;line-height:1}
+.cmap .cm-n .of{font-size:.45em;color:var(--muted)}
+.cmap .cm-t{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.cmap .cm-rate{position:absolute;inset:auto -40px 40px -40px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+.cmap .cm-rate[hidden]{display:none}
+.cmap .cm-q{font-size:14px;font-weight:600;text-align:center}
+.cmap .cm-btns{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.cmap .cm-btns button{min-height:58px;border-radius:12px;border:1px solid var(--line);background:var(--sunk);color:var(--ink);font:inherit;font-size:20px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.cmap .cm-btns button small{font-size:10.5px;font-weight:600;color:var(--muted)}
+.cmap .cm-btns button.picked{background:var(--accent);color:#0d1512;border-color:var(--accent)}
+.mapbars{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.mapbars .mb{display:grid;grid-template-columns:120px 1fr 44px;align-items:center;gap:10px;font-size:13.5px}
+.mapbars .mb .bar{height:10px;border-radius:5px;background:var(--sunk);overflow:hidden}.mapbars .mb .bar i{display:block;height:100%;background:var(--hold);border-radius:5px}
+.mapbars .mb .v{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
 .sstrip{display:none}
 .wrap.focus .sstrip{display:flex;gap:3px;width:100%;max-width:360px;height:8px;margin-top:6px}
 .sstrip>span{position:relative;height:100%;border-radius:3px;background:var(--sunk);overflow:hidden;min-width:3px}
@@ -519,12 +546,39 @@ pre.rtext{display:none}
       <button id="sFoot">Barefoot PT</button>
       <button id="sGym">Boot-on PT</button>
       <button id="sImg">Imagery (5 min)</button>
+      <button id="sMap">Calf map (10 min)</button>
     </div>
     <details class="ankpick" id="ankPick"><summary>Chris’s program · pick any exercise</summary><div id="ankList"></div></details>
     <div class="envnote" id="envNote" hidden></div>
     <div class="muted" id="sPickNote" style="font-size:12.5px">Guided, with voice and beeps. Checks itself off. BFR daily from Oct 15, first thing after a quiet morning check (seated calf raise 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15); Chris’s program then skips those two. BFR quad is a separate cuff bout for gym days. Barefoot PT (boot off: BFR calf raises → scar massage → BFR isometric → the rest) in the morning; Boot-on PT between sets at the gym. Stop anytime; it picks up where you left off. Imagery: after a press and at bedtime.</div>
     <div class="timer" id="sRun" hidden>
-      <div class="ring">
+      <div class="cmap" id="cmap" aria-hidden="true">
+          <svg viewBox="0 0 200 300" id="cmapSvg">
+            <defs>
+              <radialGradient id="cmMus" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#8a4a40"/><stop offset="1" stop-color="#3f2421"/></radialGradient>
+              <radialGradient id="cmHot" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#ffd59a"/><stop offset=".55" stop-color="#f0a24a"/><stop offset="1" stop-color="#b8661f"/></radialGradient>
+              <linearGradient id="cmSkin" x1="0" x2="1"><stop offset="0" stop-color="#1c2622"/><stop offset=".5" stop-color="#26332d"/><stop offset="1" stop-color="#1c2622"/></linearGradient>
+              <linearGradient id="cmTen" x1="0" x2="1"><stop offset="0" stop-color="#b9b2a2"/><stop offset=".5" stop-color="#e8e2d2"/><stop offset="1" stop-color="#b9b2a2"/></linearGradient>
+              <filter id="cmGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <g id="cmLeg">
+              <path d="M58,8 C52,60 48,112 56,162 C62,204 72,238 78,262 L76,284 C90,294 112,294 126,284 L122,262 C128,238 138,204 144,162 C152,112 148,60 142,8 Z" fill="url(#cmSkin)" stroke="#33443c" stroke-width="1.5"/>
+              <path class="mus" data-m="per" d="M55,40 C49,100 52,170 64,238 L71,236 C61,170 59,100 63,42 Z"/>
+              <path class="mus" data-m="sol" d="M60,118 C58,162 68,202 84,234 L116,234 C132,202 142,162 140,118 C126,152 74,152 60,118 Z"/>
+              <path class="mus" data-m="lg" d="M65,26 C55,70 57,124 82,174 C94,152 99,100 98,36 C88,26 74,22 65,26 Z"/>
+              <path class="mus" data-m="mg" d="M102,36 C102,108 108,166 126,190 C150,132 146,66 135,26 C124,20 110,24 102,36 Z"/>
+              <path class="ten" d="M86,178 C91,212 93,242 94,274 L106,274 C107,242 109,212 114,178 C105,184 95,184 86,178 Z" fill="url(#cmTen)"/>
+              <path class="mus tpline" data-m="tp" d="M121,196 C127,226 131,252 124,278" fill="none" stroke-linecap="round"/>
+              <ellipse cx="100" cy="283" rx="24" ry="9" fill="#2c3a33"/>
+              <g id="cmDot"><circle class="ring1" r="9"/><circle class="core" r="4.2"/></g>
+            </g>
+          </svg>
+          <div class="cm-side" id="cmSide"></div>
+          <div class="cm-c"><div class="cm-n" id="cmN"></div><div class="cm-t" id="cmT"></div></div>
+          <div class="cm-rate" id="cmRate" hidden><div class="cm-q" id="cmQ">How clearly did you feel it on the left?</div>
+            <div class="cm-btns"><button data-v="0">0<small>nothing</small></button><button data-v="1">1<small>faint</small></button><button data-v="2">2<small>clear</small></button><button data-v="3">3<small>strong</small></button></div></div>
+        </div>
+        <div class="ring">
         <div class="glow" aria-hidden="true"></div>
         <div class="burst" aria-hidden="true"></div>
         <svg viewBox="0 0 150 150" aria-hidden="true">
@@ -601,6 +655,7 @@ pre.rtext{display:none}
     <div class="trend" id="trendHinge"></div>
     <div class="trend" id="trendDone"></div>
     <div class="trend" id="trendWalk"></div>
+    <div class="trend" id="trendMap"></div>
   </div></details></section>
 
   <section aria-labelledby="logh" data-t="log"><details class="fold tabopen"><summary><span><span class="eyebrow">Last 14 days</span><br><span style="font-family:var(--display);font-weight:700;font-size:21px" id="logh">Log</span></span></summary><div class="body">
@@ -884,6 +939,21 @@ const ANK_DEF=[
  ['toeyoga2',3,'Toe yoga',12,6,'Boot on is fine.',[['hold','Big toe up',2,'Lift the big toe, four small toes stay down.'],['hold','Swap',2,'Big toe down, four small toes up.']],true],
  ['hiprot',2,'Long-sitting hip rotation',10,8,'From your PT, for the internal-rotation deficit. Sit up, legs out long, hands behind you. Boot on.',[['up','Roll in',2,'Roll the whole leg in from the hip. The boot moves as one piece with the leg.'],['down','Roll out',2,'Roll it back out. Keep it small if the ankle twists in the boot.']],true],
  ['pfstraight',3,'Plantarflexion isometric · knee straight',8,8,'Leg out straight. In the boot, press into the footplate; out of it, a band around the ball of the foot.',[['up','Press',1,'Push the ball of the foot down.'],['hold','Hold',5,'A quarter of effort. Steady.'],['rest','Relax',2,'Relax.']],true],];
+
+// ---- Calf map: learn to find each muscle. Right leg first (what "found it" feels like), then left, then rate the left 0–3.
+const MAP_M=[
+ {m:'sol',name:'Soleus',pos:'Sit, knee bent, ball of the foot on the floor, heel up on a book so the foot stays pointed.',touch:'Fingertips on the outer side of the lower calf, below where the big calf bulge ends.',find:'Press the ball of the foot down, a quarter of effort.',feel:'Feel the deep, low part of the calf firm up under your fingers.'},
+ {m:'mg',name:'Medial gastroc',pos:'Sit with the leg out straight, ball of the foot against the ball on the wall, foot pointed.',touch:'Fingertips on the upper inner calf, the bulge just below the back of the knee.',find:'Press through the big toe, a quarter of effort.',feel:'Feel the inner calf harden under your fingers.'},
+ {m:'lg',name:'Lateral gastroc',pos:'Leg out straight, ball of the foot on the ball, toes turned slightly in.',touch:'Fingertips on the upper outer calf.',find:'Press through the little-toe side, a quarter of effort.',feel:'Feel the outer calf harden.'},
+ {m:'tp',name:'Tibialis posterior',pos:'Sit, foot pointed a little, other hand against the inside of the foot.',touch:'Fingertips just behind and above the inner ankle bone.',find:'Press the inside of the foot into your hand, turning the sole in. The ankle doesn\'t move.',feel:'Feel the tendon tighten behind the inner ankle bone.'},
+ {m:'per',name:'Peroneals',pos:'Sit, foot pointed a little, hand against the outside of the foot.',touch:'Fingertips on the outside of the shin, a hand\'s width below the knee.',find:'Press the outside of the foot out into your hand. The ankle doesn\'t move.',feel:'Feel the outer shin firm up.'}];
+const MAP_LIST=[];
+MAP_M.forEach(x=>{
+  const ph=[['up','Find it',1,x.find],['hold','Feel it',4,x.feel],['rest','Let go',3,'Let it go. Feel it soften.']];
+  EX['map_'+x.m+'_R']={name:x.name+' · right',reps:5,setup:12,setupCue:'Right leg first. '+x.pos+' '+x.touch,phases:ph,rest:0,base:'map_'+x.m,muscle:x.m,side:'R'};
+  EX['map_'+x.m+'_L']={name:x.name+' · left',reps:5,setup:12,setupCue:'Now the left, boot off. Same position; the foot never comes up past {HINGE}. '+x.touch,phases:ph,rest:0,base:'map_'+x.m,muscle:x.m,side:'L'};
+  EX['map_'+x.m+'_rate']={name:x.name+' · how clear?',reps:1,setup:0,phases:[['rest','Rate it',12,'How clearly did you feel it on the left? Tap 0 to 3.']],rest:0,base:'map_'+x.m,rate:x.m,muscle:x.m,side:'L'};
+  MAP_LIST.push('map_'+x.m+'_R','map_'+x.m+'_L','map_'+x.m+'_rate');});
 EX.arest={name:'Rest between sets',reps:1,setup:0,phases:[['rest','Rest',15,'Fifteen seconds.']],rest:0};
 const ANK_KEYS={}; // base -> [expanded keys]
 ANK_DEF.forEach(([k,sets,name,reps,setup,setupCue,phases,inBoot])=>{ANK_KEYS[k]=[];
@@ -1024,7 +1094,7 @@ function segLayout(){const steps=sess.steps,i=sess.i,s=steps[i],e=EX[s.ex]||{},o
   return lay;}
 function drawSegs(){if(!sess){segKey=null;return;}const ringE=ringEl;if(!ringE)return;ringE.classList.add('segs');
   const sk=sess.i+':'+sess.steps.length+':'+sess.mode;if(segKey!==sk){segKey=sk;segLay=segLayout();}
-  const pos=paused?segPos:(segPos=posSeconds());const L=segLay;try{drawStrip(pos);}catch(e){}const fr=(t0,t1)=>t1>t0?(pos-t0)/(t1-t0):pos>=t1?1:0;
+  const pos=paused?segPos:(segPos=posSeconds());const L=segLay;try{drawStrip(pos);}catch(e){}try{drawMap(pos);}catch(e){}const fr=(t0,t1)=>t1>t0?(pos-t0)/(t1-t0):pos>=t1?1:0;
   const so=$('segOut'),si=$('segIn');const cuffMode=sess.cuffOn!=null;ringE.classList.toggle('cuffdial',cuffMode);
   if(cuffMode){ // BFR: the outer ring is the 10-minute cuff dial, a notch a minute, last two minutes tinted
     const m=Math.max(0,pos-sess.cuffOn)/60;segBuild(so,72,10,5);segFill(so,Array.from({length:10},(_,k)=>m-k),-1,8);so.classList.toggle('over',m>=8);
@@ -1067,6 +1137,28 @@ function drawStrip(pos){const el=$('sessStrip');if(!el||!sess)return;const k=ses
     const total=Math.max(1,stripParts.reduce((a,p)=>a+(p.t1-p.t0),0));
     stripParts.forEach(p=>{const s=document.createElement('span');if(p.rest)s.className='rest';s.style.flex=Math.max(0.6,100*(p.t1-p.t0)/total)+' 1 0';const f=document.createElement('i');s.appendChild(f);el.appendChild(s);p.el=s;p.fill=f;});}
   stripParts.forEach(p=>{const f=Math.max(0,Math.min(1,(pos-p.t0)/Math.max(0.01,p.t1-p.t0)));const w=(f*100).toFixed(1)+'%';if(p.w!==w){p.w=w;p.fill.style.width=w;}p.el.classList.toggle('now',f>0&&f<1);});}
+
+// ---- Calf map model: the target muscle glows with effort (brightens on the press, full on the hold, fades on let-go)
+const CM_DOT={sol:[70,204],mg:[124,84],lg:[76,84],tp:[127,246],per:[58,112]};
+let mapLog=[];try{mapLog=local.get('mapLog')||[];}catch(e){}
+function drawMap(pos){const w=document.querySelector('.wrap');const on=!!(sess&&sess.mode==='map');w.classList.toggle('mapmode',on);if(!on)return;
+  const st=sess.steps[sess.i];const e=EX[st.ex]||{};const m=e.muscle;const side=e.side||'L';
+  $('cmLeg').setAttribute('transform',side==='R'?'translate(200,0) scale(-1,1)':'');
+  $('cmSide').textContent=(side==='R'?'Right':'Left')+' leg · from behind';
+  const offs=stepOffsets();const ph=st.secs>0?Math.max(0,Math.min(1,(pos-offs[sess.i])/st.secs)):1;
+  const force=st.kind==='up'?ph:st.kind==='hold'?1:st.kind==='rest'&&!e.rate?Math.max(0,1-ph*1.4):st.kind==='setup'?0.15+0.15*Math.sin(pos*3):0.35;
+  document.querySelectorAll('#cmapSvg .mus').forEach(el=>{const t=el.dataset.m===m;el.classList.toggle('on',t);el.classList.toggle('dim',!t);if(t)el.style.setProperty('--g',(0.35+0.65*force).toFixed(2));});
+  const d=CM_DOT[m]||[100,120];$('cmDot').setAttribute('transform','translate('+d[0]+','+d[1]+')');
+  $('cmN').innerHTML=$('tCount').innerHTML;$('cmT').textContent=$('tPhase').textContent;
+  const r=$('cmRate');const rating=!!e.rate;if(r.hidden===rating){r.hidden=!rating;if(rating){$('cmQ').textContent='How clearly did you feel the '+(MAP_M.find(x=>x.m===m)||{}).name+' on the left?';r.querySelectorAll('button').forEach(b=>b.classList.remove('picked'));}}}
+document.querySelectorAll('#cmRate button').forEach(b=>b.addEventListener('click',ev=>{ev.stopPropagation();if(!sess)return;const e=EX[sess.steps[sess.i].ex]||{};if(!e.rate)return;
+  b.classList.add('picked');mapLog.push({d:TODAY,m:e.rate,side:'L',v:+b.dataset.v,t:Date.now()});mapLog=mapLog.slice(-400);try{local.set('mapLog',mapLog);}catch(x){}dbg('map: '+e.rate+' rated '+b.dataset.v);
+  renderMapTrend();if(window.__buzz)window.__buzz('tick');setTimeout(()=>{if(sess&&EX[sess.steps[sess.i].ex].rate)$('tSkip').click();},350);}));
+function renderMapTrend(){const el=$('trendMap');if(!el)return;if(!mapLog.length){el.innerHTML='';return;}
+  const rows=MAP_M.map(x=>{const v=mapLog.filter(r=>r.m===x.m).slice(-3);const avg=v.length?v.reduce((a,r)=>a+r.v,0)/v.length:null;
+    return '<div class="mb"><span>'+x.name+'</span><div class="bar"><i style="width:'+(avg==null?0:Math.round(avg/3*100))+'%"></i></div><span class="v">'+(avg==null?'—':avg.toFixed(1))+'</span></div>';}).join('');
+  el.innerHTML='<div class="eyebrow">Calf map · left leg, last 3 sessions (0–3)</div><div class="mapbars">'+rows+'</div>';}
+renderMapTrend();
 window.__t={start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k]};
 (function loop(){try{if(sess&&document.visibilityState==='visible')drawSegs();}catch(e){}requestAnimationFrame(loop);})();
 function setRing(frac,snap){if(snap){arc.classList.add('snap');}arc.style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,frac))));if(snap){void arc.offsetWidth;arc.classList.remove('snap');}}
@@ -1075,7 +1167,7 @@ function breathCue(st,left){ // 4 in, 6 out, repeating through the hold
   if(st.kind!=='hold'||st.secs<20){$('tBreath').textContent='';ringEl.classList.remove('breathe');return;}
   ringEl.classList.add('breathe'); const t=(st.secs-left)%10; $('tBreath').textContent=t<4?'breathe in':'breathe out';}
 function build(withPress,withRoutine,mode,forced){ if(withRoutine===undefined)withRoutine=true;
-  let list; if(forced&&forced.length)list=forced; else if(mode==='home')list=homeList(); else if(mode==='gym')list=gymLeft(day()).flatMap(k=>ANK_KEYS[k]); else if(mode&&mode.startsWith('snack:'))list=ANK_KEYS[mode.slice(6)].slice(); else if(mode==='ankle')list=ankList(); else if(mode&&mode.startsWith('ankle:'))list=ankList(mode.slice(6)); else if(mode==='bfrpress')list=BFR_PRESS.concat(withRoutine?ROUTINE:[]); else if(mode==='bfrquad')list=BFR_QUAD; else if(mode==='foot')list=ankList(); else if(mode==='imagery')list=['imagery']; else list=homeList();
+  let list; if(forced&&forced.length)list=forced; else if(mode==='home')list=homeList(); else if(mode==='gym')list=gymLeft(day()).flatMap(k=>ANK_KEYS[k]); else if(mode&&mode.startsWith('snack:'))list=ANK_KEYS[mode.slice(6)].slice(); else if(mode==='ankle')list=ankList(); else if(mode&&mode.startsWith('ankle:'))list=ankList(mode.slice(6)); else if(mode==='bfrpress')list=BFR_PRESS.concat(withRoutine?ROUTINE:[]); else if(mode==='bfrquad')list=BFR_QUAD; else if(mode==='foot')list=ankList(); else if(mode==='imagery')list=['imagery']; else if(mode==='map')list=MAP_LIST.slice(); else list=homeList();
   const steps=[];
   list.forEach((k,ei)=>{const e=EX[k];if(!e)return;
     const H=t=>t&&t.replace('{HINGE}',bootFor(today).cur.deg+'°');
@@ -1097,7 +1189,8 @@ function show(){const s=sess.steps[sess.i]; const e=EX[s.ex];
   const isRestS=s.kind==='setup'||s.kind==='rest'||s.long||REST_KEY.test(s.ex);
   const repMode=!isRestS&&!e.speakCue&&e.reps>1&&s.secs<10;
   let phaseTxt;
-  if(s.kind==='setup')phaseTxt='Get set';
+  if(e.rate)phaseTxt='Rate it';
+  else if(s.kind==='setup')phaseTxt='Get set';
   else if(isRestS){const L=segLayout();const nxt=L.sets.findIndex(([a])=>a>=posSeconds()-0.01);phaseTxt=s.kind==='rest'&&!REST_KEY.test(s.ex)?'Rep '+(s.rep+2)+' next':L.sets.length>1&&nxt>0?'Set '+(nxt+1)+' of '+L.sets.length+' next':s.label||'Rest';}
   else if(e.speakCue)phaseTxt=s.label;
   else if(repMode)phaseTxt=s.label;
@@ -1298,7 +1391,7 @@ function tick(){if(!sess||paused)return; const now=Date.now();
 }
 function beginRun(){ $('jumpList').hidden=true; ringEl.classList.remove('done','breathe'); $('tBreath').textContent='';
   $('sPick').hidden=true;$('sPickNote').hidden=true;$('sDone').hidden=true;$('sRun').hidden=false;
-  $('isoh').textContent=sess.mode==='home'?'Barefoot PT':sess.mode==='gym'?'Boot-on PT':sess.mode.startsWith('snack:')?'Quick one':(sess.mode==='foot'||sess.mode==='ankle')?'Chris’s program':sess.mode.startsWith('ankle:')?EX[ANK_KEYS[sess.mode.slice(6)][0]].name.split(' · set')[0]:sess.mode==='imagery'?'Motor imagery':sess.mode==='bfrpress'?'BFR calf':sess.mode==='bfrquad'?'BFR quad set':sess.withPress?(sess.withRoutine?'Calf press + routine':'Calf press'):'PT routine';
+  $('isoh').textContent=sess.mode==='home'?'Barefoot PT':sess.mode==='gym'?'Boot-on PT':sess.mode.startsWith('snack:')?'Quick one':(sess.mode==='foot'||sess.mode==='ankle')?'Chris’s program':sess.mode.startsWith('ankle:')?EX[ANK_KEYS[sess.mode.slice(6)][0]].name.split(' · set')[0]:sess.mode==='imagery'?'Motor imagery':sess.mode==='map'?'Calf map':sess.mode==='bfrpress'?'BFR calf':sess.mode==='bfrquad'?'BFR quad set':sess.withPress?(sess.withRoutine?'Calf press + routine':'Calf press'):'PT routine';
   document.querySelector('.wrap').classList.add('focus'); window.scrollTo(0,0);
   if(navigator.wakeLock){navigator.wakeLock.request('screen').then(w=>wake=w).catch(()=>{});}
   setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused;
@@ -1324,7 +1417,7 @@ function resumeSession(){
   if(sound){$('sNext').textContent='Session resumed. Tap Pause, then Resume, to restart the beeps.';}
   return true;
 }
-function finish(complete){try{if(window.setPocket)setPocket(false);}catch(e){}stripKey=null;dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});
+function finish(complete){try{document.querySelector('.wrap').classList.remove('mapmode');}catch(e){}try{if(window.setPocket)setPocket(false);}catch(e){}stripKey=null;dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});
   clearInterval(timer);timer=null; stopTrack(); if(wake){try{wake.release()}catch(e){} wake=null;}
   const d=day(); const w=weekFor(today)||WEEKS[0]; const done=sess?sess.doneEx:[];
   const pressDone=false; const routineDone=false;
@@ -1370,6 +1463,7 @@ function renderAnkle(){const el=$('ankList');if(!el)return;el.innerHTML='';const
     const b=document.createElement('button');b.className='pill';b.textContent=done.includes(k)?'Again':'Go';b.onclick=()=>startSession(false,false,'ankle:'+k);
     r.append(t,b);el.appendChild(r);});}
 $('sImg').onclick=()=>startSession(false,false,'imagery');
+$('sMap').onclick=()=>startSession(false,false,'map');
 $('tPause').onclick=e=>{if(!sess)return; paused=!paused;
   if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';try{speechSynthesis.cancel();}catch(e){}if(window.__nativeStopSpeak)window.__nativeStopSpeak();nativeEvt('paused');}
   else{sess.stepEnd+=Date.now()-pauseStart;pauseStart=0;lastShown=null;tick();$('audWarn').hidden=true;
