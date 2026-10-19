@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.36",
+          "buildVersion": "36",
+          "date": "2026-10-19T20:49:52Z",
+          "localizedDescription": "Medial and lateral gastroc now look different: the medial head is bigger and reaches lower; the lateral head is smaller and ends higher. The other head shows faintly for comparison.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.36.ipa",
+          "size": 940642,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.35",
           "buildVersion": "35",
           "date": "2026-10-19T20:13:47Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.34.ipa",
           "size": 940323,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.33",
-          "buildVersion": "33",
-          "date": "2026-10-19T19:52:10Z",
-          "localizedDescription": "New: Calf map (10 min) on the Today screen. Finds each muscle — soleus, medial and lateral gastroc, tibialis posterior, peroneals — right leg first, then left, with a glowing model and where to put your fingers. Rate the left 0–3; scores show in Trends.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.33.ipa",
-          "size": 939437,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.35",
-      "versionDate": "2026-10-19T20:13:47Z",
-      "versionDescription": "Readable names in the Calf map jump list (no more map_tp).",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.35.ipa",
-      "size": 940387
+      "version": "1.1.36",
+      "versionDate": "2026-10-19T20:49:52Z",
+      "versionDescription": "Medial and lateral gastroc now look different: the medial head is bigger and reaches lower; the lateral head is smaller and ends higher. The other head shows faintly for comparison.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.36.ipa",
+      "size": 940642
     }
   ],
   "news": []
