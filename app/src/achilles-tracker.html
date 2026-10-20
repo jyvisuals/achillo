@@ -1216,7 +1216,7 @@ function renderMapTrend(){const el=$('trendMap');if(!el)return;if(!mapLog.length
     return '<div class="mb"><span>'+x.name+'</span><div class="bar"><i style="width:'+(avg==null?0:Math.round(avg/3*100))+'%"></i></div><span class="v">'+(avg==null?'—':avg.toFixed(1))+'</span></div>';}).join('');
   el.innerHTML='<div class="eyebrow">Calf map · left leg, last 3 sessions (0–3)</div><div class="mapbars">'+rows+'</div>';}
 renderMapTrend();
-window.__t={start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k]};
+window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k]};
 (function loop(){try{if(sess&&document.visibilityState==='visible')drawSegs();}catch(e){}requestAnimationFrame(loop);})();
 function setRing(frac,snap){if(snap){arc.classList.add('snap');}arc.style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,frac))));if(snap){void arc.offsetWidth;arc.classList.remove('snap');}}
 const ringEl=document.querySelector('.ring');
@@ -1409,6 +1409,7 @@ function lockInfo(){try{if(!sess)return;if(!('mediaSession' in navigator)&&!wind
 function recordDone(key){try{nativeEvt('done',{key});if(sess&&sess.mode&&sess.mode.startsWith('snack:'))return;const d=day();let changed=false;
   const base=EX[key]&&EX[key].base;
   if(base&&key===ankLast(base)&&!(d.ankleDone||[]).includes(base)){d.ankleDone=(d.ankleDone||[]).concat(base);changed=true;sess.ankNew=(sess.ankNew||0)+1;
+    if(isHome(base)&&!homeLeft(d).length)d.homeN=Math.min((d.homeN||0)+1,2); if(isGym(base)&&!gymLeft(d).length)d.gymN=Math.min((d.gymN||0)+1,2);
     if(!ankLeft(d).length){d.ankle=Math.min((d.ankle||0)+1,2);d.ankleDone=[];d.foot=1;sess.ankRound=true;}}
   if(key==='bcr15c'&&!d.bfrA){d.bfrA=1;changed=true;}
   if(key==='bpi4'&&!sess.bfrCounted){d.bfr=Math.min((d.bfr||0)+1,2);sess.bfrCounted=true;changed=true;}
@@ -1456,8 +1457,9 @@ function beginRun(){ $('jumpList').hidden=true; ringEl.classList.remove('done','
 }
 function startSession(withPress,withRoutine,mode){dbg('session: start',mode||'');snackPickOpen=false;try{const sp=$('snackPick');if(sp)sp.hidden=true;$('sheetBack').hidden=true;}catch(e){}
   if((mode==='ankle'||mode==='foot')&&!ankList().length){const d=day();d.ankleDone=[];}
-  if(mode==='home'&&!homeList().length){$('nowDone').hidden=false;$('nowDone').textContent='Barefoot PT already done today.';return;}
-  if(mode==='gym'&&!gymLeft(day()).length){$('nowDone').hidden=false;$('nowDone').textContent='Boot-on PT already done today.';return;}
+  // Each half runs twice a day. If this half is already done, start a fresh pass of it (the other half's progress is kept).
+  if(mode==='home'&&!homeList().length){const d=day();if((d.homeN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Barefoot PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: fresh pass');}
+  if(mode==='gym'&&!gymLeft(day()).length){const d=day();if((d.gymN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Boot-on PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: fresh pass');}
   sess=build(withPress,withRoutine,mode); sess.t0=Date.now(); paused=false; pauseStart=0; lastShown=null;
   enter(0,Date.now(),true); beep(780,150); sayStep(); beginRun(); persist(); startTrack();
 }
