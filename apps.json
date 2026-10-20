@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.41",
+          "buildVersion": "41",
+          "date": "2026-10-20T02:14:15Z",
+          "localizedDescription": "Hamstring stretch now happens during the cuff-off break of your BFR round (left then right, ~40 s each) instead of as its own exercise.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.41.ipa",
+          "size": 941781,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.40",
           "buildVersion": "40",
           "date": "2026-10-20T00:43:42Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.39.ipa",
           "size": 941666,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.38",
-          "buildVersion": "38",
-          "date": "2026-10-19T22:31:40Z",
-          "localizedDescription": "Calf map names in plain words: inner calf (medial gastroc), outer calf (lateral gastroc), deep calf (soleus), inner ankle, outer shin.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.38.ipa",
-          "size": 940828,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.40",
-      "versionDate": "2026-10-20T00:43:42Z",
-      "versionDescription": "Barefoot PT and Boot-on PT can each be done twice a day; a second pass starts fresh instead of saying it's already done.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.40.ipa",
-      "size": 941836
+      "version": "1.1.41",
+      "versionDate": "2026-10-20T02:14:15Z",
+      "versionDescription": "Hamstring stretch now happens during the cuff-off break of your BFR round (left then right, ~40 s each) instead of as its own exercise.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.41.ipa",
+      "size": 941781
     }
   ],
   "news": []
