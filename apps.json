@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.40",
+          "buildVersion": "40",
+          "date": "2026-10-20T00:43:42Z",
+          "localizedDescription": "Barefoot PT and Boot-on PT can each be done twice a day; a second pass starts fresh instead of saying it's already done.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.40.ipa",
+          "size": 941836,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.39",
           "buildVersion": "39",
           "date": "2026-10-19T22:36:27Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.38.ipa",
           "size": 940828,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.37",
-          "buildVersion": "37",
-          "date": "2026-10-19T20:52:27Z",
-          "localizedDescription": "Calf map: Skip now goes right → left → rate, one step at a time (it used to jump past the left leg). Tibialis posterior target moved to the cord between the inner ankle bone and the arch bump, where it's easier to feel.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.37.ipa",
-          "size": 940815,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.39",
-      "versionDate": "2026-10-19T22:36:27Z",
-      "versionDescription": "Calf map: swap between the side view and a view from behind with the buttons next to the model. Your choice sticks.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.39.ipa",
-      "size": 941666
+      "version": "1.1.40",
+      "versionDate": "2026-10-20T00:43:42Z",
+      "versionDescription": "Barefoot PT and Boot-on PT can each be done twice a day; a second pass starts fresh instead of saying it's already done.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.40.ipa",
+      "size": 941836
     }
   ],
   "news": []
