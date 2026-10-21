@@ -6,6 +6,6 @@ await p.clock.install({time:new Date('2026-10-16T14:00:00')});await p.goto('file
 await p.evaluate(()=>{const a=window.__aa;});
 await p.waitForTimeout(1500);
 await p.evaluate(()=>[...document.querySelectorAll('#nowBtns button')].find(b=>b.textContent==='Pick a quick one').click());await p.waitForTimeout(200);
-await p.click('#snackPick button[data-k="inviso"]');await p.waitForTimeout(4000);
+await p.click('#snackPick button[data-k="doming"]');await p.waitForTimeout(4000);
 console.log('fallback element playing:',await p.evaluate(()=>!document.getElementById('track').paused),'| warn hidden:',await p.evaluate(()=>document.getElementById('audWarn').hidden),'|',await p.textContent('#audWarnT'),errs);
 await b.close();})();

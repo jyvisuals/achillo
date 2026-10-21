@@ -4,7 +4,7 @@ const p=await b.newPage({viewport:{width:390,height:844},colorScheme:'dark'});co
 await p.addInitScript(()=>{const R=Date;window.__off=new R('2026-10-16T18:40').getTime()-R.now();class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+window.__off);}static now(){return R.now()+window.__off;}};window.Date=D;});
 await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2200);
 await p.evaluate(()=>[...document.querySelectorAll('#nowBtns button')].find(b=>b.textContent==='Pick a quick one').click());await p.waitForTimeout(200);
-await p.click('#snackPick button[data-k="inviso"]');await p.waitForTimeout(3500);
+await p.click('#snackPick button[data-k="doming"]');await p.waitForTimeout(3500);
 console.log('errors',errs);console.log('native calls:',await p.evaluate(()=>window.__aa.calls.slice(0,8)),'bytes written',await p.evaluate(()=>window.__fsw));
 console.log('playing:',await p.evaluate(()=>window.__aa.playing),'| warn hidden:',await p.evaluate(()=>document.getElementById('audWarn').hidden));
 // iOS silently pauses the player: status poll should notice, page watchdog should resume

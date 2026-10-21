@@ -970,16 +970,12 @@ const ANK_DEF=[
  ['scar',1,'Scar massage',1,15,'Boot off. Foot on a pillow or in your lap.',[['rest','Massage',180,'Gentle circles and lengthwise strokes along and around the scar, firm enough to move the skin. Include the puncture spots on the outside of the ankle.']],false],
  ['pump',1,'Ankle pumps · knee bent',30,8,'Boot off, knee bent, heel resting on the pillow. Slow, no bouncing.',[['up','Point',2,'Point the foot down slowly.'],['down','Back',2,'Bring it back up only to about {HINGE}, where the boot is set today. Never to flat. Stretch stays at 1 or 2 out of 10.']],false],
  ['invev',1,'Active inversion and eversion',30,6,'Foot pointed down a little. Slow and controlled.',[['up','In',2,'Turn the sole in.'],['down','Out',2,'Turn the sole out.']],false],
- ['calfraise',3,'Seated calf raise · heel elevated',8,8,'Sit, knee bent, ball of the foot on the floor and the heel on a book so it never drops below the forefoot. No added weight.',[['up','Up',3,'Rise onto the ball of the foot, slowly.'],['hold','Top',1,'Hold.'],['down','Down',3,'Lower slowly, only down to the book.']],false],
  ['doming',3,'Foot doming',12,6,'Boot off. Draw the ball of the foot toward the heel, toes long.',[['up','Dome',2,'Arch lifts, toes stay long.'],['hold','Hold',3,'Hold the dome.'],['down','Release',2,'Let it down.']],false],
- ['trunkrot',2,'Lower trunk rotation',10,8,'Boot off. Lie on your back, knees bent, feet flat and planted. Foot supported, ankle relaxed; don\'t let it flop up into a stretch as you roll.',[['up','Knees left',2,'Let both knees drop slowly to one side. Feet stay flat.'],['down','Knees right',2,'Bring them through to the other side. Slow and easy.']],false],
- ['pfbent',3,'Plantarflexion isometric · knee bent',8,8,'Boot off: band around the ball of the foot, knee bent, foot pointed. Don\'t let the band pull the foot up past {HINGE}.',[['up','Press',1,'Push the ball of the foot down.'],['hold','Hold',5,'A quarter of effort. Not working through range.'],['rest','Relax',2,'Relax.']],false],
- ['bootback',1,'Boot back on',1,0,'',[['rest','Boot on',25,'Boot back on, front shell on. The rest can all be done in the boot.']],true],
- ['inviso',3,'Inversion isometric',8,8,'In the boot: press the inside of the foot against the boot wall. Ankle doesn\'t move.',[['up','Press',1,'Press the inside of the foot in.'],['hold','Hold',3,'About a quarter of effort.'],['rest','Relax',2,'Relax.']],true],
- ['eviso',3,'Eversion isometric',8,8,'In the boot: press the outside of the foot against the boot wall.',[['up','Press',1,'Press the outside of the foot out.'],['hold','Hold',3,'About a quarter of effort.'],['rest','Relax',2,'Relax.']],true],
- ['toeyoga2',3,'Toe yoga',12,6,'Boot on is fine.',[['hold','Big toe up',2,'Lift the big toe, four small toes stay down.'],['hold','Swap',2,'Big toe down, four small toes up.']],true],
- ['hiprot',2,'Long-sitting hip rotation',10,8,'From your PT, for the internal-rotation deficit. Sit up, legs out long, hands behind you. Boot on.',[['up','Roll in',2,'Roll the whole leg in from the hip. The boot moves as one piece with the leg.'],['down','Roll out',2,'Roll it back out. Keep it small if the ankle twists in the boot.']],true],
- ['pfstraight',3,'Plantarflexion isometric · knee straight',8,8,'Leg out straight. In the boot, press into the footplate; out of it, a band around the ball of the foot.',[['up','Press',1,'Push the ball of the foot down.'],['hold','Hold',5,'A quarter of effort. Steady.'],['rest','Relax',2,'Relax.']],true],];
+ ['pfwall',3,'Plantarflexion isometric · ball into wall',8,8,'Boot off. Sit, knee slightly bent, a ball between the ball of your foot and the wall, foot pointed. Don\'t let the foot come up past {HINGE}.',[['up','Press',1,'Push the ball of the foot into the ball.'],['hold','Hold',5,'Hold it. Steady, light effort.'],['rest','Relax',2,'Relax.']],false],
+ ['bandsup',1,'Band eversion + inversion · superset',12,8,'Boot off, band around the forefoot, foot pointed a little. Small, slow arcs. The ankle never comes up toward you.',[['up','Out',2,'Turn the sole out against the band.'],['down','Back',2,'Back slowly.']],false],
+ ['calfman',3,'Seated calf raise · manual resistance',8,8,'Sit, knee bent, ball of the foot on the floor, heel on a book so it never drops below the forefoot. Hands on top of the knee for light resistance, 2 to 3 out of 10.',[['up','Up',2,'Rise onto the ball of the foot, pushing up into your hands.'],['hold','Top',3,'Hold at the top.'],['down','Down',2,'Lower slowly to the book.']],false],
+ ['bootback',1,'Boot back on',1,0,'',[['rest','Boot on',25,'Boot back on, front shell on. Toe yoga can be done in the boot.']],true],
+ ['toeyoga2',3,'Toe yoga',15,6,'Boot on is fine. Fifteen of each move.',[['hold','Big toe up',2,'Lift the big toe, four small toes stay down.'],['hold','Swap',2,'Big toe down, four small toes up.']],true]];
 
 // ---- Calf map: learn to find each muscle. Right leg first (what "found it" feels like), then left, then rate the left 0–3.
 const MAP_M=[
@@ -1000,8 +996,14 @@ const ANK_KEYS={}; // base -> [expanded keys]
 ANK_DEF.forEach(([k,sets,name,reps,setup,setupCue,phases,inBoot])=>{ANK_KEYS[k]=[];
   for(let i=1;i<=sets;i++){const key=sets>1?k+'_'+i:k; EX[key]={name:name+(sets>1?' · set '+i+' of '+sets:''),reps,setup:i===1?setup:0,setupCue,phases,rest:0,base:k,inBoot};
     if(i>1)ANK_KEYS[k].push('arest'); ANK_KEYS[k].push(key);}});
+// Chris's superset: band eversion then band inversion, three rounds, rest between rounds.
+(function(){const ph=(dir,cue)=>[['up',dir,2,cue],['down','Back',2,'Back slowly.']];const base={reps:12,rest:0,base:'bandsup',inBoot:false};
+  for(let r=1;r<=3;r++){
+    EX['bev_'+r]=Object.assign({},base,{name:'Band eversion · round '+r+' of 3',setup:r===1?8:0,setupCue:'Boot off, band around the forefoot, anchored to the inside so you pull outward. Foot pointed a little. Small, slow arcs; the ankle never comes up toward you.',phases:ph('Out','Turn the sole out against the band.')});
+    EX['binv_'+r]=Object.assign({},base,{name:'Band inversion · round '+r+' of 3',setup:6,setupCue:'Switch the band anchor to the outside so you pull inward.',phases:ph('In','Turn the sole in against the band.')});}
+  ANK_KEYS.bandsup=['bev_1','binv_1','arest','bev_2','binv_2','arest','bev_3','binv_3'];})();
 const ankLast=k=>ANK_KEYS[k][ANK_KEYS[k].length-1];
-function ankBases(){const d=day();const covered=bfrPending()||(d.bfr>0&&(d.ankle||0)===0);return ANK_DEF.map(x=>x[0]).filter(k=>!(covered&&(k==='calfraise'||k==='pfbent')));}
+function ankBases(){const d=day();const covered=bfrPending()||(d.bfr>0&&(d.ankle||0)===0);return ANK_DEF.map(x=>x[0]).filter(k=>!(covered&&(k==='calfman'||k==='pfwall')));}
 function ankLeft(d){const done=(d.ankleDone||[]);return ankBases().filter(k=>!done.includes(k)&&k!=='bootback');}
 function ankList(only){let bases=only?[only]:ankBases().filter(k=>!((day().ankleDone||[]).includes(k)));
   if(!only){const off=bases.filter(k=>!ANK_DEF.find(x=>x[0]===k)[7]);if(!off.length)bases=bases.filter(k=>k!=='bootback');}
@@ -1029,7 +1031,7 @@ function bfrPlanned(){const v=verdictKind(TODAY);return bfrDay(today)&&(!v||v===
 const isHome=k=>{const d=ANK_DEF.find(x=>x[0]===k);return d&&!d[7]&&k!=='bootback';};
 const isGym=k=>{const d=ANK_DEF.find(x=>x[0]===k);return d&&d[7]&&k!=='bootback';};
 // Quick ones: Chris's "pick a drill every hour or so" — one boot-on exercise, all its sets, rotating least-recent first.
-const SNACK_POOL=['toeyoga2','inviso','eviso','hiprot','pfstraight'];
+const SNACK_POOL=['toeyoga2','doming','invev','bandsup','pfwall'];
 function snackLast(){const d=day();const a=d.snacks||[];return a.length?a[a.length-1].t:0;}
 function snackDue(){return Date.now()-snackLast()>=55*60000;}
 function snackNext(){const d=day();const a=d.snacks||[];const last={};a.forEach(x=>{last[x.k]=x.t;});
@@ -1055,8 +1057,9 @@ window.__dbg=function(m){try{const d=new Date();const pad=n=>String(n).padStart(
 const dbg=(...a)=>window.__dbg(a.map(x=>typeof x==='object'?JSON.stringify(x):String(x)).join(' '));
 window.addEventListener('error',e=>dbg('js error:',e.message,(e.filename||'').split('/').pop()+':'+e.lineno));
 window.addEventListener('unhandledrejection',e=>dbg('promise rejected:',(e.reason&&(e.reason.message||e.reason))||''));
-const PREF_DEF={rate:1.02,voice:'',haptics:0.8,remind:1,morning:'7:55',cadence:60,lastHour:21,evening:'20:00',imageryAt:'21:00',pool:['toeyoga2','inviso','eviso','hiprot','pfstraight']};
+const PREF_DEF={rate:1.02,voice:'',haptics:0.8,remind:1,morning:'7:55',cadence:60,lastHour:21,evening:'20:00',imageryAt:'21:00',pool:['toeyoga2','doming','invev','bandsup']};
 let prefs=Object.assign({},PREF_DEF,local.get('prefs')||{});
+{const pl=(prefs.pool||[]).filter(k=>SNACK_POOL.includes(k));prefs.pool=pl.length?pl:PREF_DEF.pool.slice();}
 if(!prefs.v2times){if(prefs.evening==='16:00')prefs.evening='20:00';if(prefs.imageryAt==='20:25')prefs.imageryAt='21:00';prefs.v2times=1;try{local.set('prefs',prefs);}catch(e){}}
 let audRefresh=null,volRefresh=null;
 function fmtHM(v){const [h,m]=String(v||'20:00').split(':').map(Number);return ((h%12)||12)+(m?':'+String(m).padStart(2,'0'):'')+(h<12?' AM':' PM');}

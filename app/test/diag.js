@@ -4,7 +4,7 @@ const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('p
 await p.addInitScript(()=>{window.__failNative=true;});
 await p.clock.install({time:new Date('2026-10-16T14:00:00')});await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2000);
 await p.evaluate(()=>[...document.querySelectorAll('#nowBtns button')].find(b=>b.textContent==='Pick a quick one').click());await p.waitForTimeout(200);
-await p.click('#snackPick button[data-k="inviso"]');await p.waitForTimeout(3500);
+await p.click('#snackPick button[data-k="doming"]');await p.waitForTimeout(3500);
 await p.evaluate(()=>{document.querySelector('.wrap').classList.remove('focus');});
 await p.evaluate(()=>{document.getElementById('tabbar').style.display='grid';document.querySelector('#tabbar button[data-tab=settings]').click();});await p.waitForTimeout(300);
 await p.click('#diagView');console.log((await p.textContent('#diagBox')).split('\n').slice(-8).join('\n'));
