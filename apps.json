@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.42",
+          "buildVersion": "42",
+          "date": "2026-10-21T11:04:35Z",
+          "localizedDescription": "Chris's updated program: scar massage, ankle pumps, active inversion/eversion, foot doming, plantarflexion isometric into the wall ball, band eversion + inversion superset (3 rounds), seated calf raise with manual resistance, then toe yoga (15 each move). Trunk rotation, hip rotation and the in-boot isometrics are out.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.42.ipa",
+          "size": 941744,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.41",
           "buildVersion": "41",
           "date": "2026-10-20T02:14:15Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.40.ipa",
           "size": 941836,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.39",
-          "buildVersion": "39",
-          "date": "2026-10-19T22:36:27Z",
-          "localizedDescription": "Calf map: swap between the side view and a view from behind with the buttons next to the model. Your choice sticks.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.39.ipa",
-          "size": 941666,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.41",
-      "versionDate": "2026-10-20T02:14:15Z",
-      "versionDescription": "Hamstring stretch now happens during the cuff-off break of your BFR round (left then right, ~40 s each) instead of as its own exercise.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.41.ipa",
-      "size": 941781
+      "version": "1.1.42",
+      "versionDate": "2026-10-21T11:04:35Z",
+      "versionDescription": "Chris's updated program: scar massage, ankle pumps, active inversion/eversion, foot doming, plantarflexion isometric into the wall ball, band eversion + inversion superset (3 rounds), seated calf raise with manual resistance, then toe yoga (15 each move). Trunk rotation, hip rotation and the in-boot isometrics are out.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.42.ipa",
+      "size": 941744
     }
   ],
   "news": []
