@@ -1,1 +1,1 @@
-Chris's updated program: scar massage, ankle pumps, active inversion/eversion, foot doming, plantarflexion isometric into the wall ball, band eversion + inversion superset (3 rounds), seated calf raise with manual resistance, then toe yoga (15 each move). Trunk rotation, hip rotation and the in-boot isometrics are out.
+Leaving the app no longer pauses your session. After the iOS update, iOS reports a fake 'interruption' when it backgrounds the app; real ones (a call, Siri, an alarm) still pause.

@@ -1429,7 +1429,8 @@ window.addEventListener('ach:remote',e=>{const c=e.detail&&e.detail.cmd;if(!sess
   else if(c==='next')$('tSkip').click();else if(c==='prev'&&typeof prevEx==='function')prevEx();});
 window.addEventListener('ach:routeLost',()=>{dbg('audio: headphones/route lost');if(sess&&!paused){autoPaused=false;$('tPause').click();}if(sess){$('audWarn').hidden=false;$('audWarnT').textContent='Headphones disconnected. Paused.';}});
 window.addEventListener('ach:interrupt',e=>{const began=!!(e.detail&&e.detail.began);dbg('audio: interruption',began?'began':'ended');
-  if(began){if(sess&&!paused){autoPaused=true;$('tPause').click();}}
+  // only a real interruption of playing audio (a call, Siri, an alarm) pauses the session; with sound off there's nothing to interrupt
+  if(began){if(sess&&!paused&&sound&&trackOn){autoPaused=true;$('tPause').click();}else dbg('audio: interruption ignored (nothing playing)');}
   else if(autoPaused){autoPaused=false;if(sess&&paused)$('tPause').click();}});
 window.addEventListener('ach:markRound',()=>{const d=day();if((d.ankle||0)>=2)return;d.ankle=(d.ankle||0)+1;d.ankleDone=[];d.foot=1;queueSave(TODAY);renderAll();setStatus('Round logged from the reminder.');});
 window.addEventListener('ach:seed',e=>{const sd=e.detail&&e.detail.days;if(!sd)return;let n=0;Object.keys(sd).forEach(k=>{const before=JSON.stringify(days[k]||null);days[k]=mergeDay(days[k],JSON.parse(JSON.stringify(sd[k])));if(JSON.stringify(days[k])!==before){local.set('day:'+k,days[k]);n++;}});if(n){renderAll();setStatus('Imported '+n+' day'+(n>1?'s':'')+' from the web log.');}});

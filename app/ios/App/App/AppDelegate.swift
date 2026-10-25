@@ -18,6 +18,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             guard let info = note.userInfo,
                   let raw = info[AVAudioSessionInterruptionTypeKey] as? UInt,
                   let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
+            // iOS also reports an "interruption" when it merely suspended the app in the background
+            // (nothing was playing, e.g. sound cues off). That isn't a phone call: don't pause for it.
+            if type == .began {
+                if let r = info[AVAudioSessionInterruptionReasonKey] as? UInt, r == AVAudioSession.InterruptionReason.appWasSuspended.rawValue { return }
+                if (info[AVAudioSessionInterruptionWasSuspendedKey] as? NSNumber)?.boolValue == true { return }
+            }
             switch type {
             case .began:
                 self.tellPage("window.dispatchEvent(new CustomEvent('ach:interrupt',{detail:{began:true}}))")
