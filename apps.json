@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.44",
+          "buildVersion": "44",
+          "date": "2026-10-25T12:06:15Z",
+          "localizedDescription": "Leaving the app: the cue track is kept running (restarted if iOS stops it on the way out), and a stray pause iOS sends while you're leaving is ignored. Diagnostics now log what iOS does, in case it still happens.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.44.ipa",
+          "size": 945049,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.43",
           "buildVersion": "43",
           "date": "2026-10-25T11:59:40Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.42.ipa",
           "size": 941744,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.41",
-          "buildVersion": "41",
-          "date": "2026-10-20T02:14:15Z",
-          "localizedDescription": "Hamstring stretch now happens during the cuff-off break of your BFR round (left then right, ~40 s each) instead of as its own exercise.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.41.ipa",
-          "size": 941781,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.43",
-      "versionDate": "2026-10-25T11:59:40Z",
-      "versionDescription": "Leaving the app no longer pauses your session. After the iOS update, iOS reports a fake 'interruption' when it backgrounds the app; real ones (a call, Siri, an alarm) still pause.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.43.ipa",
-      "size": 941978
+      "version": "1.1.44",
+      "versionDate": "2026-10-25T12:06:15Z",
+      "versionDescription": "Leaving the app: the cue track is kept running (restarted if iOS stops it on the way out), and a stray pause iOS sends while you're leaving is ignored. Diagnostics now log what iOS does, in case it still happens.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.44.ipa",
+      "size": 945049
     }
   ],
   "news": []
