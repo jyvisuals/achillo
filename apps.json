@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.43",
+          "buildVersion": "43",
+          "date": "2026-10-25T11:59:40Z",
+          "localizedDescription": "Leaving the app no longer pauses your session. After the iOS update, iOS reports a fake 'interruption' when it backgrounds the app; real ones (a call, Siri, an alarm) still pause.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.43.ipa",
+          "size": 941978,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.42",
           "buildVersion": "42",
           "date": "2026-10-21T11:04:35Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.41.ipa",
           "size": 941781,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.40",
-          "buildVersion": "40",
-          "date": "2026-10-20T00:43:42Z",
-          "localizedDescription": "Barefoot PT and Boot-on PT can each be done twice a day; a second pass starts fresh instead of saying it's already done.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.40.ipa",
-          "size": 941836,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.42",
-      "versionDate": "2026-10-21T11:04:35Z",
-      "versionDescription": "Chris's updated program: scar massage, ankle pumps, active inversion/eversion, foot doming, plantarflexion isometric into the wall ball, band eversion + inversion superset (3 rounds), seated calf raise with manual resistance, then toe yoga (15 each move). Trunk rotation, hip rotation and the in-boot isometrics are out.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.42.ipa",
-      "size": 941744
+      "version": "1.1.43",
+      "versionDate": "2026-10-25T11:59:40Z",
+      "versionDescription": "Leaving the app no longer pauses your session. After the iOS update, iOS reports a fake 'interruption' when it backgrounds the app; real ones (a call, Siri, an alarm) still pause.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.43.ipa",
+      "size": 941978
     }
   ],
   "news": []
