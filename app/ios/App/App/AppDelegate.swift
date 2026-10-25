@@ -117,12 +117,31 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
     ]
 
     private var player: AVAudioPlayer?
+    private var wantPlaying = false   // the session wants the cue track running
+    private var bgAt = Date.distantPast
     private let synth = AVSpeechSynthesizer()
     private var remoteReady = false
 
     override public func load() {
         synth.usesApplicationAudioSession = true
         NotificationCenter.default.addObserver(self, selector: #selector(routeChanged(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
+        // Leaving the app: make sure the cue track keeps running (iOS sometimes stops it on the way out).
+        NotificationCenter.default.addObserver(self, selector: #selector(wentBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(cameBack), name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    @objc func wentBackground() {
+        bgAt = Date()
+        for delay in [0.3, 1.2, 3.0] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let self = self, self.wantPlaying, let p = self.player, !p.isPlaying, p.currentTime < p.duration - 0.5 else { return }
+                self.activate(); let ok = p.play(); self.updateNowPlayingRate()
+                self.notifyListeners("log", data: ["msg": "background: cue track had stopped, restarted (\(ok ? "ok" : "failed"))"])
+            }
+        }
+    }
+    @objc func cameBack() {
+        guard wantPlaying, let p = player, !p.isPlaying, p.currentTime < p.duration - 0.5 else { return }
+        notifyListeners("log", data: ["msg": "foreground: cue track was stopped at \(Int(p.currentTime))s while away"])
     }
 
     private func activate() {
@@ -157,13 +176,14 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
             self.activate()
             if let at = at { p.currentTime = max(0, min(at, p.duration)) }
             let ok = p.play()
+            self.wantPlaying = ok
             self.updateNowPlayingRate()
             call.resolve(["playing": ok, "position": p.currentTime])
         }
     }
 
     @objc func pause(_ call: CAPPluginCall) {
-        main { self.player?.pause(); self.updateNowPlayingRate(); call.resolve(["position": self.player?.currentTime ?? 0]) }
+        main { self.wantPlaying = false; self.player?.pause(); self.updateNowPlayingRate(); call.resolve(["position": self.player?.currentTime ?? 0]) }
     }
 
     @objc func seek(_ call: CAPPluginCall) {
@@ -173,7 +193,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
 
     @objc func stop(_ call: CAPPluginCall) {
         main {
-            self.player?.stop(); self.player = nil
+            self.wantPlaying = false; self.player?.stop(); self.player = nil
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
             call.resolve()
         }
@@ -430,8 +450,8 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         remoteReady = true
         let c = MPRemoteCommandCenter.shared()
         c.playCommand.addTarget { [weak self] _ in self?.notifyListeners("remote", data: ["cmd": "play"]); return .success }
-        c.pauseCommand.addTarget { [weak self] _ in self?.notifyListeners("remote", data: ["cmd": "pause"]); return .success }
-        c.togglePlayPauseCommand.addTarget { [weak self] _ in self?.notifyListeners("remote", data: ["cmd": "toggle"]); return .success }
+        c.pauseCommand.addTarget { [weak self] _ in guard let self = self else { return .success }; if Date().timeIntervalSince(self.bgAt) < 2 { self.notifyListeners("log", data: ["msg": "ignored a pause sent while leaving the app"]); return .success }; self.notifyListeners("remote", data: ["cmd": "pause"]); return .success }
+        c.togglePlayPauseCommand.addTarget { [weak self] _ in guard let self = self else { return .success }; if Date().timeIntervalSince(self.bgAt) < 2 { self.notifyListeners("log", data: ["msg": "ignored a play/pause toggle sent while leaving the app"]); return .success }; self.notifyListeners("remote", data: ["cmd": "toggle"]); return .success }
         c.nextTrackCommand.addTarget { [weak self] _ in self?.notifyListeners("remote", data: ["cmd": "next"]); return .success }
         c.previousTrackCommand.addTarget { [weak self] _ in self?.notifyListeners("remote", data: ["cmd": "prev"]); return .success }
         c.skipForwardCommand.isEnabled = false
@@ -439,7 +459,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         c.changePlaybackPositionCommand.isEnabled = false
     }
 
-    public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+    public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) { wantPlaying = false;
         notifyListeners("ended", data: [:])
     }
 

@@ -1,1 +1,1 @@
-Leaving the app no longer pauses your session. After the iOS update, iOS reports a fake 'interruption' when it backgrounds the app; real ones (a call, Siri, an alarm) still pause.
+Leaving the app: the cue track is kept running (restarted if iOS stops it on the way out), and a stray pause iOS sends while you're leaving is ignored. Diagnostics now log what iOS does, in case it still happens.

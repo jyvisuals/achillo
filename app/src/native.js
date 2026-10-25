@@ -117,7 +117,8 @@ function makeNativeTrack() {
   };
   AchAudio.addListener('ended', () => { pos = dur || cur(); playing = false; emit('ended'); });
   AchAudio.addListener('routeLost', () => { if (playing) { pos = cur(); playing = false; } window.dispatchEvent(new Event('ach:routeLost')); });
-  AchAudio.addListener('remote', (e) => window.dispatchEvent(new CustomEvent('ach:remote', { detail: e })));
+  AchAudio.addListener('remote', (e) => { log('remote command:', e && e.cmd); window.dispatchEvent(new CustomEvent('ach:remote', { detail: e })); });
+  AchAudio.addListener('log', (e) => log(e && e.msg));
   // keep the JS clock honest, and notice if iOS paused the player behind our back
   setInterval(async () => {
     if (fb || !playing || silent || nowMs() < holdPoll) return;
