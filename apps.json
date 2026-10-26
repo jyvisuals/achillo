@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.45",
+          "buildVersion": "45",
+          "date": "2026-10-26T14:48:41Z",
+          "localizedDescription": "David's ball-into-wall isometric: four 30 s holds, leg straight, with 2 min rests. Ankle circles fill the first two rests. The routine strip now shows time left and total.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.45.ipa",
+          "size": 945530,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.44",
           "buildVersion": "44",
           "date": "2026-10-25T12:06:15Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.43.ipa",
           "size": 941978,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.42",
-          "buildVersion": "42",
-          "date": "2026-10-21T11:04:35Z",
-          "localizedDescription": "Chris's updated program: scar massage, ankle pumps, active inversion/eversion, foot doming, plantarflexion isometric into the wall ball, band eversion + inversion superset (3 rounds), seated calf raise with manual resistance, then toe yoga (15 each move). Trunk rotation, hip rotation and the in-boot isometrics are out.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.42.ipa",
-          "size": 941744,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.44",
-      "versionDate": "2026-10-25T12:06:15Z",
-      "versionDescription": "Leaving the app: the cue track is kept running (restarted if iOS stops it on the way out), and a stray pause iOS sends while you're leaving is ignored. Diagnostics now log what iOS does, in case it still happens.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.44.ipa",
-      "size": 945049
+      "version": "1.1.45",
+      "versionDate": "2026-10-26T14:48:41Z",
+      "versionDescription": "David's ball-into-wall isometric: four 30 s holds, leg straight, with 2 min rests. Ankle circles fill the first two rests. The routine strip now shows time left and total.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.45.ipa",
+      "size": 945530
     }
   ],
   "news": []
