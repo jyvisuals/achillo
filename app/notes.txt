@@ -1,1 +1,1 @@
-Leaving the app: the cue track is kept running (restarted if iOS stops it on the way out), and a stray pause iOS sends while you're leaving is ignored. Diagnostics now log what iOS does, in case it still happens.
+David's ball-into-wall isometric: four 30 s holds, leg straight, with 2 min rests. Ankle circles fill the first two rests. The routine strip now shows time left and total.

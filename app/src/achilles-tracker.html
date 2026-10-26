@@ -229,6 +229,8 @@ html.tabs .wrap:not(.focus) #audRow{display:none}
 .sstrip>span.rest{background:transparent;border:1px dashed color-mix(in srgb,var(--muted) 35%,transparent);box-sizing:border-box}
 .sstrip>span>i{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent);display:block}
 .sstrip>span.rest>i{background:color-mix(in srgb,var(--muted) 45%,transparent)}
+.stime{display:none}
+.wrap.focus .stime{display:block;font-size:11px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .sstrip>span.now{outline:2px solid color-mix(in srgb,var(--ink) 55%,transparent);outline-offset:1px}
 #pocket{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;touch-action:none;user-select:none;-webkit-user-select:none}
 #pocket[hidden]{display:none}
@@ -654,7 +656,7 @@ pre.rtext{display:none}
     <div class="audwarn" id="audWarn" hidden><span id="audWarnT">Audio didn't start.</span><button id="audRetry">Retry audio</button></div>
     <div class="verdict go" id="sDone" hidden></div>
     <div class="sctl aud" id="audRow"><button id="tAud" class="ctlb" aria-label="Voice and cues"></button><button id="tVol" class="ctlb" aria-label="Cue volume"></button><button id="tPocket" class="ctlb" aria-label="Pocket mode" title="Pocket mode"><i class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 6.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 10v6m-2.6-2.6L12 16l2.6-2.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button></div>
-    <div class="sstrip" id="sessStrip" aria-hidden="true"></div>
+    <div class="sstrip" id="sessStrip" aria-hidden="true"></div><div class="stime" id="sessTime"></div>
   </section>
 
   <section aria-labelledby="todoh" data-t="log">
@@ -971,7 +973,7 @@ const ANK_DEF=[
  ['pump',1,'Ankle pumps · knee bent',30,8,'Boot off, knee bent, heel resting on the pillow. Slow, no bouncing.',[['up','Point',2,'Point the foot down slowly.'],['down','Back',2,'Bring it back up only to about {HINGE}, where the boot is set today. Never to flat. Stretch stays at 1 or 2 out of 10.']],false],
  ['invev',1,'Active inversion and eversion',30,6,'Foot pointed down a little. Slow and controlled.',[['up','In',2,'Turn the sole in.'],['down','Out',2,'Turn the sole out.']],false],
  ['doming',3,'Foot doming',12,6,'Boot off. Draw the ball of the foot toward the heel, toes long.',[['up','Dome',2,'Arch lifts, toes stay long.'],['hold','Hold',3,'Hold the dome.'],['down','Release',2,'Let it down.']],false],
- ['pfwall',3,'Plantarflexion isometric · ball into wall',8,8,'Boot off. Sit, knee slightly bent, a ball between the ball of your foot and the wall, foot pointed. Don\'t let the foot come up past {HINGE}.',[['up','Press',1,'Push the ball of the foot into the ball.'],['hold','Hold',5,'Hold it. Steady, light effort.'],['rest','Relax',2,'Relax.']],false],
+ ['pfwall',4,'Plantarflexion isometric · 30 s holds',1,10,'Boot off. Sit up tall, leg out straight, a ball between the ball of your foot and the wall, foot pointed. Set the distance so the foot never comes up past {HINGE}. Leg relaxed, foot doesn\'t roll to either side.',[['up','Press',2,'Ease the ball of the foot into the ball.'],['hold','Hold',30,'Hold it. Gentle and steady, two or three out of ten the whole way. Don\'t let it creep up.'],['down','Release',2,'Ease off slowly.']],false],
  ['bandsup',1,'Band eversion + inversion · superset',12,8,'Boot off, band around the forefoot, foot pointed a little. Small, slow arcs. The ankle never comes up toward you.',[['up','Out',2,'Turn the sole out against the band.'],['down','Back',2,'Back slowly.']],false],
  ['calfman',3,'Seated calf raise · manual resistance',8,8,'Sit, knee bent, ball of the foot on the floor, heel on a book so it never drops below the forefoot. Hands on top of the knee for light resistance, 2 to 3 out of 10.',[['up','Up',2,'Rise onto the ball of the foot, pushing up into your hands.'],['hold','Top',3,'Hold at the top.'],['down','Down',2,'Lower slowly to the book.']],false],
  ['bootback',1,'Boot back on',1,0,'',[['rest','Boot on',25,'Boot back on, front shell on. Toe yoga can be done in the boot.']],true],
@@ -1002,6 +1004,13 @@ ANK_DEF.forEach(([k,sets,name,reps,setup,setupCue,phases,inBoot])=>{ANK_KEYS[k]=
     EX['bev_'+r]=Object.assign({},base,{name:'Band eversion · round '+r+' of 3',setup:r===1?8:0,setupCue:'Boot off, band around the forefoot, anchored to the inside so you pull outward. Foot pointed a little. Small, slow arcs; the ankle never comes up toward you.',phases:ph('Out','Turn the sole out against the band.')});
     EX['binv_'+r]=Object.assign({},base,{name:'Band inversion · round '+r+' of 3',setup:6,setupCue:'Switch the band anchor to the outside so you pull inward.',phases:ph('In','Turn the sole in against the band.')});}
   ANK_KEYS.bandsup=['bev_1','binv_1','arest','bev_2','binv_2','arest','bev_3','binv_3'];})();
+// David's long isometric holds: two minutes between holds, ankle circles filling the first two rests.
+(function(){const c=(dir,cue)=>({name:'Ankle circles · '+dir,reps:20,setup:6,setupCue:cue,phases:[['up','Circle',3,'Small, slow circle.']],rest:0,base:'pfwall',inBoot:false});
+  EX.circ_cw=c('clockwise','Rest. Slide the foot off the ball, towel roll just above the ankle. Twenty small, lazy circles one way. Keep the top of each circle below {HINGE}.');
+  EX.circ_ccw=c('the other way','Rest. Same setup, twenty small circles the other way. Effortless.');
+  EX.pfrest={name:'Rest',reps:1,setup:0,phases:[['rest','Rest',54,'Rest. Foot back on the ball when it ends.']],rest:0};
+  EX.pfrest2={name:'Rest',reps:1,setup:0,phases:[['rest','Rest',120,'Two minutes. Leg relaxed. Foot back on the ball when it ends.']],rest:0};
+  ANK_KEYS.pfwall=['pfwall_1','circ_cw','pfrest','pfwall_2','circ_ccw','pfrest','pfwall_3','pfrest2','pfwall_4'];})();
 const ankLast=k=>ANK_KEYS[k][ANK_KEYS[k].length-1];
 function ankBases(){const d=day();const covered=bfrPending()||(d.bfr>0&&(d.ankle||0)===0);return ANK_DEF.map(x=>x[0]).filter(k=>!(covered&&(k==='calfman'||k==='pfwall')));}
 function ankLeft(d){const done=(d.ankleDone||[]);return ankBases().filter(k=>!done.includes(k)&&k!=='bootback');}
@@ -1180,7 +1189,8 @@ function drawStrip(pos){const el=$('sessStrip');if(!el||!sess)return;const k=ses
       if(rest&&cur){cur.t1=t1;return;}const g=rest?'~':groupOf(st.ex);if(cur&&cur.g===g)cur.t1=t1;else{cur={g,t0,t1,rest};stripParts.push(cur);}});
     const total=Math.max(1,stripParts.reduce((a,p)=>a+(p.t1-p.t0),0));
     stripParts.forEach(p=>{const s=document.createElement('span');if(p.rest)s.className='rest';s.style.flex=Math.max(0.6,100*(p.t1-p.t0)/total)+' 1 0';const f=document.createElement('i');s.appendChild(f);el.appendChild(s);p.el=s;p.fill=f;});}
-  stripParts.forEach(p=>{const f=Math.max(0,Math.min(1,(pos-p.t0)/Math.max(0.01,p.t1-p.t0)));const w=(f*100).toFixed(1)+'%';if(p.w!==w){p.w=w;p.fill.style.width=w;}p.el.classList.toggle('now',f>0&&f<1);});}
+  stripParts.forEach(p=>{const f=Math.max(0,Math.min(1,(pos-p.t0)/Math.max(0.01,p.t1-p.t0)));const w=(f*100).toFixed(1)+'%';if(p.w!==w){p.w=w;p.fill.style.width=w;}p.el.classList.toggle('now',f>0&&f<1);});
+  const tm=$('sessTime');if(tm){const tot=stripParts.length?stripParts[stripParts.length-1].t1:0,left=Math.max(0,Math.round(tot-pos));const t=Math.floor(left/60)+':'+String(left%60).padStart(2,'0')+' left · '+Math.round(tot/60)+' min';if(tm.textContent!==t)tm.textContent=t;}}
 
 // ---- Calf map model: the target muscle glows with effort (brightens on the press, full on the hold, fades on let-go)
 const CM_DOT={sol:[116,210],mg:[70,84],tp:[148,272],lg:[78,70],per:[116,120]};
@@ -1533,7 +1543,7 @@ $('tPause').onclick=e=>{if(!sess)return; paused=!paused;
     const st=sess&&sess.steps[sess.i];if(st&&EX[st.ex]&&EX[st.ex].speakCue){sess.stepEnd=Date.now()+st.secs*1000;sayStep();}}
   setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); lockInfo(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack();};
 // ---- skip / jump: skipping never marks an exercise done; the next Start plays only what's left.
-const REST_KEY=/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/;
+const REST_KEY=/^(arest|srest|pfrest2?|cuffdown|cuffoff|deflate|bootback)$/;
 const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(k)?'bfrB':k;
 const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);if(d)return d[2];if(g==='bfrA')return 'BFR seated calf raise';if(g==='bfrB')return 'BFR ball press';if(/^map_/.test(g)){const m=MAP_M.find(x=>'map_'+x.m===g);if(m)return 'Calf map · '+m.name;}return EX[g]?EX[g].name:g;};
 function jumpTo(idx){if(!sess)return;hush();$('jumpList').hidden=true;dbg('jump: to step',idx,sess.steps[idx]&&sess.steps[idx].ex);
