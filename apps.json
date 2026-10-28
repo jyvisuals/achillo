@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.48",
+          "buildVersion": "48",
+          "date": "2026-10-28T02:13:52Z",
+          "localizedDescription": "Leaving the app no longer pauses: a tap that lands as you swipe out is undone. Diagnostics now say what caused every pause. Evening rounds after BFR include the 30 s holds and calf raise.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.48.ipa",
+          "size": 945715,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.47",
           "buildVersion": "47",
           "date": "2026-10-28T02:08:06Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.46.ipa",
           "size": 945521,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.45",
-          "buildVersion": "45",
-          "date": "2026-10-26T14:48:41Z",
-          "localizedDescription": "David's ball-into-wall isometric: four 30 s holds, leg straight, with 2 min rests. Ankle circles fill the first two rests. The routine strip now shows time left and total.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.45.ipa",
-          "size": 945530,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.47",
-      "versionDate": "2026-10-28T02:08:06Z",
-      "versionDescription": "After a BFR morning, the evening round now includes David's 30 s holds and the seated calf raise.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.47.ipa",
-      "size": 945530
+      "version": "1.1.48",
+      "versionDate": "2026-10-28T02:13:52Z",
+      "versionDescription": "Leaving the app no longer pauses: a tap that lands as you swipe out is undone. Diagnostics now say what caused every pause. Evening rounds after BFR include the 30 s holds and calf raise.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.48.ipa",
+      "size": 945715
     }
   ],
   "news": []
