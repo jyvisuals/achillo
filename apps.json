@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.46",
+          "buildVersion": "46",
+          "date": "2026-10-28T02:05:25Z",
+          "localizedDescription": "BFR mornings keep David's 30 s wall holds; only the calf raise is skipped.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.46.ipa",
+          "size": 945521,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.45",
           "buildVersion": "45",
           "date": "2026-10-26T14:48:41Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.44.ipa",
           "size": 945049,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.43",
-          "buildVersion": "43",
-          "date": "2026-10-25T11:59:40Z",
-          "localizedDescription": "Leaving the app no longer pauses your session. After the iOS update, iOS reports a fake 'interruption' when it backgrounds the app; real ones (a call, Siri, an alarm) still pause.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.43.ipa",
-          "size": 941978,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.45",
-      "versionDate": "2026-10-26T14:48:41Z",
-      "versionDescription": "David's ball-into-wall isometric: four 30 s holds, leg straight, with 2 min rests. Ankle circles fill the first two rests. The routine strip now shows time left and total.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.45.ipa",
-      "size": 945530
+      "version": "1.1.46",
+      "versionDate": "2026-10-28T02:05:25Z",
+      "versionDescription": "BFR mornings keep David's 30 s wall holds; only the calf raise is skipped.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.46.ipa",
+      "size": 945521
     }
   ],
   "news": []
