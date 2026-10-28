@@ -1012,7 +1012,7 @@ ANK_DEF.forEach(([k,sets,name,reps,setup,setupCue,phases,inBoot])=>{ANK_KEYS[k]=
   EX.pfrest2={name:'Rest',reps:1,setup:0,phases:[['rest','Rest',120,'Two minutes. Leg relaxed. Foot back on the ball when it ends.']],rest:0};
   ANK_KEYS.pfwall=['pfwall_1','circ_cw','pfrest','pfwall_2','circ_ccw','pfrest','pfwall_3','pfrest2','pfwall_4'];})();
 const ankLast=k=>ANK_KEYS[k][ANK_KEYS[k].length-1];
-function ankBases(){const d=day();const covered=bfrPending()||(d.bfr>0&&(d.ankle||0)===0);return ANK_DEF.map(x=>x[0]).filter(k=>!(covered&&k==='calfman'));}
+function ankBases(){const d=day();const covered=bfrPending()||(d.bfr>0&&(d.homeN||0)===0&&(d.ankle||0)===0);return ANK_DEF.map(x=>x[0]).filter(k=>!(covered&&k==='calfman'));}
 function ankLeft(d){const done=(d.ankleDone||[]);return ankBases().filter(k=>!done.includes(k)&&k!=='bootback');}
 function ankList(only){let bases=only?[only]:ankBases().filter(k=>!((day().ankleDone||[]).includes(k)));
   if(!only){const off=bases.filter(k=>!ANK_DEF.find(x=>x[0]===k)[7]);if(!off.length)bases=bases.filter(k=>k!=='bootback');}
