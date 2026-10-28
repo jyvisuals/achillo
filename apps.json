@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.47",
+          "buildVersion": "47",
+          "date": "2026-10-28T02:08:06Z",
+          "localizedDescription": "After a BFR morning, the evening round now includes David's 30 s holds and the seated calf raise.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.47.ipa",
+          "size": 945530,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.46",
           "buildVersion": "46",
           "date": "2026-10-28T02:05:25Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.45.ipa",
           "size": 945530,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.44",
-          "buildVersion": "44",
-          "date": "2026-10-25T12:06:15Z",
-          "localizedDescription": "Leaving the app: the cue track is kept running (restarted if iOS stops it on the way out), and a stray pause iOS sends while you're leaving is ignored. Diagnostics now log what iOS does, in case it still happens.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.44.ipa",
-          "size": 945049,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.46",
-      "versionDate": "2026-10-28T02:05:25Z",
-      "versionDescription": "BFR mornings keep David's 30 s wall holds; only the calf raise is skipped.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.46.ipa",
-      "size": 945521
+      "version": "1.1.47",
+      "versionDate": "2026-10-28T02:08:06Z",
+      "versionDescription": "After a BFR morning, the evening round now includes David's 30 s holds and the seated calf raise.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.47.ipa",
+      "size": 945530
     }
   ],
   "news": []
