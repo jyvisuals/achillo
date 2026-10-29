@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.51",
+          "buildVersion": "51",
+          "date": "2026-10-29T02:26:36Z",
+          "localizedDescription": "Chris's update: band plantarflexion joins the band superset; wall isometric is Chris's 3 × 3 × 15 s in the morning round and David's 4 × 30 s in the evening. Skipping counts as done; evening always starts a full round.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.51.ipa",
+          "size": 946378,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.50",
           "buildVersion": "50",
           "date": "2026-10-29T01:57:48Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.49.ipa",
           "size": 945912,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.48",
-          "buildVersion": "48",
-          "date": "2026-10-28T02:13:52Z",
-          "localizedDescription": "Leaving the app no longer pauses: a tap that lands as you swipe out is undone. Diagnostics now say what caused every pause. Evening rounds after BFR include the 30 s holds and calf raise.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.48.ipa",
-          "size": 945715,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.50",
-      "versionDate": "2026-10-29T01:57:48Z",
-      "versionDescription": "Skipping past an exercise counts it as done. An unfinished morning round no longer eats the evening one.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.50.ipa",
-      "size": 945992
+      "version": "1.1.51",
+      "versionDate": "2026-10-29T02:26:36Z",
+      "versionDescription": "Chris's update: band plantarflexion joins the band superset; wall isometric is Chris's 3 × 3 × 15 s in the morning round and David's 4 × 30 s in the evening. Skipping counts as done; evening always starts a full round.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.51.ipa",
+      "size": 946378
     }
   ],
   "news": []
