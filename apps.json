@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.54",
+          "buildVersion": "54",
+          "date": "2026-10-29T10:28:27Z",
+          "localizedDescription": "BFR moves to the end of the morning round, as the finisher. Plus Hips with drawings, Chris's update, AM/PM isometrics, skip counts as done.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.54.ipa",
+          "size": 948602,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.53",
           "buildVersion": "53",
           "date": "2026-10-29T02:39:25Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.52.ipa",
           "size": 947292,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.51",
-          "buildVersion": "51",
-          "date": "2026-10-29T02:26:36Z",
-          "localizedDescription": "Chris's update: band plantarflexion joins the band superset; wall isometric is Chris's 3 × 3 × 15 s in the morning round and David's 4 × 30 s in the evening. Skipping counts as done; evening always starts a full round.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.51.ipa",
-          "size": 946378,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.53",
-      "versionDate": "2026-10-29T02:39:25Z",
-      "versionDescription": "Hips now shows a simple drawing of each stretch, with a glow where you should feel it.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.53.ipa",
-      "size": 948536
+      "version": "1.1.54",
+      "versionDate": "2026-10-29T10:28:27Z",
+      "versionDescription": "BFR moves to the end of the morning round, as the finisher. Plus Hips with drawings, Chris's update, AM/PM isometrics, skip counts as done.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.54.ipa",
+      "size": 948602
     }
   ],
   "news": []
