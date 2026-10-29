@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.52",
+          "buildVersion": "52",
+          "date": "2026-10-29T02:29:57Z",
+          "localizedDescription": "New: Hips, Chris's daily hip mobility as one guided 17-minute session, boot on. Also Chris's updated routine, AM/PM isometrics, skip counts as done.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.52.ipa",
+          "size": 947292,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.51",
           "buildVersion": "51",
           "date": "2026-10-29T02:26:36Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.50.ipa",
           "size": 945992,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.49",
-          "buildVersion": "49",
-          "date": "2026-10-29T01:53:52Z",
-          "localizedDescription": "An unfinished morning round no longer eats the evening one: after four hours, Barefoot PT starts a full new round.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.49.ipa",
-          "size": 945912,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.51",
-      "versionDate": "2026-10-29T02:26:36Z",
-      "versionDescription": "Chris's update: band plantarflexion joins the band superset; wall isometric is Chris's 3 × 3 × 15 s in the morning round and David's 4 × 30 s in the evening. Skipping counts as done; evening always starts a full round.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.51.ipa",
-      "size": 946378
+      "version": "1.1.52",
+      "versionDate": "2026-10-29T02:29:57Z",
+      "versionDescription": "New: Hips, Chris's daily hip mobility as one guided 17-minute session, boot on. Also Chris's updated routine, AM/PM isometrics, skip counts as done.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.52.ipa",
+      "size": 947292
     }
   ],
   "news": []
