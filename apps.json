@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.58",
+          "buildVersion": "58",
+          "date": "2026-10-29T10:55:56Z",
+          "localizedDescription": "Skip now moves one set at a time (and past the rest after it). The list button still jumps whole exercises.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.58.ipa",
+          "size": 948561,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.57",
           "buildVersion": "57",
           "date": "2026-10-29T10:49:40Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.55.ipa",
           "size": 948488,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.54",
-          "buildVersion": "54",
-          "date": "2026-10-29T10:28:27Z",
-          "localizedDescription": "BFR moves to the end of the morning round, as the finisher. Plus Hips with drawings, Chris's update, AM/PM isometrics, skip counts as done.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.54.ipa",
-          "size": 948602,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.57",
-      "versionDate": "2026-10-29T10:49:40Z",
-      "versionDescription": "BFR mornings skip the wall isometric again (the BFR ball press covers it); evening keeps David's 30 s holds.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.57.ipa",
-      "size": 948558
+      "version": "1.1.58",
+      "versionDate": "2026-10-29T10:55:56Z",
+      "versionDescription": "Skip now moves one set at a time (and past the rest after it). The list button still jumps whole exercises.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.58.ipa",
+      "size": 948561
     }
   ],
   "news": []
