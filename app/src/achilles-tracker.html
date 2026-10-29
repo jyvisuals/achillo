@@ -1420,7 +1420,7 @@ function lockInfo(){try{if(!sess)return;if(!('mediaSession' in navigator)&&!wind
 // Check exercises off the moment they finish, not at the end of the session.
 function recordDone(key){try{nativeEvt('done',{key});if(sess&&sess.mode&&sess.mode.startsWith('snack:'))return;const d=day();let changed=false;
   const base=EX[key]&&EX[key].base;
-  if(base&&key===ankLast(base)&&!(d.ankleDone||[]).includes(base)){d.ankleDone=(d.ankleDone||[]).concat(base);changed=true;sess.ankNew=(sess.ankNew||0)+1;
+  if(base&&key===ankLast(base)&&!(d.ankleDone||[]).includes(base)){d.ankleDone=(d.ankleDone||[]).concat(base);changed=true;sess.ankNew=(sess.ankNew||0)+1;if(isHome(base))d.homeAt=Date.now();if(isGym(base))d.gymAt=Date.now();
     if(isHome(base)&&!homeLeft(d).length)d.homeN=Math.min((d.homeN||0)+1,2); if(isGym(base)&&!gymLeft(d).length)d.gymN=Math.min((d.gymN||0)+1,2);
     if(!ankLeft(d).length){d.ankle=Math.min((d.ankle||0)+1,2);d.ankleDone=[];d.foot=1;sess.ankRound=true;}}
   if(key==='bcr15c'&&!d.bfrA){d.bfrA=1;changed=true;}
@@ -1471,6 +1471,10 @@ function beginRun(){ $('jumpList').hidden=true; ringEl.classList.remove('done','
 function startSession(withPress,withRoutine,mode){dbg('session: start',mode||'');snackPickOpen=false;try{const sp=$('snackPick');if(sp)sp.hidden=true;$('sheetBack').hidden=true;}catch(e){}
   if((mode==='ankle'||mode==='foot')&&!ankList().length){const d=day();d.ankleDone=[];}
   // Each half runs twice a day. If this half is already done, start a fresh pass of it (the other half's progress is kept).
+  // A morning round left unfinished doesn't eat the evening one: four hours on, start a new round and drop the leftovers.
+  {const d=day();const stale=t=>t&&Date.now()-t>4*3600e3;
+   if(mode==='home'&&(d.homeN||0)===0&&homeLeft(d).length&&stale(d.homeAt)){d.homeN=1;d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: new round, morning leftovers dropped');}
+   if(mode==='gym'&&(d.gymN||0)===0&&gymLeft(d).length&&stale(d.gymAt)){d.gymN=1;d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: new round, morning leftovers dropped');}}
   if(mode==='home'&&!homeList().length){const d=day();if((d.homeN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Barefoot PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: fresh pass');}
   if(mode==='gym'&&!gymLeft(day()).length){const d=day();if((d.gymN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Boot-on PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: fresh pass');}
   sess=build(withPress,withRoutine,mode); sess.t0=Date.now(); paused=false; pauseStart=0; lastShown=null;

@@ -1,1 +1,1 @@
-Leaving the app no longer pauses: a tap that lands as you swipe out is undone. Diagnostics now say what caused every pause. Evening rounds after BFR include the 30 s holds and calf raise.
+An unfinished morning round no longer eats the evening one: after four hours, Barefoot PT starts a full new round.
