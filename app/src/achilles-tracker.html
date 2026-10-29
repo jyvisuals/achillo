@@ -1068,7 +1068,7 @@ function drawHip(){const w=document.querySelector('.wrap');const on=!!(sess&&ses
   el.classList.toggle('holding',st.kind==='hold');}
 const HIPS_LAST=HIPS[HIPS.length-1];
 const ankLast=k=>ANK_KEYS[k][ANK_KEYS[k].length-1];
-function ankBases(){const d=day();const covered=bfrPending()||(d.bfr>0&&(d.homeN||0)===0&&(d.ankle||0)===0);return ANK_DEF.map(x=>x[0]).filter(k=>!(covered&&k==='calfman'));}
+function ankBases(){const d=day();const covered=bfrPending()||(d.bfr>0&&(d.homeN||0)===0&&(d.ankle||0)===0);return ANK_DEF.map(x=>x[0]).filter(k=>!(covered&&(k==='calfman'||k==='pfwall')));}
 function ankLeft(d){const done=(d.ankleDone||[]);return ankBases().filter(k=>!done.includes(k)&&k!=='bootback');}
 function ankList(only){let bases=only?[only]:ankBases().filter(k=>!((day().ankleDone||[]).includes(k)));
   if(!only){const off=bases.filter(k=>!ANK_DEF.find(x=>x[0]===k)[7]);if(!off.length)bases=bases.filter(k=>k!=='bootback');}
