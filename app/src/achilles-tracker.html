@@ -973,6 +973,7 @@ const EX={
  bfrq15b:{name:'BFR quad set 3 of 4 · 15 reps',reps:15,setup:0,phases:[['up','Lift',2,'Lift.'],['down','Lower',2,'Lower.']],rest:0},
  bfrq15c:{name:'BFR quad set 4 of 4 · 15 reps',reps:15,setup:0,phases:[['up','Lift',2,'Lift.'],['down','Lower',2,'Lower.']],rest:0},
  srest:{name:'Between sets',reps:1,setup:0,phases:[['rest','Rest',30,'Cuff stays on. Thirty seconds.']],rest:0},
+ deflatex:{name:'Deflate',reps:1,setup:0,phases:[['rest','Deflate',20,'Cuff all the way down and off. Wiggle the toes. That\'s the round.']],rest:0},
  deflate:{name:'Deflate',reps:1,setup:0,phases:[['rest','Deflate',20,'Cuff all the way down and off. Wiggle the toes. The rest is no-cuff.']],rest:0},
  imagery:{name:'Motor imagery',reps:1,setup:0,speakCue:true,phases:[
   ['rest','Settle',30,'Eyes closed. Feel the weight of both legs. You\'re rehearsing from inside your body, not watching yourself from outside.'],
@@ -1112,7 +1113,8 @@ function homeList(){const d=day();const left=homeLeft(d);
   const gap=left.includes('scar')?ANK_KEYS.scar:['cuffoff'];
   const after=left.filter(k=>k!=='scar').flatMap(k=>ANK_KEYS[k]);
   const calf=d.bfrA?[]:['bcr30','srest','bcr15a','srest','bcr15b','srest','bcr15c','cuffdown'];
-  return calf.concat(d.bfrA&&!left.includes('scar')?[]:gap,['bpi1','srest','bpi2','srest','bpi3','srest','bpi4','deflate'],after);}
+  // BFR goes last: the routine with a fresh calf, then BFR as the finisher (scar massage fills the cuff break).
+  return after.concat(calf,d.bfrA&&!left.includes('scar')?[]:gap,['bpi1','srest','bpi2','srest','bpi3','srest','bpi4','deflatex']);}
 // ---- diagnostics: a rolling log of audio/session events, kept on the device ----
 const DBG_MAX=400;let dbgBuf=[];try{dbgBuf=JSON.parse(localStorage.getItem('ach:dbg')||'[]');}catch(e){}
 let dbgT=null;
@@ -1142,7 +1144,7 @@ function stepSpeech(steps,list,i){const s=steps[i];const e=EX[s.ex];if(!e)return
   if(e.speakCue)return s.cue||'';
   if(e.timed&&s.rep===0&&s.kind==='hold')return e.name+'. '+s.cue;
   if(/^(cuffdown|cuffoff|deflate|bootback)$/.test(s.ex)){const nxt=list[s.ei+1];const nn=nxt&&EX[nxt]?EX[nxt].name.split(' · ')[0].replace(/\(\d of \d\)/,''):'';
-    return (s.ex==='deflate'?'Cuff off. ':s.ex==='bootback'?'Boot back on. ':'Cuff off for now. ')+(nn?'Next: '+nn+'.':'That\'s the block.');}
+    return (/^deflatex?$/.test(s.ex)?'Cuff off. ':s.ex==='bootback'?'Boot back on. ':'Cuff off for now. ')+(nn?'Next: '+nn+'.':'That\'s the block.');}
   return '';}
 // The spoken lines laid out on the track's timeline, so the app can record them into the audio file.
 // Each line ends where the next line starts or the next exercise begins, so a skip never lands in the middle of an old sentence.
@@ -1605,7 +1607,7 @@ $('tPause').onclick=e=>{if(!sess)return; paused=!paused; dbg('pause:',paused?'on
     const st=sess&&sess.steps[sess.i];if(st&&EX[st.ex]&&EX[st.ex].speakCue){sess.stepEnd=Date.now()+st.secs*1000;sayStep();}}
   setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); lockInfo(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack();};
 // ---- skip / jump: skipping forward past an exercise counts it as done.
-const REST_KEY=/^(arest|srest|pfrest2?|cuffdown|cuffoff|deflate|bootback)$/;
+const REST_KEY=/^(arest|srest|pfrest2?|cuffdown|cuffoff|deflatex?|bootback)$/;
 const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(k)?'bfrB':k;
 const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);if(d)return d[2];if(HIP_NAMES[g])return HIP_NAMES[g];if(g==='bfrA')return 'BFR seated calf raise';if(g==='bfrB')return 'BFR ball press';if(/^map_/.test(g)){const m=MAP_M.find(x=>'map_'+x.m===g);if(m)return 'Calf map · '+m.name;}return EX[g]?EX[g].name:g;};
 function jumpTo(idx){if(!sess)return;hush();$('jumpList').hidden=true;dbg('jump: to step',idx,sess.steps[idx]&&sess.steps[idx].ex);
