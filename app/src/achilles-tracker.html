@@ -574,7 +574,7 @@ pre.rtext{display:none}
       <button id="sGym">Boot-on PT</button>
       <button id="sImg">Imagery (5 min)</button>
       <button id="sMap">Calf map (10 min)</button>
-      <button id="sHips">Hips (17 min)</button>
+      <button id="sHips">Hips (16 min)</button>
     </div>
     <details class="ankpick" id="ankPick"><summary>Chris’s program · pick any exercise</summary><div id="ankList"></div></details>
     <div class="envnote" id="envNote" hidden></div>
@@ -959,7 +959,7 @@ function renderTasks(){
   if(isoN>0)row('Calf press','4 × 30 s at ~50%. '+(isoN===1?'Once, at night.':isoN===2?'Twice, 6–8 h apart.':'Three today: morning, mid-afternoon, night.')+' Tap to log one done off-app.',d.iso||0,'iso',isoN,true);
   {const L=ankLeft(d).length,T=ankBases().length-1;row('Chris’s program','Twice a day, morning and evening: Barefoot PT then Boot-on PT. '+(L<T&&L>0?(T-L)+' of '+T+' done this round; picks up where you left off.':(d.ankle===1?'Evening round still to do.':'')),d.ankle||0,'ankle',2,true);}
   row('Quick ones','One boot-on drill, all its sets, every hour or so between rounds. Logs itself.',(d.snacks||[]).length,'snackN',8,false);
-  row('Hips','Chris · daily. 90/90, glute, adductor, hip flexors, ITB. About 17 min.',d.hips||0,'hips',1,true);
+  row('Hips','Chris · daily. 90/90, glute, adductor, hip flexors, ITB. About 16 min.',d.hips||0,'hips',1,true);
   row('Imagery','5 min guided, first-person. One after a session, one at bedtime.',d.imagery||0,'imagery',2,true);
   if(bfrDay(today))row('BFR',(verdictKind(TODAY)&&verdictKind(TODAY)!=='go'?'Skipped today: morning wasn\'t quiet. ':'First thing after the morning check: ')+'seated calf raise 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15 × 3 s squeezes.',d.bfr||0,'bfr',1,true);
 
@@ -990,7 +990,7 @@ const ROUTINE=[]; // PT home program retired Oct 15 (gym covers core/quad/glute)
 const ANK_DEF=[
  ['scar',1,'Scar massage',1,15,'Boot off. Foot on a pillow or in your lap.',[['rest','Massage',180,'Gentle circles and lengthwise strokes along and around the scar, firm enough to move the skin. Include the puncture spots on the outside of the ankle.']],false],
  ['pump',1,'Ankle pumps · in a left hamstring stretch',30,15,'Boot off. Lie back, left leg up, knee straight, strap behind the heel or lower calf, never the ball of the foot. Ease in until you feel the back of the thigh. Then pump slowly.',[['up','Point',2,'Point the foot down slowly.'],['down','Back',2,'Back up only to {HINGE}, where the boot is set today. Never past flat. No bouncing.']],false],
- ['invev',1,'Active inversion and eversion',30,6,'Foot pointed down a little. Slow and controlled.',[['up','In',2,'Turn the sole in.'],['down','Out',2,'Turn the sole out.']],false],
+ ['invev',1,'Inversion and eversion · in pigeon',30,15,'On the bed in pigeon: left leg in front, shin across the bed, ankle just past the edge so the foot hangs free. Right leg straight back. Ease into the left glute. Foot pointed down a little; slow and controlled.',[['up','In',2,'Turn the sole in.'],['down','Out',2,'Turn the sole out.']],false],
  ['doming',3,'Foot doming',12,6,'Boot off. Draw the ball of the foot toward the heel, toes long.',[['up','Dome',2,'Arch lifts, toes stay long.'],['hold','Hold',3,'Hold the dome.'],['down','Release',2,'Let it down.']],false],
  ['pfwall',4,'Plantarflexion isometric · ball into wall',1,10,'Boot off. Sit up tall, leg out straight, a ball between the ball of your foot and the wall, foot pointed. Set the distance so the foot never comes up past {HINGE}. Leg relaxed, foot doesn\'t roll to either side.',[['up','Press',2,'Ease the ball of the foot into the ball.'],['hold','Hold',30,'Hold it. Gentle and steady, two or three out of ten the whole way. Don\'t let it creep up.'],['down','Release',2,'Ease off slowly.']],false],
  ['bandsup',1,'Band superset · out, in, point',12,8,'Boot off, band around the forefoot, foot pointed a little. Small, slow arcs. The ankle never comes up toward you.',[['up','Out',2,'Turn the sole out against the band.'],['down','Back',2,'Back slowly.']],false],
@@ -1041,7 +1041,7 @@ const HIP_NAMES={};const HIPS=[];
 (function(){const add=(g,name,key,o)=>{HIP_NAMES[g]=name;EX[key]=Object.assign({rest:0,base:g,hips:true},o);HIPS.push(key);};
   const hold=(secs,cue)=>[['hold','Hold',secs,cue],['rest','Ease off',4,'Ease off.']];
   add('hip_9090','Hip 90/90 · lying down','hip_9090',{boot:false,name:'Hip 90/90 · lying down',reps:10,setup:15,setupCue:'On your back, feet up on the wall or a chair, hips and knees bent to ninety. Left foot relaxed.',phases:[['up','Set',2,'Flatten the low back.'],['hold','Hold',6,'Hold it. Breathe out.'],['rest','Relax',3,'Relax.']]});
-  ['R','L'].forEach(sd=>{const side=sd==='R'?'right':'left';
+  ['R'].forEach(sd=>{const side=sd==='R'?'right':'left';
     add('hip_glute','Seated glute stretch','hip_glute_'+sd,{boot:false,name:'Seated glute stretch · '+side,reps:4,setup:10,setupCue:'Sit, '+side+' ankle across the other knee. Lean forward from the hips until you feel the '+side+' glute.'+(sd==='L'?' Left foot hangs relaxed; don\'t pull the toes up.':''),phases:hold(20,'Hold. Breathe into it.')});});
   add('hip_rock','Hip adductor rockback','hip_rock',{boot:false,name:'Hip adductor rockback',reps:10,setup:12,setupCue:'Hands and knees, one leg out to the side. Tops of the feet flat on the floor, toes not tucked.',phases:[['up','Back',2,'Rock your hips back.'],['hold','Hold',6,'Hold. Feel the inner thigh.'],['down','Forward',2,'Come forward.']]});
   add('hip_kneel','½ kneel hip flexor','hip_kneel_L',{boot:false,name:'½ kneel hip flexor · left knee down',reps:6,setup:12,setupCue:'Left knee down on a pillow, top of the left foot flat on the floor. Band as Chris set it. Tuck the tail under and shift forward.',phases:hold(10,'Hold. Squeeze the back glute.')});
