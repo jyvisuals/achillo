@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.53",
+          "buildVersion": "53",
+          "date": "2026-10-29T02:39:25Z",
+          "localizedDescription": "Hips now shows a simple drawing of each stretch, with a glow where you should feel it.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.53.ipa",
+          "size": 948536,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.52",
           "buildVersion": "52",
           "date": "2026-10-29T02:29:57Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.51.ipa",
           "size": 946378,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.50",
-          "buildVersion": "50",
-          "date": "2026-10-29T01:57:48Z",
-          "localizedDescription": "Skipping past an exercise counts it as done. An unfinished morning round no longer eats the evening one.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.50.ipa",
-          "size": 945992,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.52",
-      "versionDate": "2026-10-29T02:29:57Z",
-      "versionDescription": "New: Hips, Chris's daily hip mobility as one guided 17-minute session, boot on. Also Chris's updated routine, AM/PM isometrics, skip counts as done.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.52.ipa",
-      "size": 947292
+      "version": "1.1.53",
+      "versionDate": "2026-10-29T02:39:25Z",
+      "versionDescription": "Hips now shows a simple drawing of each stretch, with a glow where you should feel it.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.53.ipa",
+      "size": 948536
     }
   ],
   "news": []
