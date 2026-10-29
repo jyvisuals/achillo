@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.57",
+          "buildVersion": "57",
+          "date": "2026-10-29T10:49:40Z",
+          "localizedDescription": "BFR mornings skip the wall isometric again (the BFR ball press covers it); evening keeps David's 30 s holds.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.57.ipa",
+          "size": 948558,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.55",
           "buildVersion": "55",
           "date": "2026-10-29T10:44:35Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.54.ipa",
           "size": 948602,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.53",
-          "buildVersion": "53",
-          "date": "2026-10-29T02:39:25Z",
-          "localizedDescription": "Hips now shows a simple drawing of each stretch, with a glow where you should feel it.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.53.ipa",
-          "size": 948536,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.55",
-      "versionDate": "2026-10-29T10:44:35Z",
-      "versionDescription": "Ankle pumps now happen inside a left hamstring stretch; the right hamstring stretch is gone. BFR is the finisher of the morning round.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.55.ipa",
-      "size": 948488
+      "version": "1.1.57",
+      "versionDate": "2026-10-29T10:49:40Z",
+      "versionDescription": "BFR mornings skip the wall isometric again (the BFR ball press covers it); evening keeps David's 30 s holds.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.57.ipa",
+      "size": 948558
     }
   ],
   "news": []
