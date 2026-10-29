@@ -973,8 +973,8 @@ const ANK_DEF=[
  ['pump',1,'Ankle pumps · knee bent',30,8,'Boot off, knee bent, heel resting on the pillow. Slow, no bouncing.',[['up','Point',2,'Point the foot down slowly.'],['down','Back',2,'Bring it back up only to about {HINGE}, where the boot is set today. Never to flat. Stretch stays at 1 or 2 out of 10.']],false],
  ['invev',1,'Active inversion and eversion',30,6,'Foot pointed down a little. Slow and controlled.',[['up','In',2,'Turn the sole in.'],['down','Out',2,'Turn the sole out.']],false],
  ['doming',3,'Foot doming',12,6,'Boot off. Draw the ball of the foot toward the heel, toes long.',[['up','Dome',2,'Arch lifts, toes stay long.'],['hold','Hold',3,'Hold the dome.'],['down','Release',2,'Let it down.']],false],
- ['pfwall',4,'Plantarflexion isometric · 30 s holds',1,10,'Boot off. Sit up tall, leg out straight, a ball between the ball of your foot and the wall, foot pointed. Set the distance so the foot never comes up past {HINGE}. Leg relaxed, foot doesn\'t roll to either side.',[['up','Press',2,'Ease the ball of the foot into the ball.'],['hold','Hold',30,'Hold it. Gentle and steady, two or three out of ten the whole way. Don\'t let it creep up.'],['down','Release',2,'Ease off slowly.']],false],
- ['bandsup',1,'Band eversion + inversion · superset',12,8,'Boot off, band around the forefoot, foot pointed a little. Small, slow arcs. The ankle never comes up toward you.',[['up','Out',2,'Turn the sole out against the band.'],['down','Back',2,'Back slowly.']],false],
+ ['pfwall',4,'Plantarflexion isometric · ball into wall',1,10,'Boot off. Sit up tall, leg out straight, a ball between the ball of your foot and the wall, foot pointed. Set the distance so the foot never comes up past {HINGE}. Leg relaxed, foot doesn\'t roll to either side.',[['up','Press',2,'Ease the ball of the foot into the ball.'],['hold','Hold',30,'Hold it. Gentle and steady, two or three out of ten the whole way. Don\'t let it creep up.'],['down','Release',2,'Ease off slowly.']],false],
+ ['bandsup',1,'Band superset · out, in, point',12,8,'Boot off, band around the forefoot, foot pointed a little. Small, slow arcs. The ankle never comes up toward you.',[['up','Out',2,'Turn the sole out against the band.'],['down','Back',2,'Back slowly.']],false],
  ['calfman',3,'Seated calf raise · manual resistance',8,8,'Sit, knee bent, ball of the foot on the floor, heel on a book so it never drops below the forefoot. Hands on top of the knee for light resistance, 2 to 3 out of 10.',[['up','Up',2,'Rise onto the ball of the foot, pushing up into your hands.'],['hold','Top',3,'Hold at the top.'],['down','Down',2,'Lower slowly to the book.']],false],
  ['bootback',1,'Boot back on',1,0,'',[['rest','Boot on',25,'Boot back on, front shell on. Toe yoga can be done in the boot.']],true],
  ['toeyoga2',3,'Toe yoga',15,6,'Boot on is fine. Fifteen of each move.',[['hold','Big toe up',2,'Lift the big toe, four small toes stay down.'],['hold','Swap',2,'Big toe down, four small toes up.']],true]];
@@ -1002,15 +1002,21 @@ ANK_DEF.forEach(([k,sets,name,reps,setup,setupCue,phases,inBoot])=>{ANK_KEYS[k]=
 (function(){const ph=(dir,cue)=>[['up',dir,2,cue],['down','Back',2,'Back slowly.']];const base={reps:12,rest:0,base:'bandsup',inBoot:false};
   for(let r=1;r<=3;r++){
     EX['bev_'+r]=Object.assign({},base,{name:'Band eversion · round '+r+' of 3',setup:r===1?8:0,setupCue:'Boot off, band around the forefoot, anchored to the inside so you pull outward. Foot pointed a little. Small, slow arcs; the ankle never comes up toward you.',phases:ph('Out','Turn the sole out against the band.')});
-    EX['binv_'+r]=Object.assign({},base,{name:'Band inversion · round '+r+' of 3',setup:6,setupCue:'Switch the band anchor to the outside so you pull inward.',phases:ph('In','Turn the sole in against the band.')});}
-  ANK_KEYS.bandsup=['bev_1','binv_1','arest','bev_2','binv_2','arest','bev_3','binv_3'];})();
+    EX['binv_'+r]=Object.assign({},base,{name:'Band inversion · round '+r+' of 3',setup:6,setupCue:'Switch the band anchor to the outside so you pull inward.',phases:ph('In','Turn the sole in against the band.')});
+    EX['bpf_'+r]=Object.assign({},base,{name:'Band plantarflexion · round '+r+' of 3',setup:6,setupCue:'Band around the ball of the foot, ends in your hands. Point the foot down against it; on the way back the foot never comes up past {HINGE}.',phases:[['up','Point',2,'Point the foot down against the band.'],['down','Back',2,'Back slowly, only to {HINGE}.']]});}
+  ANK_KEYS.bandsup=['bev_1','binv_1','bpf_1','arest','bev_2','binv_2','bpf_2','arest','bev_3','binv_3','bpf_3'];})();
 // David's long isometric holds: two minutes between holds, ankle circles filling the first two rests.
 (function(){const c=(dir,cue)=>({name:'Ankle circles · '+dir,reps:20,setup:6,setupCue:cue,phases:[['up','Circle',3,'Small, slow circle.']],rest:0,base:'pfwall',inBoot:false});
   EX.circ_cw=c('clockwise','Rest. Slide the foot off the ball, towel roll just above the ankle. Twenty small, lazy circles one way. Keep the top of each circle below {HINGE}.');
   EX.circ_ccw=c('the other way','Rest. Same setup, twenty small circles the other way. Effortless.');
   EX.pfrest={name:'Rest',reps:1,setup:0,phases:[['rest','Rest',54,'Rest. Foot back on the ball when it ends.']],rest:0};
   EX.pfrest2={name:'Rest',reps:1,setup:0,phases:[['rest','Rest',120,'Two minutes. Leg relaxed. Foot back on the ball when it ends.']],rest:0};
-  ANK_KEYS.pfwall=['pfwall_1','circ_cw','pfrest','pfwall_2','circ_ccw','pfrest','pfwall_3','pfrest2','pfwall_4'];})();
+  for(let i=1;i<=4;i++)EX['pfwall_'+i].name='Plantarflexion isometric · 30 s hold '+i+' of 4';
+  // Chris's version: 3 sets of 3 × 15 s holds at 3–4/10.
+  for(let i=1;i<=3;i++)EX['pfc_'+i]={name:'Plantarflexion isometric · 15 s holds · set '+i+' of 3',reps:3,setup:i===1?10:0,setupCue:'Boot off. Sit, knee slightly bent, a ball between the ball of your foot and the wall, foot pointed. Set the distance so the foot never comes up past {HINGE}.',phases:[['up','Press',2,'Press the ball of the foot into the ball.'],['hold','Hold',15,'Hold it. Three or four out of ten.'],['down','Release',2,'Ease off.'],['rest','Rest',8,'Rest.']],rest:0,base:'pfwall',inBoot:false};
+  const DAVID=['pfwall_1','circ_cw','pfrest','pfwall_2','circ_ccw','pfrest','pfwall_3','pfrest2','pfwall_4'],CHRIS=['pfc_1','arest','pfc_2','arest','pfc_3'];
+  // Morning round gets Chris's version, evening round gets David's.
+  Object.defineProperty(ANK_KEYS,'pfwall',{get(){let n=0;try{n=day().homeN||0;}catch(e){}return n>=1?DAVID:CHRIS;},enumerable:true,configurable:true});})();
 const ankLast=k=>ANK_KEYS[k][ANK_KEYS[k].length-1];
 function ankBases(){const d=day();const covered=bfrPending()||(d.bfr>0&&(d.homeN||0)===0&&(d.ankle||0)===0);return ANK_DEF.map(x=>x[0]).filter(k=>!(covered&&k==='calfman'));}
 function ankLeft(d){const done=(d.ankleDone||[]);return ankBases().filter(k=>!done.includes(k)&&k!=='bootback');}
