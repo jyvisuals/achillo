@@ -187,6 +187,21 @@ html.tabs .wrap:not(.focus) #audRow{display:none}
 .wrap.focus #tPause{width:84px!important;height:84px!important}
 .wrap.focus .sctl.aud .ctlb{width:48px!important;height:48px!important}
 .cmap{display:none}
+.hipfig{display:none}
+.wrap.hipmode .hipfig{display:block;position:relative;width:100%;max-width:300px;margin:4px auto 2px}
+.hipfig svg{width:100%;height:auto;display:block}
+.hipfig line,.hipfig path{stroke:var(--ink);stroke-width:5;stroke-linecap:round;fill:none}
+.hipfig .dim{opacity:.4;stroke-dasharray:2 8}
+.hipfig .gr{stroke:var(--muted);stroke-width:2;opacity:.6}
+.hipfig .band{stroke:var(--accent);stroke-width:2.5;stroke-dasharray:5 4}
+.hipfig .hd{fill:var(--ink)}
+.hipfig .glow{fill:var(--accent);opacity:.3;transition:opacity .4s}
+.hipfig.holding .glow{opacity:.75;animation:hipglow 1.6s ease-in-out infinite}
+@keyframes hipglow{50%{opacity:.4}}
+.hipfig .bt{fill:var(--ink);font-size:11px;font-weight:700;letter-spacing:.08em}
+.bootchip{position:absolute;top:0;left:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.bootchip.on{background:var(--accent);color:var(--bg)}
+.wrap.hipmode .ring{transform:scale(.72);margin:-38px auto -40px}
 .wrap.mapmode .ring{display:none!important}
 .wrap.mapmode .cmap{display:block;position:relative;width:260px;height:390px;margin:0 auto}
 .cmap svg{width:100%;height:326px;margin-top:14px}
@@ -640,6 +655,7 @@ pre.rtext{display:none}
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
         <div class="eyebrow" id="sStep"></div>
+        <div class="hipfig" id="hipFig" aria-hidden="true"></div>
         <div style="font-family:var(--display);font-weight:700;font-size:22px" id="sName"></div>
         <div class="cue" id="tCue"></div>
         <div class="reps" id="reps" aria-label="Reps done"></div>
@@ -943,7 +959,7 @@ function renderTasks(){
   if(isoN>0)row('Calf press','4 × 30 s at ~50%. '+(isoN===1?'Once, at night.':isoN===2?'Twice, 6–8 h apart.':'Three today: morning, mid-afternoon, night.')+' Tap to log one done off-app.',d.iso||0,'iso',isoN,true);
   {const L=ankLeft(d).length,T=ankBases().length-1;row('Chris’s program','Twice a day, morning and evening: Barefoot PT then Boot-on PT. '+(L<T&&L>0?(T-L)+' of '+T+' done this round; picks up where you left off.':(d.ankle===1?'Evening round still to do.':'')),d.ankle||0,'ankle',2,true);}
   row('Quick ones','One boot-on drill, all its sets, every hour or so between rounds. Logs itself.',(d.snacks||[]).length,'snackN',8,false);
-  row('Hips','Chris · daily, boot on. 90/90, glute, adductor, hip flexors, ITB. About 17 min.',d.hips||0,'hips',1,true);
+  row('Hips','Chris · daily. 90/90, glute, adductor, hip flexors, ITB. About 17 min.',d.hips||0,'hips',1,true);
   row('Imagery','5 min guided, first-person. One after a session, one at bedtime.',d.imagery||0,'imagery',2,true);
   if(bfrDay(today))row('BFR',(verdictKind(TODAY)&&verdictKind(TODAY)!=='go'?'Skipped today: morning wasn\'t quiet. ':'First thing after the morning check: ')+'seated calf raise 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15 × 3 s squeezes.',d.bfr||0,'bfr',1,true);
 
@@ -1019,20 +1035,36 @@ ANK_DEF.forEach(([k,sets,name,reps,setup,setupCue,phases,inBoot])=>{ANK_KEYS[k]=
   const DAVID=['pfwall_1','circ_cw','pfrest','pfwall_2','circ_ccw','pfrest','pfwall_3','pfrest2','pfwall_4'],CHRIS=['pfc_1','arest','pfc_2','arest','pfc_3'];
   // Morning round gets Chris's version, evening round gets David's.
   Object.defineProperty(ANK_KEYS,'pfwall',{get(){let n=0;try{n=day().homeN||0;}catch(e){}return n>=1?DAVID:CHRIS;},enumerable:true,configurable:true});})();
-// ---- Hips: Chris's daily hip mobility, boot on the whole time.
+// ---- Hips: Chris's daily hip mobility, one guided session.
 const HIP_NAMES={};const HIPS=[];
 (function(){const add=(g,name,key,o)=>{HIP_NAMES[g]=name;EX[key]=Object.assign({rest:0,base:g,hips:true},o);HIPS.push(key);};
   const hold=(secs,cue)=>[['hold','Hold',secs,cue],['rest','Ease off',4,'Ease off.']];
-  add('hip_9090','Hip 90/90 · supine','hip_9090',{name:'Hip 90/90 · lying down',reps:10,setup:15,setupCue:'Keep the boot on for this whole session. Lie on your back, hips and knees bent to ninety, the way Chris showed you.',phases:[['up','Set',2,'Into position.'],['hold','Hold',6,'Hold it. Breathe out.'],['rest','Relax',3,'Relax.']]});
+  add('hip_9090','Hip 90/90 · lying down','hip_9090',{boot:false,name:'Hip 90/90 · lying down',reps:10,setup:15,setupCue:'On your back, feet up on the wall or a chair, hips and knees bent to ninety. Left foot relaxed.',phases:[['up','Set',2,'Flatten the low back.'],['hold','Hold',6,'Hold it. Breathe out.'],['rest','Relax',3,'Relax.']]});
   ['R','L'].forEach(sd=>{const side=sd==='R'?'right':'left';
-    add('hip_glute','Seated glute stretch','hip_glute_'+sd,{name:'Seated glute stretch · '+side,reps:4,setup:10,setupCue:'Sit, '+side+' ankle across the other knee. Lean forward from the hips until you feel the '+side+' glute.',phases:hold(20,'Hold. Breathe into it.')});});
-  add('hip_rock','Hip adductor rockback','hip_rock',{name:'Hip adductor rockback',reps:10,setup:12,setupCue:'Hands and knees, one leg out to the side. Tops of the feet flat on the floor, toes not tucked.',phases:[['up','Back',2,'Rock your hips back.'],['hold','Hold',6,'Hold. Feel the inner thigh.'],['down','Forward',2,'Come forward.']]});
+    add('hip_glute','Seated glute stretch','hip_glute_'+sd,{boot:false,name:'Seated glute stretch · '+side,reps:4,setup:10,setupCue:'Sit, '+side+' ankle across the other knee. Lean forward from the hips until you feel the '+side+' glute.'+(sd==='L'?' Left foot hangs relaxed; don\'t pull the toes up.':''),phases:hold(20,'Hold. Breathe into it.')});});
+  add('hip_rock','Hip adductor rockback','hip_rock',{boot:false,name:'Hip adductor rockback',reps:10,setup:12,setupCue:'Hands and knees, one leg out to the side. Tops of the feet flat on the floor, toes not tucked.',phases:[['up','Back',2,'Rock your hips back.'],['hold','Hold',6,'Hold. Feel the inner thigh.'],['down','Forward',2,'Come forward.']]});
+  add('hip_kneel','½ kneel hip flexor','hip_kneel_L',{boot:false,name:'½ kneel hip flexor · left knee down',reps:6,setup:12,setupCue:'Left knee down on a pillow, top of the left foot flat on the floor. Band as Chris set it. Tuck the tail under and shift forward.',phases:hold(10,'Hold. Squeeze the back glute.')});
+  add('hip_kneel','½ kneel hip flexor','hip_kneel_R',{boot:true,name:'½ kneel hip flexor · right knee down',reps:6,setup:12,setupCue:'Right knee down, left foot forward, left shin upright. Tuck the tail under and shift forward.',phases:hold(10,'Hold. Squeeze the back glute.')});
   ['R','L'].forEach(sd=>{const side=sd==='R'?'right':'left';
-    add('hip_kneel','½ kneel hip flexor · sideband','hip_kneel_'+sd,{name:'½ kneel hip flexor stretch · '+side,reps:6,setup:12,setupCue:side.charAt(0).toUpperCase()+side.slice(1)+' knee down on a pillow, band as Chris set it. Top of the back foot flat on the floor, toes not tucked. Tuck the tail under and shift forward.',phases:hold(10,'Hold. Squeeze the back glute.')});});
+    add('hip_stand','Standing hip flexor stretch','hip_stand_'+sd,{boot:true,name:'Standing hip flexor stretch · '+side,reps:4,setup:10,setupCue:'Standing. '+side.charAt(0).toUpperCase()+side.slice(1)+' leg back. Tuck the tail under and ease the hips forward. The back heel can stay up.',phases:hold(20,'Hold. Tail tucked.')});});
   ['R','L'].forEach(sd=>{const side=sd==='R'?'right':'left';
-    add('hip_stand','Standing hip flexor stretch','hip_stand_'+sd,{name:'Standing hip flexor stretch · '+side,reps:4,setup:10,setupCue:'Standing, boot on. '+side.charAt(0).toUpperCase()+side.slice(1)+' leg back. Tuck the tail under and ease the hips forward. The back heel can stay up.',phases:hold(20,'Hold. Tail tucked.')});});
-  ['R','L'].forEach(sd=>{const side=sd==='R'?'right':'left';
-    add('hip_itb','Standing ITB stretch','hip_itb_'+sd,{name:'Standing ITB stretch · '+side,reps:6,setup:10,setupCue:'Standing, boot on, a hand on the wall. Cross the '+side+' leg behind and lean the hip out to the side.',phases:hold(10,'Hold. Feel the outside of the hip.')});});})();
+    add('hip_itb','Standing ITB stretch','hip_itb_'+sd,{boot:true,name:'Standing ITB stretch · '+side,reps:6,setup:10,setupCue:'Standing, a hand on the wall. Cross the '+side+' leg behind and lean the hip out to the side.',phases:hold(10,'Hold. Feel the outside of the hip.')});});})();
+// Simple pose drawings for each hip stretch; the glow marks where you should feel it.
+const HIP_FIG=(()=>{const L=(a)=>a.map(([x1,y1,x2,y2,d])=>'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"'+(d?' class="dim"':'')+'/>').join('');
+  const H=(x,y)=>'<circle class="hd" cx="'+x+'" cy="'+y+'" r="7"/>',G=(x,y)=>'<circle class="glow" cx="'+x+'" cy="'+y+'" r="11"/>',floor='<line class="gr" x1="4" y1="102" x2="196" y2="102"/>';
+  return {
+   hip_9090:floor+'<line class="gr" x1="156" y1="18" x2="156" y2="102"/>'+G(92,88)+L([[38,92,95,92],[95,92,95,56],[95,56,152,56],[152,56,152,46],[50,92,76,98]])+H(28,90),
+   hip_glute:floor+'<path class="gr" d="M58 62H100M62 62V102M98 62V102M58 62V26" fill="none"/>'+G(76,56)+L([[78,58,104,26],[78,58,120,62],[120,62,120,100],[120,100,132,100],[78,56,104,42],[104,42,122,58],[98,32,114,48]])+H(109,18),
+   hip_rock:floor+G(62,86)+L([[82,78,140,68],[140,68,150,100],[82,78,100,100],[100,100,70,100],[82,78,40,98,1]])+H(152,60),
+   hip_kneel:floor+'<line class="band" x1="86" y1="64" x2="14" y2="64"/><line class="gr" x1="12" y1="54" x2="12" y2="102"/>'+G(88,64)+L([[70,100,36,100],[70,100,85,62],[85,62,88,22],[85,62,125,64],[125,64,125,100],[125,100,138,100],[88,32,78,48],[78,48,85,58]])+H(89,13),
+   hip_stand:floor+G(97,58)+L([[95,55,98,16],[95,55,125,78],[125,78,125,100],[125,100,138,100],[95,55,66,80],[66,80,46,98],[46,98,38,94],[97,26,90,50]])+H(99,8),
+   hip_itb:floor+'<line class="gr" x1="166" y1="10" x2="166" y2="102"/>'+G(96,56)+L([[121,20,105,55],[120,26,163,32],[105,55,118,100],[105,55,138,100,1]])+H(124,12),
+   hip_boot:'<path class="gr" d="M80 20h34l6 60h22a8 8 0 0 1 8 8v12H70l4-20z" fill="none"/><text x="100" y="58" text-anchor="middle" class="bt">BOOT ON</text>'};})();
+function drawHip(){const w=document.querySelector('.wrap');const on=!!(sess&&sess.mode==='hips');w.classList.toggle('hipmode',on);if(!on)return;
+  const st=sess.steps[sess.i];const e=st&&EX[st.ex];if(!e)return;const el=$('hipFig');const g=e.base;
+  if(el.dataset.g!==st.ex){el.dataset.g=st.ex;const flip=/_L$/.test(st.ex)&&g!=='hip_kneel';
+    el.innerHTML='<svg viewBox="0 0 200 110"><g'+(flip?' transform="translate(200 0) scale(-1 1)"':'')+'>'+(HIP_FIG[g]||'')+'</g></svg>';}
+  el.classList.toggle('holding',st.kind==='hold');}
 const HIPS_LAST=HIPS[HIPS.length-1];
 const ankLast=k=>ANK_KEYS[k][ANK_KEYS[k].length-1];
 function ankBases(){const d=day();const covered=bfrPending()||(d.bfr>0&&(d.homeN||0)===0&&(d.ankle||0)===0);return ANK_DEF.map(x=>x[0]).filter(k=>!(covered&&k==='calfman'));}
@@ -1170,7 +1202,7 @@ function segLayout(){const steps=sess.steps,i=sess.i,s=steps[i],e=EX[s.ex]||{},o
   return lay;}
 function drawSegs(){if(!sess){segKey=null;return;}const ringE=ringEl;if(!ringE)return;ringE.classList.add('segs');
   const sk=sess.i+':'+sess.steps.length+':'+sess.mode;if(segKey!==sk){segKey=sk;segLay=segLayout();}
-  const pos=paused?segPos:(segPos=posSeconds());const L=segLay;try{drawStrip(pos);}catch(e){}try{drawMap(pos);}catch(e){}const fr=(t0,t1)=>t1>t0?(pos-t0)/(t1-t0):pos>=t1?1:0;
+  const pos=paused?segPos:(segPos=posSeconds());const L=segLay;try{drawStrip(pos);}catch(e){}try{drawMap(pos);}catch(e){}try{drawHip();}catch(e){}const fr=(t0,t1)=>t1>t0?(pos-t0)/(t1-t0):pos>=t1?1:0;
   const so=$('segOut'),si=$('segIn');const cuffMode=sess.cuffOn!=null;ringE.classList.toggle('cuffdial',cuffMode);
   if(cuffMode){ // BFR: the outer ring is the 10-minute cuff dial, a notch a minute, last two minutes tinted
     const m=Math.max(0,pos-sess.cuffOn)/60;segBuild(so,72,10,5);segFill(so,Array.from({length:10},(_,k)=>m-k),-1,8);so.classList.toggle('over',m>=8);
@@ -1517,7 +1549,7 @@ function resumeSession(){
   if(sound){$('sNext').textContent='Session resumed. Tap Pause, then Resume, to restart the beeps.';}
   return true;
 }
-function finish(complete){try{document.querySelector('.wrap').classList.remove('mapmode');}catch(e){}try{if(window.setPocket)setPocket(false);}catch(e){}stripKey=null;dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});
+function finish(complete){try{document.querySelector('.wrap').classList.remove('mapmode','hipmode');}catch(e){}try{if(window.setPocket)setPocket(false);}catch(e){}stripKey=null;dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});
   clearInterval(timer);timer=null; stopTrack(); if(wake){try{wake.release()}catch(e){} wake=null;}
   const d=day(); const w=weekFor(today)||WEEKS[0]; const done=sess?sess.doneEx:[];
   const pressDone=false; const routineDone=false;
