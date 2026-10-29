@@ -1627,8 +1627,8 @@ $('tJump').onclick=()=>{if(!sess)return;const el=$('jumpList');if(!el.hidden){el
   el.hidden=false;};
 $('tSkip').onclick=()=>{if(!sess)return; hush(); const st=sess.steps[sess.i];dbg('skip: from',st.ex,st.kind,'at',posSeconds().toFixed(1),'track',track.currentTime.toFixed(1),track.paused?'paused':'playing');
   if(sess.mode==='map'){let j=sess.i+1;while(j<sess.steps.length&&sess.steps[j].ei===st.ei)j++;jumpTo(j);return;} // calf map: right → left → rate, one block at a time
-  if(!(st.kind==='setup'||st.long||st.kind==='rest'||REST_KEY.test(st.ex)||EX[st.ex].speakCue)){ // skip the whole exercise, all its sets, without checking it off
-    const cur=groupOf(st.ex);let j=sess.i+1;while(j<sess.steps.length&&(sess.steps[j].kind==='mark'||REST_KEY.test(sess.steps[j].ex)||groupOf(sess.steps[j].ex)===cur))j++;
+  if(!(st.kind==='setup'||st.long||st.kind==='rest'||REST_KEY.test(st.ex)||EX[st.ex].speakCue)){ // skip just this set (and the rest after it); the jump list skips whole exercises
+    let j=sess.i+1;while(j<sess.steps.length&&(sess.steps[j].kind==='mark'||REST_KEY.test(sess.steps[j].ex)||sess.steps[j].ex===st.ex))j++;
     jumpTo(j);return;}
   const isRest=st.kind==='setup'||st.long||st.kind==='rest'||/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/.test(st.ex);
   if(!(isRest||EX[st.ex].speakCue)){ // skip the rest of this exercise (imagery: just this scene)
