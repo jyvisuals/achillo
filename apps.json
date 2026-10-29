@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.49",
+          "buildVersion": "49",
+          "date": "2026-10-29T01:53:52Z",
+          "localizedDescription": "An unfinished morning round no longer eats the evening one: after four hours, Barefoot PT starts a full new round.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.49.ipa",
+          "size": 945912,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.48",
           "buildVersion": "48",
           "date": "2026-10-28T02:13:52Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.47.ipa",
           "size": 945530,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.46",
-          "buildVersion": "46",
-          "date": "2026-10-28T02:05:25Z",
-          "localizedDescription": "BFR mornings keep David's 30 s wall holds; only the calf raise is skipped.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.46.ipa",
-          "size": 945521,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.48",
-      "versionDate": "2026-10-28T02:13:52Z",
-      "versionDescription": "Leaving the app no longer pauses: a tap that lands as you swipe out is undone. Diagnostics now say what caused every pause. Evening rounds after BFR include the 30 s holds and calf raise.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.48.ipa",
-      "size": 945715
+      "version": "1.1.49",
+      "versionDate": "2026-10-29T01:53:52Z",
+      "versionDescription": "An unfinished morning round no longer eats the evening one: after four hours, Barefoot PT starts a full new round.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.49.ipa",
+      "size": 945912
     }
   ],
   "news": []
