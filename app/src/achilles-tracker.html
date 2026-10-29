@@ -1547,11 +1547,13 @@ $('tPause').onclick=e=>{if(!sess)return; paused=!paused; dbg('pause:',paused?'on
     {const st=sess.steps[sess.i];if(st&&st.kind==='hold')nativeEvt('step',{kind:'hold',ex:st.ex,rep:st.rep,reps:1,secs:Math.max(1,Math.round((sess.stepEnd-Date.now())/1000)),quiet:false,rest:false,first:false});}
     const st=sess&&sess.steps[sess.i];if(st&&EX[st.ex]&&EX[st.ex].speakCue){sess.stepEnd=Date.now()+st.secs*1000;sayStep();}}
   setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); lockInfo(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack();};
-// ---- skip / jump: skipping never marks an exercise done; the next Start plays only what's left.
+// ---- skip / jump: skipping forward past an exercise counts it as done.
 const REST_KEY=/^(arest|srest|pfrest2?|cuffdown|cuffoff|deflate|bootback)$/;
 const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(k)?'bfrB':k;
 const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);if(d)return d[2];if(g==='bfrA')return 'BFR seated calf raise';if(g==='bfrB')return 'BFR ball press';if(/^map_/.test(g)){const m=MAP_M.find(x=>'map_'+x.m===g);if(m)return 'Calf map · '+m.name;}return EX[g]?EX[g].name:g;};
 function jumpTo(idx){if(!sess)return;hush();$('jumpList').hidden=true;dbg('jump: to step',idx,sess.steps[idx]&&sess.steps[idx].ex);
+  // Skipping forward past an exercise counts it as done.
+  if(idx>sess.i){const to=sess.steps[idx]&&sess.steps[idx].ex;const seen=new Set();for(let j=sess.i;j<idx&&j<sess.steps.length;j++){const k=sess.steps[j].ex;if(k&&k!==to&&!seen.has(k)){seen.add(k);recordDone(k);}}}
   while(idx<sess.steps.length&&sess.steps[idx].kind==='mark')idx++;
   if(idx>=sess.steps.length){finish(true);return;}
   if(paused){paused=false;pauseStart=0;setL('tPause','Pause');}
