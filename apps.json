@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.69",
+          "buildVersion": "69",
+          "date": "2026-10-30T12:43:33Z",
+          "localizedDescription": "Apple Watch app (first version): wrist taps for each phase, ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip. Start a session on the phone; the watch follows.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.69.ipa",
+          "size": 1194604,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.68",
           "buildVersion": "68",
           "date": "2026-10-30T12:37:41Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.67.ipa",
           "size": 948780,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.66",
-          "buildVersion": "66",
-          "date": "2026-10-30T11:41:14Z",
-          "localizedDescription": "Leaving the app no longer pauses the session (iOS's media pause on the way out is ignored).",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.66.ipa",
-          "size": 948778,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.68",
-      "versionDate": "2026-10-30T12:37:41Z",
-      "versionDescription": "Apple Watch app (first version): your wrist taps the phases, the ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.68.ipa",
-      "size": 953699
+      "version": "1.1.69",
+      "versionDate": "2026-10-30T12:43:33Z",
+      "versionDescription": "Apple Watch app (first version): wrist taps for each phase, ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip. Start a session on the phone; the watch follows.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.69.ipa",
+      "size": 1194604
     }
   ],
   "news": []
