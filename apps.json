@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.73",
+          "buildVersion": "73",
+          "date": "2026-10-30T18:20:09Z",
+          "localizedDescription": "Boot-on PT is gone from the app.\nWatch taps are stronger. Each cue is now a firmer, doubled tap. On the watch start screen, set Taps to Normal, Strong or Max.\nSkipping a rest on the phone now updates the watch too.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.73.ipa",
+          "size": 1211074,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.72",
           "buildVersion": "72",
           "date": "2026-10-30T13:18:19Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.70.ipa",
           "size": 1203434,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.69",
-          "buildVersion": "69",
-          "date": "2026-10-30T12:43:33Z",
-          "localizedDescription": "Apple Watch app (first version): wrist taps for each phase, ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip. Start a session on the phone; the watch follows.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.69.ipa",
-          "size": 1194604,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.72",
-      "versionDate": "2026-10-30T13:18:19Z",
-      "versionDescription": "Watch taps are stronger. Each cue is now a firmer, doubled tap. On the watch start screen, set Taps to Normal, Strong or Max.\nSkipping a rest or \"I'm ready\" on the phone now updates the watch too.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.72.ipa",
-      "size": 1211129
+      "version": "1.1.73",
+      "versionDate": "2026-10-30T18:20:09Z",
+      "versionDescription": "Boot-on PT is gone from the app.\nWatch taps are stronger. Each cue is now a firmer, doubled tap. On the watch start screen, set Taps to Normal, Strong or Max.\nSkipping a rest on the phone now updates the watch too.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.73.ipa",
+      "size": 1211074
     }
   ],
   "news": []
