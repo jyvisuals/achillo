@@ -1668,7 +1668,7 @@ $('tSkip').onclick=()=>{if(!sess)return; hush(); const st=sess.steps[sess.i];dbg
   const isRest=st.kind==='setup'||st.long||st.kind==='rest'||/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/.test(st.ex);
   if(!(isRest||EX[st.ex].speakCue)){ // skip the rest of this exercise (imagery: just this scene)
     let i=sess.i; while(i+1<sess.steps.length&&sess.steps[i+1].kind!=='mark')i++; sess.i=i;}
-  sess.stepEnd=Date.now(); if(paused){paused=false;pauseStart=0;setL('tPause','Pause');} lastShown=null; tick(); syncTrack();};
+  sess.stepEnd=Date.now(); if(paused){paused=false;pauseStart=0;setL('tPause','Pause');} lastShown=null; tick(); syncTrack(); watchSync();};
 $('tStop').onclick=()=>finish(false);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')window.__hiddenAt=Date.now();dbg('app:',document.visibilityState,sess?'(in session)':'');if(document.visibilityState==='hidden'){if(sess&&paused&&Date.now()-tapPauseAt<2000){tapPauseAt=0;dbg('pause: undone, that tap was the swipe out of the app');pSrc='undo';$('tPause').click();}persist();if(sess&&!paused&&trackOn&&track.paused)track.play().catch(()=>{});}
   if(document.visibilityState==='visible'){lastShown=null;tick();syncTrack();if(sess)watchSync();
