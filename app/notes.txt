@@ -1,1 +1,1 @@
-Toe yoga moves into Barefoot PT (after doming); the Boot-on PT button is gone. An evening start more than 4 h after the morning always gets a full round.
+Leaving the app no longer pauses the session (iOS's media pause on the way out is ignored).
