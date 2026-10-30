@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.70",
+          "buildVersion": "70",
+          "date": "2026-10-30T12:52:29Z",
+          "localizedDescription": "Watch controls work with the phone locked: pause, skip, end and Start on the watch drive the phone's audio directly, and the phone catches up when you open it.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.70.ipa",
+          "size": 1203434,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.69",
           "buildVersion": "69",
           "date": "2026-10-30T12:43:33Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.68.ipa",
           "size": 953699,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.67",
-          "buildVersion": "67",
-          "date": "2026-10-30T12:02:36Z",
-          "localizedDescription": "Every build now has a version number (1.2.N) and a What to Test note in TestFlight.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.67.ipa",
-          "size": 948780,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.69",
-      "versionDate": "2026-10-30T12:43:33Z",
-      "versionDescription": "Apple Watch app (first version): wrist taps for each phase, ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip. Start a session on the phone; the watch follows.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.69.ipa",
-      "size": 1194604
+      "version": "1.1.70",
+      "versionDate": "2026-10-30T12:52:29Z",
+      "versionDescription": "Watch controls work with the phone locked: pause, skip, end and Start on the watch drive the phone's audio directly, and the phone catches up when you open it.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.70.ipa",
+      "size": 1203434
     }
   ],
   "news": []
