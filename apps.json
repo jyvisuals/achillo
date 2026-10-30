@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.62",
+          "buildVersion": "62",
+          "date": "2026-10-30T02:41:25Z",
+          "localizedDescription": "Toe yoga moves into Barefoot PT (after doming); the Boot-on PT button is gone. An evening start more than 4 h after the morning always gets a full round.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.62.ipa",
+          "size": 948681,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.61",
           "buildVersion": "61",
           "date": "2026-10-30T02:36:12Z",
@@ -35,25 +44,16 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.59.ipa",
           "size": 948663,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.58",
-          "buildVersion": "58",
-          "date": "2026-10-29T10:55:56Z",
-          "localizedDescription": "Skip now moves one set at a time (and past the rest after it). The list button still jumps whole exercises.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.58.ipa",
-          "size": 948561,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.61",
-      "versionDate": "2026-10-30T02:36:12Z",
+      "version": "1.1.62",
+      "versionDate": "2026-10-30T02:41:25Z",
       "versionDescription": "Toe yoga moves into Barefoot PT (after doming); the Boot-on PT button is gone. An evening start more than 4 h after the morning always gets a full round.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.61.ipa",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.62.ipa",
       "size": 948681
     }
   ],
