@@ -571,7 +571,6 @@ pre.rtext{display:none}
       <button id="sBfrPress">BFR calf (30/15/15/15)</button>
       <button id="sBfrQuad">BFR quad set</button>
       <button id="sFoot">Barefoot PT</button>
-      <button id="sGym">Boot-on PT</button>
       <button id="sImg">Imagery (5 min)</button>
       <button id="sMap">Calf map (10 min)</button>
       <button id="sHips">Hips (16 min)</button>
@@ -957,7 +956,7 @@ function renderTasks(){
     r.append(l,t);el.appendChild(r);
   };
   if(isoN>0)row('Calf press','4 × 30 s at ~50%. '+(isoN===1?'Once, at night.':isoN===2?'Twice, 6–8 h apart.':'Three today: morning, mid-afternoon, night.')+' Tap to log one done off-app.',d.iso||0,'iso',isoN,true);
-  {const L=ankLeft(d).length,T=ankBases().length-1;row('Chris’s program','Twice a day, morning and evening: Barefoot PT then Boot-on PT. '+(L<T&&L>0?(T-L)+' of '+T+' done this round; picks up where you left off.':(d.ankle===1?'Evening round still to do.':'')),d.ankle||0,'ankle',2,true);}
+  {const L=ankLeft(d).length,T=ankBases().length-1;row('Chris’s program','Twice a day, morning and evening: Barefoot PT. '+(L<T&&L>0?(T-L)+' of '+T+' done this round; picks up where you left off.':(d.ankle===1?'Evening round still to do.':'')),d.ankle||0,'ankle',2,true);}
   row('Quick ones','One boot-on drill, all its sets, every hour or so between rounds. Logs itself.',(d.snacks||[]).length,'snackN',8,false);
   row('Hips','Chris · daily. 90/90, glute, adductor, hip flexors, ITB. About 16 min.',d.hips||0,'hips',1,true);
   row('Imagery','5 min guided, first-person. One after a session, one at bedtime.',d.imagery||0,'imagery',2,true);
@@ -992,11 +991,11 @@ const ANK_DEF=[
  ['pump',1,'Ankle pumps · in a left hamstring stretch',30,15,'Boot off. Lie back, left leg up, knee straight, strap behind the heel or lower calf, never the ball of the foot. Ease in until you feel the back of the thigh. Then pump slowly.',[['up','Point',2,'Point the foot down slowly.'],['down','Back',2,'Back up only to {HINGE}, where the boot is set today. Never past flat. No bouncing.']],false],
  ['invev',1,'Inversion and eversion · in pigeon',30,15,'On the bed in pigeon: left leg in front, shin across the bed, ankle just past the edge so the foot hangs free. Right leg straight back. Ease into the left glute. Foot pointed down a little; slow and controlled.',[['up','In',2,'Turn the sole in.'],['down','Out',2,'Turn the sole out.']],false],
  ['doming',3,'Foot doming',12,6,'Boot off. Draw the ball of the foot toward the heel, toes long.',[['up','Dome',2,'Arch lifts, toes stay long.'],['hold','Hold',3,'Hold the dome.'],['down','Release',2,'Let it down.']],false],
+ ['toeyoga2',3,'Toe yoga',15,6,'Boot off. Fifteen of each move.',[['hold','Big toe up',2,'Lift the big toe, four small toes stay down.'],['hold','Swap',2,'Big toe down, four small toes up.']],false],
  ['pfwall',4,'Plantarflexion isometric · ball into wall',1,10,'Boot off. Sit up tall, leg out straight, a ball between the ball of your foot and the wall, foot pointed. Set the distance so the foot never comes up past {HINGE}. Leg relaxed, foot doesn\'t roll to either side.',[['up','Press',2,'Ease the ball of the foot into the ball.'],['hold','Hold',30,'Hold it. Gentle and steady, two or three out of ten the whole way. Don\'t let it creep up.'],['down','Release',2,'Ease off slowly.']],false],
  ['bandsup',1,'Band superset · out, in, point',12,8,'Boot off, band around the forefoot, foot pointed a little. Small, slow arcs. The ankle never comes up toward you.',[['up','Out',2,'Turn the sole out against the band.'],['down','Back',2,'Back slowly.']],false],
  ['calfman',3,'Seated calf raise · manual resistance',8,8,'Sit, knee bent, ball of the foot on the floor, heel on a book so it never drops below the forefoot. Hands on top of the knee for light resistance, 2 to 3 out of 10.',[['up','Up',2,'Rise onto the ball of the foot, pushing up into your hands.'],['hold','Top',3,'Hold at the top.'],['down','Down',2,'Lower slowly to the book.']],false],
- ['bootback',1,'Boot back on',1,0,'',[['rest','Boot on',25,'Boot back on, front shell on. Toe yoga can be done in the boot.']],true],
- ['toeyoga2',3,'Toe yoga',15,6,'Boot on is fine. Fifteen of each move.',[['hold','Big toe up',2,'Lift the big toe, four small toes stay down.'],['hold','Swap',2,'Big toe down, four small toes up.']],true]];
+ ['bootback',1,'Boot back on',1,0,'',[['rest','Boot on',25,'Boot back on, front shell on. Toe yoga can be done in the boot.']],true]];
 
 // ---- Calf map: learn to find each muscle. Right leg first (what "found it" feels like), then left, then rate the left 0–3.
 const MAP_M=[
@@ -1531,7 +1530,7 @@ function startSession(withPress,withRoutine,mode){dbg('session: start',mode||'')
   // Each half runs twice a day. If this half is already done, start a fresh pass of it (the other half's progress is kept).
   // A morning round left unfinished doesn't eat the evening one: four hours on, start a new round and drop the leftovers.
   {const d=day();const stale=t=>t&&Date.now()-t>4*3600e3;
-   if(mode==='home'&&(d.homeN||0)===0&&homeLeft(d).length&&stale(d.homeAt)){d.homeN=1;d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: new round, morning leftovers dropped');}
+   if(mode==='home'&&(d.homeN||0)<=1&&homeLeft(d).length&&stale(d.homeAt)){d.homeN=Math.max(d.homeN||0,1);d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: new round, morning leftovers dropped');}
    if(mode==='gym'&&(d.gymN||0)===0&&gymLeft(d).length&&stale(d.gymAt)){d.gymN=1;d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: new round, morning leftovers dropped');}}
   // After a BFR morning, the only "leftovers" are what BFR covered (calf raise, wall isometric). That round is done: start the evening fresh.
   {const d=day();const L=homeLeft(d);if(mode==='home'&&(d.homeN||0)===1&&L.length&&L.every(k=>k==='calfman'||k==='pfwall')){d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: evening round, BFR-covered leftovers dropped');}}
@@ -1587,7 +1586,7 @@ function finish(complete){try{document.querySelector('.wrap').classList.remove('
 $('sBfrPress').onclick=()=>startSession(true,false,'bfrpress');
 $('sBfrQuad').onclick=()=>startSession(false,false,'bfrquad');
 $('sFoot').onclick=()=>startSession(false,false,'home');
-$('sGym').onclick=()=>startSession(false,false,'gym');
+if($('sGym'))$('sGym').onclick=()=>startSession(false,false,'gym');
 function renderAnkle(){const el=$('ankList');if(!el)return;el.innerHTML='';const d=day();const done=d.ankleDone||[];const bases=ankBases();
   const left=ankLeft(d).length;$('ankPick').querySelector('summary').textContent='Chris’s program · '+(d.ankle?'round '+(d.ankle+1)+' · ':'')+(bases.length-1-left)+' of '+(bases.length-1)+' done · pick any';
   let shownBoot=false;
