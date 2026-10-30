@@ -30,6 +30,10 @@ final class SessionModel: NSObject, ObservableObject {
     @Published var tick = Date()
     @Published var phoneReachable = false
     @Published var finished: String? = nil
+    // Tap strength: 0 normal, 1 strong (default), 2 max.
+    @Published var strength: Int = UserDefaults.standard.object(forKey: "tapStrength") as? Int ?? 1 {
+        didSet { UserDefaults.standard.set(strength, forKey: "tapStrength") }
+    }
 
     private(set) var steps: [WStep] = []
     private(set) var exs: [WEx] = []
@@ -129,9 +133,9 @@ final class SessionModel: NSObject, ObservableObject {
         if sec != lastSecond {
             lastSecond = sec
             let k = n.step.kind
-            if (k == "rest" || k == "setup") && n.step.secs >= 6 && sec >= 1 && sec <= 3 { play(.click) }
-            if k == "hold" && n.step.secs >= 8 && sec >= 1 && sec <= 3 { play(.click) }
-            if k == "hold" && n.step.secs >= 20 && sec > 3 && sec % 10 == 0 && Double(sec) < n.step.secs - 1 { play(.click) }
+            if (k == "rest" || k == "setup") && n.step.secs >= 6 && sec >= 1 && sec <= 3 { cue(.countdown) }
+            if k == "hold" && n.step.secs >= 8 && sec >= 1 && sec <= 3 { cue(.countdown) }
+            if k == "hold" && n.step.secs >= 20 && sec > 3 && sec % 10 == 0 && Double(sec) < n.step.secs - 1 { cue(.holdTick) }
         }
     }
 
@@ -139,26 +143,56 @@ final class SessionModel: NSObject, ObservableObject {
         let s = n.step
         let newExercise = prev >= 0 && steps[prev].ex != s.ex && !n.ex.rest
         let firstPhaseOfRep = n.index == 0 || steps[n.index - 1].rep != s.rep || steps[n.index - 1].ex != s.ex
-        if newExercise && s.kind == "setup" { play(.notification); return }
+        let lastRep = firstPhaseOfRep && n.ex.reps > 1 && s.rep == n.ex.reps - 1
+        if newExercise && s.kind == "setup" { cue(.newExercise); return }
         switch s.kind {
-        case "up":
-            play(firstPhaseOfRep && n.ex.reps > 1 && s.rep == n.ex.reps - 1 ? .notification : .directionUp)
-        case "down": play(.directionDown)
-        case "hold": play(firstPhaseOfRep && n.ex.reps > 1 && s.rep == n.ex.reps - 1 ? .notification : .start)
-        case "rest": play(.stop)
-        case "setup": play(.retry)
+        case "up": cue(lastRep ? .lastRep : .up)
+        case "down": cue(.down)
+        case "hold": cue(lastRep ? .lastRep : .holdStart)
+        case "rest": cue(.rest)
+        case "setup": cue(.getSet)
         default: break
         }
     }
 
-    private func play(_ t: WKHapticType) { WKInterfaceDevice.current().play(t) }
+    // Wrist cues. Apple only allows its built-in taps on the watch, so strength comes from
+    // picking the firmer ones and stacking them with gaps the wrist can tell apart.
+    enum Cue { case up, down, holdStart, holdTick, countdown, rest, getSet, newExercise, lastRep, done, control }
+
+    private func pattern(_ c: Cue) -> [(WKHapticType, Double)] {
+        switch c {
+        case .up: return [(.directionUp, 0), (.directionUp, 0.32)]
+        case .down: return [(.directionDown, 0), (.directionDown, 0.5)]
+        case .holdStart: return [(.start, 0), (.start, 0.2)]
+        case .holdTick: return [(.start, 0)]
+        case .countdown: return [(.start, 0)]
+        case .rest: return [(.stop, 0), (.stop, 0.35)]
+        case .getSet: return [(.retry, 0)]
+        case .newExercise: return [(.notification, 0)]
+        case .lastRep: return [(.notification, 0)]
+        case .done: return [(.success, 0)]
+        case .control: return [(.start, 0)]
+        }
+    }
+
+    func cue(_ c: Cue) {
+        var p = pattern(c)
+        if strength == 0 { p = Array(p.prefix(1)) }
+        if strength == 2, let last = p.last { p.append((c == .countdown || c == .holdTick || c == .control ? .start : .notification, last.1 + 0.25)) }
+        for (t, d) in p {
+            if d == 0 { WKInterfaceDevice.current().play(t) }
+            else { DispatchQueue.main.asyncAfter(deadline: .now() + d) { WKInterfaceDevice.current().play(t) } }
+        }
+    }
+
+    func cycleStrength() { strength = (strength + 1) % 3; cue(.holdStart) }
 
     private func finish(complete: Bool) {
         guard active else { return }
         active = false
         paused = false
         finished = complete ? "Round done" : "Session ended"
-        if complete { play(.success) }
+        if complete { cue(.done) }
         stopRuntime()
     }
 
@@ -167,14 +201,14 @@ final class SessionModel: NSObject, ObservableObject {
     func pause() {
         guard active, !paused else { return }
         basePos = position; baseAt = Date(); paused = true
-        play(.click)
+        cue(.control)
         sendCmd("pause")
     }
 
     func resume() {
         guard active, paused else { return }
         baseAt = Date(); paused = false; lastSecond = -1
-        play(.click)
+        cue(.control)
         sendCmd("play")
     }
 
