@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0BB2B9366580AC3EA67C7DEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DAF451233554C993F4B43D5 /* Assets.xcassets */; };
 		2FAD9763203C412B000D30F8 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 2FAD9762203C412B000D30F8 /* config.xml */; };
 		4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */ = {isa = PBXBuildFile; productRef = 4D22ABE82AF431CB00220026 /* CapApp-SPM */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
@@ -15,11 +16,43 @@
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
+		69374588AC5C48C8E36D41E1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C311942E183DD1E5CDBC2EBA /* ContentView.swift */; };
+		7E2024564663DCC73885D019 /* SessionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E46B56A6BB72DF01A51BCC0 /* SessionModel.swift */; };
+		8D178A6889F5408E7760D959 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1474BD13F37759EEED507E7A /* Foundation.framework */; };
 		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
+		A6D6BEFB3306927ED6AA4BE9 /* AchilloWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E735DA1CC7BF9E6BA96220F8 /* AchilloWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E625F0B7ABC56395E10C15D9 /* AchilloWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4098C2BF98238AF21F5999D /* AchilloWatchApp.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		30D9191B7535574EDE3BE7CB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE0C51D1F9D9016E89F903AB;
+			remoteInfo = AchilloWatch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2CAE3FFB7AE9DDD921A42FED /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				A6D6BEFB3306927ED6AA4BE9 /* AchilloWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		0F64F4CEC6CF1A178CC636A9 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1474BD13F37759EEED507E7A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
+		4DAF451233554C993F4B43D5 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		504EC3071FED79650016851F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -28,8 +61,12 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		7E46B56A6BB72DF01A51BCC0 /* SessionModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SessionModel.swift; sourceTree = "<group>"; };
 		9582B6822FE993A50072D4E8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		A4098C2BF98238AF21F5999D /* AchilloWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AchilloWatchApp.swift; sourceTree = "<group>"; };
+		C311942E183DD1E5CDBC2EBA /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E735DA1CC7BF9E6BA96220F8 /* AchilloWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AchilloWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,15 +78,33 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		50A29C1175DCAAD6C58A0D61 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D178A6889F5408E7760D959 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2FC3EE15AB9C5B2E58583925 /* watchOS */ = {
+			isa = PBXGroup;
+			children = (
+				1474BD13F37759EEED507E7A /* Foundation.framework */,
+			);
+			name = watchOS;
+			sourceTree = "<group>";
+		};
 		504EC2FB1FED79650016851F = {
 			isa = PBXGroup;
 			children = (
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
 				504EC3051FED79650016851F /* Products */,
+				72BF4274D1183930C2A7E630 /* Frameworks */,
+				A2F48B9BF756AF9B95C6B731 /* AchilloWatch */,
 			);
 			sourceTree = "<group>";
 		};
@@ -57,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
+				E735DA1CC7BF9E6BA96220F8 /* AchilloWatch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -77,6 +133,27 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		72BF4274D1183930C2A7E630 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2FC3EE15AB9C5B2E58583925 /* watchOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A2F48B9BF756AF9B95C6B731 /* AchilloWatch */ = {
+			isa = PBXGroup;
+			children = (
+				A4098C2BF98238AF21F5999D /* AchilloWatchApp.swift */,
+				7E46B56A6BB72DF01A51BCC0 /* SessionModel.swift */,
+				C311942E183DD1E5CDBC2EBA /* ContentView.swift */,
+				4DAF451233554C993F4B43D5 /* Assets.xcassets */,
+				0F64F4CEC6CF1A178CC636A9 /* Info.plist */,
+			);
+			name = AchilloWatch;
+			path = AchilloWatch;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -87,10 +164,12 @@
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
+				2CAE3FFB7AE9DDD921A42FED /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				68BC529E2AB99D57FC66E9DA /* PBXTargetDependency */,
 			);
 			name = App;
 			packageProductDependencies = (
@@ -98,6 +177,23 @@
 			);
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CE0C51D1F9D9016E89F903AB /* AchilloWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D35BF910C51C08B1BF908F13 /* Build configuration list for PBXNativeTarget "AchilloWatch" */;
+			buildPhases = (
+				27D29F5AD39EB6C8C5726916 /* Sources */,
+				50A29C1175DCAAD6C58A0D61 /* Frameworks */,
+				9B14C114A8EB9D171D1E3397 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AchilloWatch;
+			productName = AchilloWatch;
+			productReference = E735DA1CC7BF9E6BA96220F8 /* AchilloWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -133,6 +229,7 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
+				CE0C51D1F9D9016E89F903AB /* AchilloWatch */,
 			);
 		};
 /* End PBXProject section */
@@ -151,9 +248,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9B14C114A8EB9D171D1E3397 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0BB2B9366580AC3EA67C7DEC /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		27D29F5AD39EB6C8C5726916 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E625F0B7ABC56395E10C15D9 /* AchilloWatchApp.swift in Sources */,
+				7E2024564663DCC73885D019 /* SessionModel.swift in Sources */,
+				69374588AC5C48C8E36D41E1 /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		504EC3001FED79650016851F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -164,6 +279,15 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		68BC529E2AB99D57FC66E9DA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AchilloWatch;
+			target = CE0C51D1F9D9016E89F903AB /* AchilloWatch */;
+			targetProxy = 30D9191B7535574EDE3BE7CB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		504EC30B1FED79650016851F /* Main.storyboard */ = {
@@ -185,6 +309,37 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		412174F84B2ECE5FC8A50E87 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4GP6GFRGCR;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AchilloWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Achilló";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.jyvisuals.achilles;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyvisuals.achilles.watchkitapp;
+				PRODUCT_NAME = AchilloWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 		504EC3141FED79650016851F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 958DCC722DB07C7200EA8C5F /* debug.xcconfig */;
@@ -300,8 +455,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4GP6GFRGCR;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4GP6GFRGCR;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -323,8 +478,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4GP6GFRGCR;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4GP6GFRGCR;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -339,6 +494,36 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
+		};
+		EC3C2793C06A110100597137 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4GP6GFRGCR;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AchilloWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Achilló";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.jyvisuals.achilles;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyvisuals.achilles.watchkitapp;
+				PRODUCT_NAME = AchilloWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
@@ -357,6 +542,15 @@
 			buildConfigurations = (
 				504EC3171FED79650016851F /* Debug */,
 				504EC3181FED79650016851F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D35BF910C51C08B1BF908F13 /* Build configuration list for PBXNativeTarget "AchilloWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				412174F84B2ECE5FC8A50E87 /* Release */,
+				EC3C2793C06A110100597137 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
