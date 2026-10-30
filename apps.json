@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.59",
+          "buildVersion": "59",
+          "date": "2026-10-30T02:04:21Z",
+          "localizedDescription": "After a BFR morning, the evening Barefoot PT is the full round again (not just the calf raise and wall holds).",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.59.ipa",
+          "size": 948663,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.58",
           "buildVersion": "58",
           "date": "2026-10-29T10:55:56Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.57.ipa",
           "size": 948558,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.55",
-          "buildVersion": "55",
-          "date": "2026-10-29T10:44:35Z",
-          "localizedDescription": "Ankle pumps now happen inside a left hamstring stretch; the right hamstring stretch is gone. BFR is the finisher of the morning round.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.55.ipa",
-          "size": 948488,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.58",
-      "versionDate": "2026-10-29T10:55:56Z",
-      "versionDescription": "Skip now moves one set at a time (and past the rest after it). The list button still jumps whole exercises.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.58.ipa",
-      "size": 948561
+      "version": "1.1.59",
+      "versionDate": "2026-10-30T02:04:21Z",
+      "versionDescription": "After a BFR morning, the evening Barefoot PT is the full round again (not just the calf raise and wall holds).",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.59.ipa",
+      "size": 948663
     }
   ],
   "news": []
