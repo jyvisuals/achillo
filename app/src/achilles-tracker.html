@@ -1423,7 +1423,7 @@ const pre={key:null,url:null,busy:false}; window.__pre=pre;
 const listKey=l=>vol+':'+l.join('|');
 async function prebuild(mode,wp,wr){try{if(sess||pre.busy||!sound)return;preAssume=true;let b;try{b=build(wp,wr,mode);}finally{preAssume=false;}if(!b.list.length)return;const k=listKey(b.list);if(pre.key===k&&pre.url)return;
   pre.busy=true;const url=await buildTrackFor(b.steps);if(pre.url)URL.revokeObjectURL(pre.url);pre.key=k;pre.url=url;
-  if(track.__prepare){track.__opts=voiceOpts();track.__prepare(url,voice?speechPlan(b.steps,b.list):[],{rate:prefs.rate,voice:prefs.voice});}}catch(e){}finally{pre.busy=false;}}
+  if(track.__prepare){track.__opts=voiceOpts();track.__prepare(url,voice?speechPlan(b.steps,b.list):[],{rate:prefs.rate,voice:prefs.voice},JSON.stringify(planOf(b.steps,mode==='hips'?'Hips':'Barefoot PT',0,false,mode||'home')));}}catch(e){}finally{pre.busy=false;}}
 let preHint=null;
 function hint(mode,wp,wr){preHint=[mode,wp,wr];}
 function prebuildNext(){if(!preHint||sess)return;const [m,wp,wr]=preHint;setTimeout(()=>prebuild(m,wp,wr),300);}
@@ -1495,14 +1495,34 @@ window.addEventListener('ach:open',e=>{const k=e.detail&&e.detail.kind;if(sess||
 let autoPaused=false;
 // ---- Apple Watch: the phone sends the whole plan; the watch runs the same timeline and taps your wrist.
 function watchSend(o){try{nativeEvt('watch',{json:JSON.stringify(o)});}catch(e){}}
-function watchSync(){if(!sess)return;const idx={},ex=[];
-  const steps=sess.steps.map(st=>{const k=st.ex;if(idx[k]==null){idx[k]=ex.length;const e=EX[k]||{};const nm=(e.name||k);const m=nm.match(/(\d+) of (\d+)\)?$/);
+function planOf(stepsIn,title,pos,isPaused,mode){const idx={},ex=[];
+  const steps=stepsIn.map(st=>{const k=st.ex;if(idx[k]==null){idx[k]=ex.length;const e=EX[k]||{};const nm=(e.name||k);const m=nm.match(/(\d+) of (\d+)\)?$/);
       const name=nm.replace(/\s*·\s*(set|round)\s+\d+\s+of\s+\d+$/,'').replace(/\s*\(\d+ of \d+\)$/,'').replace(/\s+hold \d+ of \d+$/,' hold');
       const rest=REST_KEY.test(k)||!!(e.phases&&e.phases.every(p=>p[0]==='rest'));
       ex.push([name,e.reps||1,m?+m[1]:1,m?+m[2]:1,rest?1:0]);}
     return [st.kind,st.kind==='mark'?0:st.secs,idx[k],st.rep||0,st.label||''];});
-  watchSend({type:'plan',title:$('isoh').textContent,steps,ex,pos:posSeconds(),at:Date.now(),paused:!!paused});}
+  return {type:'plan',title,mode:mode||'',steps,ex,pos,at:Date.now(),paused:!!isPaused};}
+function watchSync(){if(!sess||window.__extApply)return;watchSend(planOf(sess.steps,$('isoh').textContent,posSeconds(),paused,sess.mode));}
+// The watch can drive the session while this page is asleep: the app's native clock keeps the truth, and we catch up to it here.
+function applyExternal(d){window.__extApply=true;try{
+  if(d.cmd==='start'&&!sess){startSession(false,false,d.mode==='hips'?'hips':'home');}
+  if(!sess)return;
+  if(d.cmd==='end'){finish(false);return;}
+  if(d.pos==null)return;
+  const offs=stepOffsets(),n=sess.steps.length,total=offs[n-1]+(sess.steps[n-1].kind==='mark'?0:sess.steps[n-1].secs);
+  const now=Date.now(),pos=d.pos+(d.paused?0:Math.max(0,(now-d.at)/1000));
+  if(pos>=total-0.05){finish(true);return;}
+  let idx=0;for(let i=0;i<n;i++){if(offs[i]<=pos)idx=i;else break;}
+  while(idx<n-1&&sess.steps[idx].kind==='mark')idx++;
+  if(idx>sess.i){const to=sess.steps[idx].ex;const seen=new Set();for(let j=sess.i;j<idx;j++){const k=sess.steps[j].ex;if(k&&k!==to&&!seen.has(k)){seen.add(k);recordDone(k);}}}
+  if(!!d.paused!==!!paused){pSrc='watch';$('tPause').click();}
+  enter(idx,now-(pos-offs[idx])*1000,true);
+  if(paused)pauseStart=now;
+  dbg('watch: caught up to',pos.toFixed(1),d.paused?'(paused)':'');
+  lastShown=null;tick();persist();if(trackOn)syncTrack();
+}finally{window.__extApply=false;}}
 window.addEventListener('ach:remote',e=>{const c=e.detail&&e.detail.cmd;
+  if(e.detail&&e.detail.from==='watch'&&(e.detail.pos!=null||c==='start'||c==='end')){applyExternal(e.detail);return;}
   if(c==='start'&&!sess){const md=e.detail.mode==='hips'?'hips':'home';startSession(false,false,md);return;}
   if(!sess)return;
   if(c==='skip'){$('tSkip').click();return;} if(c==='end'){finish(false);return;}

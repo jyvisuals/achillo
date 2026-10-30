@@ -116,6 +116,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         CAPPluginMethod(name: "render", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "haptic", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "watch", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "preparePlan", returnType: CAPPluginReturnPromise),
     ]
 
     private var player: AVAudioPlayer?
@@ -126,12 +127,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
     private let watchLink = WatchLink()
 
     override public func load() {
-        watchLink.onMessage = { [weak self] msg in
-            guard let self = self else { return }
-            // A pause from the wrist stops the cue track right away, even if the page is asleep.
-            if (msg["cmd"] as? String) == "pause" { self.player?.pause(); self.wantPlaying = false; self.updateNowPlayingRate() }
-            self.notifyListeners("watch", data: msg)
-        }
+        watchLink.onMessage = { [weak self] msg in self?.handleWatch(msg) }
         watchLink.start()
         synth.usesApplicationAudioSession = true
         NotificationCenter.default.addObserver(self, selector: #selector(routeChanged(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
@@ -266,8 +262,132 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         CHHapticEvent(eventType: .hapticContinuous, parameters: [CHHapticEventParameter(parameterID: .hapticIntensity, value: i), CHHapticEventParameter(parameterID: .hapticSharpness, value: s)], relativeTime: t, duration: d)
     }
     @objc func watch(_ call: CAPPluginCall) {
-        watchLink.send(call.getString("json") ?? "")
-        call.resolve(["paired": watchLink.paired, "installed": watchLink.installed, "reachable": watchLink.reachable])
+        let json = call.getString("json") ?? ""
+        main {
+            if let o = Self.parse(json) {
+                if (o["type"] as? String) == "plan" { self.loadPlan(o) } else if (o["type"] as? String) == "end" { self.planActive = false }
+            }
+            self.watchLink.send(json)
+            call.resolve(["paired": self.watchLink.paired, "installed": self.watchLink.installed, "reachable": self.watchLink.reachable])
+        }
+    }
+
+    // The next likely session, already rendered, so the watch can start it with the phone locked.
+    @objc func preparePlan(_ call: CAPPluginCall) {
+        let json = call.getString("json") ?? "", path = call.getString("path") ?? ""
+        main {
+            if let o = Self.parse(json), !path.isEmpty { self.preparedPlan = o; self.preparedPath = path; self.preparedMode = (o["mode"] as? String) ?? "home" }
+            call.resolve()
+        }
+    }
+
+    // MARK: session clock — the page is the truth while it's awake; this keeps time (and obeys the watch) while it sleeps.
+    private var plan: [String: Any]? = nil
+    private var planSteps: [(kind: String, secs: Double, ex: Int)] = []
+    private var planRest: [Bool] = []
+    private var planOffsets: [Double] = []
+    private var planPos: Double = 0
+    private var planAt = Date()
+    private var planPaused = false
+    private var planActive = false
+    private var preparedPlan: [String: Any]? = nil
+    private var preparedPath: String? = nil
+    private var preparedMode = "home"
+
+    private static func parse(_ json: String) -> [String: Any]? {
+        guard let d = json.data(using: .utf8) else { return nil }
+        return (try? JSONSerialization.jsonObject(with: d)) as? [String: Any]
+    }
+    private static func num(_ x: Any?) -> Double { (x as? NSNumber)?.doubleValue ?? 0 }
+
+    private func loadPlan(_ o: [String: Any]) {
+        plan = o
+        let st = (o["steps"] as? [[Any]]) ?? []
+        planSteps = st.map { a in (kind: a.count > 0 ? (a[0] as? String ?? "") : "", secs: a.count > 1 ? Self.num(a[1]) : 0, ex: a.count > 2 ? Int(Self.num(a[2])) : 0) }
+        planRest = ((o["ex"] as? [[Any]]) ?? []).map { a in a.count > 4 && Self.num(a[4]) > 0 }
+        var t = 0.0
+        planOffsets = planSteps.map { s in let r = t; t += max(0, s.secs); return r }
+        planPos = Self.num(o["pos"])
+        planAt = Date(timeIntervalSince1970: Self.num(o["at"]) / 1000)
+        planPaused = (o["paused"] as? Bool) ?? false
+        planActive = !planSteps.isEmpty
+    }
+
+    private func clockPos() -> Double { planPaused ? planPos : planPos + Date().timeIntervalSince(planAt) }
+    private var planTotal: Double { (planOffsets.last ?? 0) + max(0, planSteps.last?.secs ?? 0) }
+
+    // Same rule as the page: skip this set and the rest after it; during a rest or setup, just the wait.
+    private func skipTarget(from p: Double) -> Double {
+        guard !planSteps.isEmpty else { return p }
+        var i = 0
+        for k in 0..<planSteps.count { if planOffsets[k] <= p { i = k } else { break } }
+        while i < planSteps.count - 1 && planSteps[i].secs <= 0 { i += 1 }
+        let s = planSteps[i]
+        let isRest: (Int) -> Bool = { e in e < self.planRest.count ? self.planRest[e] : false }
+        var j = i + 1
+        if !(s.kind == "setup" || s.kind == "rest" || isRest(s.ex)) {
+            while j < planSteps.count && (planSteps[j].ex == s.ex || isRest(planSteps[j].ex) || planSteps[j].secs <= 0) { j += 1 }
+        }
+        return j < planSteps.count ? planOffsets[j] : planTotal
+    }
+
+    private func startPrepared() -> Bool {
+        guard let o = preparedPlan, let path = preparedPath else { return false }
+        guard let url = path.hasPrefix("file://") ? URL(string: path) : URL(fileURLWithPath: path),
+              let p = try? AVAudioPlayer(contentsOf: url) else { return false }
+        activate()
+        player?.stop()
+        p.delegate = self
+        p.prepareToPlay()
+        player = p
+        setupRemote()
+        var fresh = o
+        fresh["pos"] = 0
+        fresh["at"] = Date().timeIntervalSince1970 * 1000
+        fresh["paused"] = false
+        loadPlan(fresh)
+        p.currentTime = 0
+        wantPlaying = p.play()
+        preparedPlan = nil
+        return true
+    }
+
+    private func handleWatch(_ msg: [String: Any]) {
+        let cmd = msg["cmd"] as? String ?? ""
+        switch cmd {
+        case "pause":
+            if planActive && !planPaused { planPos = clockPos(); planAt = Date(); planPaused = true }
+            player?.pause(); wantPlaying = false
+        case "play":
+            if planActive && planPaused {
+                planAt = Date(); planPaused = false
+                if let p = player { activate(); p.currentTime = max(0, min(planPos, p.duration)); wantPlaying = p.play() }
+            }
+        case "skip":
+            if planActive {
+                let to = skipTarget(from: clockPos())
+                planPos = to; planAt = Date()
+                if let p = player { p.currentTime = max(0, min(to, p.duration)) }
+            }
+        case "end":
+            planActive = false
+            player?.pause(); wantPlaying = false
+        case "start":
+            if !planActive && preparedMode == ((msg["mode"] as? String) ?? "home") { _ = startPrepared() }
+        default: break
+        }
+        updateNowPlayingRate()
+        var out = msg
+        out["from"] = "watch"
+        if planActive, var o = plan {
+            planPos = clockPos(); planAt = Date()
+            out["pos"] = planPos; out["at"] = planAt.timeIntervalSince1970 * 1000; out["paused"] = planPaused
+            o["pos"] = planPos; o["at"] = planAt.timeIntervalSince1970 * 1000; o["paused"] = planPaused; o["type"] = "plan"
+            if let d = try? JSONSerialization.data(withJSONObject: o), let j = String(data: d, encoding: .utf8) { watchLink.send(j) }
+        } else if cmd == "end" {
+            watchLink.send("{\"type\":\"end\",\"complete\":false}")
+        }
+        notifyListeners("watch", data: out, retainUntilConsumed: true)
     }
 
     @objc func haptic(_ call: CAPPluginCall) {

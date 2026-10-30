@@ -101,7 +101,7 @@ function makeNativeTrack() {
       } catch (e) { log('bake failed', e); return false; }
     },
     // Ahead of time: save and render the next likely session so Start plays immediately.
-    async __prepare(url, items, opts) {
+    async __prepare(url, items, opts, planJson) {
       if (fb) return;
       const key = url, o = tr.__opts;
       if (prepared && prepared.url === key && prepared.opts === o) return;
@@ -109,9 +109,10 @@ function makeNativeTrack() {
       try {
         const cue = await writeTrack(url, 0, 'pre-cue.wav', () => prepared === mine); if (!cue || prepared !== mine) return;
         mine.cue = cue;
-        if (!items || !items.length) { mine.path = cue; log('prepared cue track', Math.round(nowMs() - T) + 'ms'); return; }
+        const hand = () => { if (planJson && prepared === mine && mine.path) AchAudio.preparePlan({ json: planJson, path: mine.path }).catch(() => {}); };
+        if (!items || !items.length) { mine.path = cue; log('prepared cue track', Math.round(nowMs() - T) + 'ms'); hand(); return; }
         const r = await AchAudio.render({ cuePath: cue, items, rate: opts.rate || 1.02, voice: opts.voice || '', out: 'pre-baked.wav' });
-        if (prepared === mine) { mine.path = r.path; mine.baked = true; log('prepared next session with voice:', r.placed, 'lines,', Math.round(nowMs() - T) + 'ms'); }
+        if (prepared === mine) { mine.path = r.path; mine.baked = true; log('prepared next session with voice:', r.placed, 'lines,', Math.round(nowMs() - T) + 'ms'); hand(); }
       } catch (e) { log('prepare failed', e); if (prepared === mine) prepared = null; }
     },
   };

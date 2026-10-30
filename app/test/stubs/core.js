@@ -14,6 +14,7 @@ export function registerPlugin(name){const a=window.__aa;const now=()=>performan
   stopSpeaking:async()=>{a.calls.push('stopSpeaking');},
   haptic:async(o)=>{a.calls.push('hap:'+o.pattern+(o.secs?':'+o.secs:''));return {ok:true};},
   watch:async(o)=>{a.calls.push('watch:'+(JSON.parse(o.json).type));(window.__watchMsgs=window.__watchMsgs||[]).push(JSON.parse(o.json));return {ok:true};},
+  preparePlan:async(o)=>{a.calls.push('preparePlan');window.__preparedPlan=JSON.parse(o.json);return {ok:true};},
   voices:async()=>({voices:[{id:'com.apple.voice.enhanced.en-US.Zoe',name:'Zoe',lang:'en-US',quality:'enhanced'}]}),
   nowPlaying:async(o)=>{a.calls.push('np:'+o.title+'|'+o.artist);},
   addListener:(n,f)=>{a.L[n]=f;return {remove(){}};},
