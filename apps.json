@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.64",
+          "buildVersion": "64",
+          "date": "2026-10-30T11:22:37Z",
+          "localizedDescription": "Toe yoga moves into Barefoot PT (after doming); the Boot-on PT button is gone. An evening start more than 4 h after the morning always gets a full round.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.64.ipa",
+          "size": 948681,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.63",
           "buildVersion": "63",
           "date": "2026-10-30T02:50:18Z",
@@ -35,25 +44,16 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.62.ipa",
           "size": 948681,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.61",
-          "buildVersion": "61",
-          "date": "2026-10-30T02:36:12Z",
-          "localizedDescription": "Toe yoga moves into Barefoot PT (after doming); the Boot-on PT button is gone. An evening start more than 4 h after the morning always gets a full round.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.61.ipa",
-          "size": 948681,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.63",
-      "versionDate": "2026-10-30T02:50:18Z",
+      "version": "1.1.64",
+      "versionDate": "2026-10-30T11:22:37Z",
       "versionDescription": "Toe yoga moves into Barefoot PT (after doming); the Boot-on PT button is gone. An evening start more than 4 h after the morning always gets a full round.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.63.ipa",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.64.ipa",
       "size": 948681
     }
   ],
