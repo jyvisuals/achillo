@@ -577,7 +577,7 @@ pre.rtext{display:none}
     </div>
     <details class="ankpick" id="ankPick"><summary>Chris’s program · pick any exercise</summary><div id="ankList"></div></details>
     <div class="envnote" id="envNote" hidden></div>
-    <div class="muted" id="sPickNote" style="font-size:12.5px">Guided, with voice and beeps. Checks itself off. BFR daily from Oct 15, first thing after a quiet morning check (seated calf raise 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15); Chris’s program then skips those two. BFR quad is a separate cuff bout for gym days. Barefoot PT (boot off: BFR calf raises → scar massage → BFR isometric → the rest) in the morning; Boot-on PT between sets at the gym. Stop anytime; it picks up where you left off. Imagery: after a press and at bedtime.</div>
+    <div class="muted" id="sPickNote" style="font-size:12.5px">Guided, with voice and beeps. Checks itself off. BFR daily from Oct 15, first thing after a quiet morning check (seated calf raise 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15); Chris’s program then skips those two. BFR quad is a separate cuff bout for gym days. Barefoot PT (boot off: BFR calf raises → scar massage → BFR isometric → the rest) in the morning. Stop anytime; it picks up where you left off. Imagery: after a press and at bedtime.</div>
     <div class="timer" id="sRun" hidden>
       <div class="cmap" id="cmap" aria-hidden="true">
           <svg viewBox="0 0 220 320" id="cmapSvg">
@@ -1093,7 +1093,7 @@ function bfrDay(d){return d>=BFR_DAILY?true:(d>=BFR_START&&[1,3,5].includes(d.ge
 function bfrPlanned(){const v=verdictKind(TODAY);return bfrDay(today)&&(!v||v==='go')&&!day().bfrSkip;}
 // Home block (boot off, cuff woven in) and gym block (boot on, pick between sets).
 const isHome=k=>{const d=ANK_DEF.find(x=>x[0]===k);return d&&!d[7]&&k!=='bootback';};
-const isGym=k=>{const d=ANK_DEF.find(x=>x[0]===k);return d&&d[7]&&k!=='bootback';};
+const isGym=k=>false; // Boot-on PT retired Oct 30
 // Quick ones: Chris's "pick a drill every hour or so" — one boot-on exercise, all its sets, rotating least-recent first.
 const SNACK_POOL=['toeyoga2','doming','invev','bandsup','pfwall'];
 function snackLast(){const d=day();const a=d.snacks||[];return a.length?a[a.length-1].t:0;}
@@ -1625,7 +1625,7 @@ function renderAnkle(){const el=$('ankList');if(!el)return;el.innerHTML='';const
   const left=ankLeft(d).length;$('ankPick').querySelector('summary').textContent='Chris’s program · '+(d.ankle?'round '+(d.ankle+1)+' · ':'')+(bases.length-1-left)+' of '+(bases.length-1)+' done · pick any';
   let shownBoot=false;
   bases.forEach(k=>{if(k==='bootback')return;const def=ANK_DEF.find(x=>x[0]===k);
-    if(def[7]&&!shownBoot){shownBoot=true;const h=document.createElement('div');h.className='ankh';h.textContent='Boot-on PT · gym';el.appendChild(h);}
+    
     if(!def[7]&&!el.childElementCount){const h=document.createElement('div');h.className='ankh';h.textContent='Barefoot PT · home';el.appendChild(h);}
     const r=document.createElement('div');r.className='ankrow'+(done.includes(k)?' done':'');
     const t=document.createElement('span');t.textContent=(done.includes(k)?'✓ ':'')+def[2]+' · '+(def[1]>1?def[1]+'×':'')+(def[3]>1?def[3]:'')+(k==='scar'?'3 min':'');
@@ -1830,13 +1830,13 @@ function _renderNow(){
   if(chain==='press'){txt.textContent='Morning check done. Calf press next: kneel on the couch, shin supported, front shell on.'+(bfrDay(today)&&isoTarget()>1?' Tonight is BFR.':'');
     btn('Start calf press',()=>{chain=null;startSession(true,false);},true);btn('Later',()=>{chain=null;renderNow();});return;}
   if(chain==='home'){const bp=bfrPending(),HL=homeLeft(d).length;
-    txt.textContent=(v==='go'?'Quiet morning. ':'Morning check done. ')+'Barefoot PT: '+(bp?'BFR calf raises, scar massage with the cuff off, BFR band isometric, then the rest of the no-cuff work. Under 30 minutes.':'no BFR today; '+HL+' boot-off exercises, no cuff.')+' Boot-on PT waits for the gym.';
+    txt.textContent=(v==='go'?'Quiet morning. ':'Morning check done. ')+'Barefoot PT: '+(bp?'BFR calf raises, scar massage with the cuff off, BFR band isometric, then the rest of the no-cuff work. Under 30 minutes.':'no BFR today; '+HL+' boot-off exercises, no cuff.')+'';
     hint('home',false,false);btn('Start barefoot PT',()=>{chain=null;startSession(false,false,'home');},true);if(bp)btn('Skip BFR today',()=>{d.bfrSkip=1;queueSave(TODAY);renderAnkle();renderNow();});btn('Later',()=>{chain=null;renderNow();});return;}
   if(chain==='gymnext'){const G=gymLeft(d);txt.textContent='Barefoot PT done. Boot-on PT whenever you\'re at the gym: '+G.length+' exercises, boot on. Skip or jump to fit them between sets.';
     hint('gym',false,false);btn('Boot-on PT',()=>{chain=null;startSession(false,false,'gym');},true);btn('Imagery now',()=>{chain='imagery';renderNow();});return;}
   if(chain==='bfr'){txt.textContent='Quiet morning. BFR first: cuff high on the thigh, seated calf raises 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15. About 15 minutes, then Chris’s program.';
     btn('Start BFR',()=>{chain=null;startSession(false,false,'bfrpress');},true);btn('Skip BFR today',()=>{chain='foot';d.bfrSkip=1;renderNow();});return;}
-  if(chain==='foot'){{const L=ankLeft(d).length,T=ankBases().length-1;txt.textContent=(isoTarget()>0?'Press done. ':(d.bfr>0?'BFR done. ':'Morning check done. '))+'Chris’s program next: barefoot first, boot-on at the gym.'+(L<T?' '+L+' exercises left from earlier.':'');
+  if(chain==='foot'){{const L=ankLeft(d).length,T=ankBases().length-1;txt.textContent=(isoTarget()>0?'Press done. ':(d.bfr>0?'BFR done. ':'Morning check done. '))+'Chris’s program next.'+(L<T?' '+L+' exercises left from earlier.':'');
     btn(L<T?'Resume Chris’s program':'Start Chris’s program',()=>{chain=null;startSession(false,false,'ankle');},true);}btn('Skip to imagery',()=>{chain='imagery';renderNow();});btn('Done for now',()=>{chain=null;renderNow();});return;}
   if(chain==='imagery'){txt.textContent='Ramp off: boot back on, lie back, eyes closed. Five minutes of imagery while the real thing is fresh.';
     hint('imagery',false,false);btn('Start imagery',()=>{chain=null;startSession(false,false,'imagery');},true);btn('Skip',()=>{chain=null;renderNow();});return;}
@@ -1853,7 +1853,7 @@ function _renderNow(){
     if(rounds===0&&gymLeft(d).length&&h<23){const G=gymLeft(d);txt.textContent='Boot-on PT at the gym: '+G.length+' left, boot on. Skip or jump to fit them between sets.';
       hint('gym',false,false);btn('Boot-on PT',()=>startSession(false,false,'gym'),true);img();return;}
     if(false){txt.textContent='BFR first: cuff high on the thigh, seated calf raises 30/15/15/15, cuff off 2 min, then knee-bent isometric 30/15/15/15. About 15 minutes.';btn('Start BFR',()=>startSession(false,false,'bfrpress'),true);img();return;}
-    if(rounds===0&&h<23){txt.textContent=(partial?'Chris’s program, '+L+' exercises left. Picks up where you stopped.':'Chris’s program: barefoot first, boot-on at the gym. About 35 minutes; stop anytime.')+(v==='back'?' Easy day: one round only, lighter effort.':'')+(bfrPlanned()&&v==='go'?' BFR covers the calf raise and knee-bent isometric today.':v&&v!=='go'&&bfrDay(today)?' No BFR today (morning wasn\'t quiet); the calf raise and knee-bent isometric are back in, no cuff.':'');
+    if(rounds===0&&h<23){txt.textContent=(partial?'Chris’s program, '+L+' exercises left. Picks up where you stopped.':'Chris’s program. About 35 minutes; stop anytime.')+(v==='back'?' Easy day: one round only, lighter effort.':'')+(bfrPlanned()&&v==='go'?' BFR covers the calf raise and knee-bent isometric today.':v&&v!=='go'&&bfrDay(today)?' No BFR today (morning wasn\'t quiet); the calf raise and knee-bent isometric are back in, no cuff.':'');
       btn(partial?'Resume Chris’s program':'Start Chris’s program',()=>startSession(false,false,'ankle'),true);img();return;}
     if(rounds===1&&h>=Math.min(16,parseInt(prefs.evening)||16)&&h<23&&v!=='back'){const HL=homeLeft(d).length,GL=gymLeft(d).length;txt.textContent='Evening round: '+(HL?'Barefoot PT (no cuff)'+(GL?', then Boot-on PT.':'.'):'Boot-on PT.')+(partial?' Picks up where you stopped.':'');
       hint(homeLeft(d).length?'home':'gym',false,false);btn(partial?'Resume evening round':'Start evening round',()=>startSession(false,false,homeLeft(d).length?'home':'gym'),true);snackBtn(btn);img();return;}

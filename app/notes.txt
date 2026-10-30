@@ -1,2 +1,3 @@
+Boot-on PT is gone from the app.
 Watch taps are stronger. Each cue is now a firmer, doubled tap. On the watch start screen, set Taps to Normal, Strong or Max.
-Skipping a rest or "I'm ready" on the phone now updates the watch too.
+Skipping a rest on the phone now updates the watch too.
