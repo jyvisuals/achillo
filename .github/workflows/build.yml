@@ -53,3 +53,64 @@ jobs:
           git add apps.json ipa
           git commit -m "Achilló $V [skip ci]"
           git push
+
+  testflight:
+    # Signs with the Apple Developer account and uploads to TestFlight. Skips itself until the ASC_* secrets exist.
+    runs-on: macos-15
+    continue-on-error: true
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+      TEAM: ${{ secrets.APPLE_TEAM_ID }}
+      V: 1.1.${{ github.run_number }}
+      N: ${{ github.run_number }}
+    steps:
+      - name: Check secrets
+        id: chk
+        run: |
+          if [ -n "$ASC_KEY_ID" ] && [ -n "$ASC_ISSUER_ID" ] && [ -n "$ASC_KEY_P8" ] && [ -n "$TEAM" ]; then echo "ok=1" >> "$GITHUB_OUTPUT"; else echo "TestFlight secrets not set yet; skipping."; fi
+      - uses: actions/checkout@v4
+        if: steps.chk.outputs.ok == '1'
+      - uses: actions/setup-node@v4
+        if: steps.chk.outputs.ok == '1'
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Web bundle
+        if: steps.chk.outputs.ok == '1'
+        working-directory: app
+        run: |
+          npm ci
+          node build.js
+          npx cap sync ios
+      - name: Archive and upload to TestFlight
+        if: steps.chk.outputs.ok == '1'
+        working-directory: app/ios/App
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app || true
+          xcodebuild -version
+          KEY="$RUNNER_TEMP/AuthKey_$ASC_KEY_ID.p8"
+          printf '%s\n' "$ASC_KEY_P8" > "$KEY"
+          AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
+          xcodebuild -resolvePackageDependencies -project App.xcodeproj -scheme App >/dev/null
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" archive \
+            DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic MARKETING_VERSION="$V" CURRENT_PROJECT_VERSION="$N" \
+            "${AUTH[@]}" -quiet
+          cat > "$RUNNER_TEMP/export.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$TEAM</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" -exportOptionsPlist "$RUNNER_TEMP/export.plist" \
+            -exportPath "$RUNNER_TEMP/export" "${AUTH[@]}"
+          rm -f "$KEY"
+          echo "Uploaded $V ($N) to TestFlight"
