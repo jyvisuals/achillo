@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.72",
+          "buildVersion": "72",
+          "date": "2026-10-30T13:18:19Z",
+          "localizedDescription": "Watch taps are stronger. Each cue is now a firmer, doubled tap. On the watch start screen, set Taps to Normal, Strong or Max.\nSkipping a rest or \"I'm ready\" on the phone now updates the watch too.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.72.ipa",
+          "size": 1211129,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.70",
           "buildVersion": "70",
           "date": "2026-10-30T12:52:29Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.69.ipa",
           "size": 1194604,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.68",
-          "buildVersion": "68",
-          "date": "2026-10-30T12:37:41Z",
-          "localizedDescription": "Apple Watch app (first version): your wrist taps the phases, the ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.68.ipa",
-          "size": 953699,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.70",
-      "versionDate": "2026-10-30T12:52:29Z",
-      "versionDescription": "Watch controls work with the phone locked: pause, skip, end and Start on the watch drive the phone's audio directly, and the phone catches up when you open it.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.70.ipa",
-      "size": 1203434
+      "version": "1.1.72",
+      "versionDate": "2026-10-30T13:18:19Z",
+      "versionDescription": "Watch taps are stronger. Each cue is now a firmer, doubled tap. On the watch start screen, set Taps to Normal, Strong or Max.\nSkipping a rest or \"I'm ready\" on the phone now updates the watch too.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.72.ipa",
+      "size": 1211129
     }
   ],
   "news": []
