@@ -51,6 +51,7 @@ jobs:
           git config user.name "Achilló build"
           git config user.email "noreply@github.com"
           git add apps.json ipa
+          git add -f app/ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved || true
           git commit -m "Achilló $V [skip ci]"
           git push
 
