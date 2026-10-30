@@ -8,3 +8,7 @@ node -v
 npm ci
 node build.js
 npx cap sync ios
+# Xcode Cloud won't resolve Swift packages itself without a Package.resolved; create it now that the plugin sources exist.
+cd "$CI_PRIMARY_REPOSITORY_PATH/app/ios/App"
+xcodebuild -resolvePackageDependencies -project App.xcodeproj -scheme App
+ls App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
