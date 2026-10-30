@@ -1533,6 +1533,8 @@ function startSession(withPress,withRoutine,mode){dbg('session: start',mode||'')
   {const d=day();const stale=t=>t&&Date.now()-t>4*3600e3;
    if(mode==='home'&&(d.homeN||0)===0&&homeLeft(d).length&&stale(d.homeAt)){d.homeN=1;d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: new round, morning leftovers dropped');}
    if(mode==='gym'&&(d.gymN||0)===0&&gymLeft(d).length&&stale(d.gymAt)){d.gymN=1;d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: new round, morning leftovers dropped');}}
+  // After a BFR morning, the only "leftovers" are what BFR covered (calf raise, wall isometric). That round is done: start the evening fresh.
+  {const d=day();const L=homeLeft(d);if(mode==='home'&&(d.homeN||0)===1&&L.length&&L.every(k=>k==='calfman'||k==='pfwall')){d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: evening round, BFR-covered leftovers dropped');}}
   if(mode==='home'&&!homeList().length){const d=day();if((d.homeN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Barefoot PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: fresh pass');}
   if(mode==='gym'&&!gymLeft(day()).length){const d=day();if((d.gymN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Boot-on PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: fresh pass');}
   sess=build(withPress,withRoutine,mode); sess.t0=Date.now(); paused=false; pauseStart=0; lastShown=null;
