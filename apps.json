@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.68",
+          "buildVersion": "68",
+          "date": "2026-10-30T12:37:41Z",
+          "localizedDescription": "Apple Watch app (first version): your wrist taps the phases, the ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.68.ipa",
+          "size": 953699,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.67",
           "buildVersion": "67",
           "date": "2026-10-30T12:02:36Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.66.ipa",
           "size": 948778,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.65",
-          "buildVersion": "65",
-          "date": "2026-10-30T11:29:10Z",
-          "localizedDescription": "Toe yoga moves into Barefoot PT (after doming); the Boot-on PT button is gone. An evening start more than 4 h after the morning always gets a full round.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.65.ipa",
-          "size": 948682,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.67",
-      "versionDate": "2026-10-30T12:02:36Z",
-      "versionDescription": "Every build now has a version number (1.2.N) and a What to Test note in TestFlight.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.67.ipa",
-      "size": 948780
+      "version": "1.1.68",
+      "versionDate": "2026-10-30T12:37:41Z",
+      "versionDescription": "Apple Watch app (first version): your wrist taps the phases, the ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.68.ipa",
+      "size": 953699
     }
   ],
   "news": []
