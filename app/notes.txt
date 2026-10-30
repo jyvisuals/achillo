@@ -1,1 +1,1 @@
-Apple Watch app (first version): your wrist taps the phases, the ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip.
+Apple Watch app (first version): wrist taps for each phase, ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip. Start a session on the phone; the watch follows.
