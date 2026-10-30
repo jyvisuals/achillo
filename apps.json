@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.74",
+          "buildVersion": "74",
+          "date": "2026-10-30T19:42:24Z",
+          "localizedDescription": "Haptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds. Turn them on or off with Textures on the watch start screen.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.74.ipa",
+          "size": 1216273,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.73",
           "buildVersion": "73",
           "date": "2026-10-30T18:20:09Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.72.ipa",
           "size": 1211129,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.70",
-          "buildVersion": "70",
-          "date": "2026-10-30T12:52:29Z",
-          "localizedDescription": "Watch controls work with the phone locked: pause, skip, end and Start on the watch drive the phone's audio directly, and the phone catches up when you open it.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.70.ipa",
-          "size": 1203434,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.73",
-      "versionDate": "2026-10-30T18:20:09Z",
-      "versionDescription": "Boot-on PT is gone from the app.\nWatch taps are stronger. Each cue is now a firmer, doubled tap. On the watch start screen, set Taps to Normal, Strong or Max.\nSkipping a rest on the phone now updates the watch too.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.73.ipa",
-      "size": 1211074
+      "version": "1.1.74",
+      "versionDate": "2026-10-30T19:42:24Z",
+      "versionDescription": "Haptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds. Turn them on or off with Textures on the watch start screen.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.74.ipa",
+      "size": 1216273
     }
   ],
   "news": []
