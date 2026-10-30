@@ -1493,7 +1493,19 @@ window.addEventListener('ach:open',e=>{const k=e.detail&&e.detail.kind;if(sess||
   else if(k==='imagery')startSession(false,false,'imagery');
   else window.scrollTo(0,0);});
 let autoPaused=false;
-window.addEventListener('ach:remote',e=>{const c=e.detail&&e.detail.cmd;if(!sess)return;
+// ---- Apple Watch: the phone sends the whole plan; the watch runs the same timeline and taps your wrist.
+function watchSend(o){try{nativeEvt('watch',{json:JSON.stringify(o)});}catch(e){}}
+function watchSync(){if(!sess)return;const idx={},ex=[];
+  const steps=sess.steps.map(st=>{const k=st.ex;if(idx[k]==null){idx[k]=ex.length;const e=EX[k]||{};const nm=(e.name||k);const m=nm.match(/(\d+) of (\d+)\)?$/);
+      const name=nm.replace(/\s*·\s*(set|round)\s+\d+\s+of\s+\d+$/,'').replace(/\s*\(\d+ of \d+\)$/,'').replace(/\s+hold \d+ of \d+$/,' hold');
+      const rest=REST_KEY.test(k)||!!(e.phases&&e.phases.every(p=>p[0]==='rest'));
+      ex.push([name,e.reps||1,m?+m[1]:1,m?+m[2]:1,rest?1:0]);}
+    return [st.kind,st.kind==='mark'?0:st.secs,idx[k],st.rep||0,st.label||''];});
+  watchSend({type:'plan',title:$('isoh').textContent,steps,ex,pos:posSeconds(),at:Date.now(),paused:!!paused});}
+window.addEventListener('ach:remote',e=>{const c=e.detail&&e.detail.cmd;
+  if(c==='start'&&!sess){const md=e.detail.mode==='hips'?'hips':'home';startSession(false,false,md);return;}
+  if(!sess)return;
+  if(c==='skip'){$('tSkip').click();return;} if(c==='end'){finish(false);return;}
   pSrc='remote '+c;if(c==='pause'&&!paused)$('tPause').click();else if(c==='play'&&paused)$('tPause').click();else if(c==='toggle')$('tPause').click();
   else if(c==='next')$('tSkip').click();else if(c==='prev'&&typeof prevEx==='function')prevEx();});
 window.addEventListener('ach:routeLost',()=>{dbg('audio: headphones/route lost');if(sess&&!paused){autoPaused=false;pSrc='headphones';$('tPause').click();}if(sess){$('audWarn').hidden=false;$('audWarnT').textContent='Headphones disconnected. Paused.';}});
@@ -1539,7 +1551,7 @@ function startSession(withPress,withRoutine,mode){dbg('session: start',mode||'')
   if(mode==='home'&&!homeList().length){const d=day();if((d.homeN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Barefoot PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: fresh pass');}
   if(mode==='gym'&&!gymLeft(day()).length){const d=day();if((d.gymN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Boot-on PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: fresh pass');}
   sess=build(withPress,withRoutine,mode); sess.t0=Date.now(); paused=false; pauseStart=0; lastShown=null;
-  enter(0,Date.now(),true); beep(780,150); sayStep(); beginRun(); persist(); startTrack();
+  enter(0,Date.now(),true); beep(780,150); sayStep(); beginRun(); persist(); startTrack(); watchSync();
 }
 function resumeSession(){
   let saved=null; try{saved=JSON.parse(localStorage.getItem('ach:sess')||'null');}catch(e){}
@@ -1554,7 +1566,7 @@ function resumeSession(){
   if(sound){$('sNext').textContent='Session resumed. Tap Pause, then Resume, to restart the beeps.';}
   return true;
 }
-function finish(complete){try{document.querySelector('.wrap').classList.remove('mapmode','hipmode');}catch(e){}try{if(window.setPocket)setPocket(false);}catch(e){}stripKey=null;dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});
+function finish(complete){try{document.querySelector('.wrap').classList.remove('mapmode','hipmode');}catch(e){}try{if(window.setPocket)setPocket(false);}catch(e){}stripKey=null;dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});watchSend({type:'end',complete:!!complete});
   clearInterval(timer);timer=null; stopTrack(); if(wake){try{wake.release()}catch(e){} wake=null;}
   const d=day(); const w=weekFor(today)||WEEKS[0]; const done=sess?sess.doneEx:[];
   const pressDone=false; const routineDone=false;
@@ -1608,7 +1620,7 @@ $('tPause').onclick=e=>{if(!sess)return; paused=!paused; dbg('pause:',paused?'on
   else{sess.stepEnd+=Date.now()-pauseStart;pauseStart=0;lastShown=null;tick();$('audWarn').hidden=true;
     {const st=sess.steps[sess.i];if(st&&st.kind==='hold')nativeEvt('step',{kind:'hold',ex:st.ex,rep:st.rep,reps:1,secs:Math.max(1,Math.round((sess.stepEnd-Date.now())/1000)),quiet:false,rest:false,first:false});}
     const st=sess&&sess.steps[sess.i];if(st&&EX[st.ex]&&EX[st.ex].speakCue){sess.stepEnd=Date.now()+st.secs*1000;sayStep();}}
-  setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); lockInfo(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack();};
+  setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); lockInfo(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack(); watchSync();};
 // ---- skip / jump: skipping forward past an exercise counts it as done.
 const REST_KEY=/^(arest|srest|pfrest2?|cuffdown|cuffoff|deflatex?|bootback)$/;
 const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(k)?'bfrB':k;
@@ -1619,7 +1631,7 @@ function jumpTo(idx){if(!sess)return;hush();$('jumpList').hidden=true;dbg('jump:
   while(idx<sess.steps.length&&sess.steps[idx].kind==='mark')idx++;
   if(idx>=sess.steps.length){finish(true);return;}
   if(paused){paused=false;pauseStart=0;setL('tPause','Pause');}
-  enter(idx,Date.now(),false); lastShown=null; tick(); persist(); syncTrack();}
+  enter(idx,Date.now(),false); lastShown=null; tick(); persist(); syncTrack(); watchSync();}
 function sessGroups(){const out=[];sess.steps.forEach((st,i)=>{if(st.kind==='mark'||REST_KEY.test(st.ex))return;const g=groupOf(st.ex);if(!out.find(x=>x.g===g))out.push({g,i});});return out;}
 function groupDone(g){const d=day();if((d.ankleDone||[]).includes(g))return true;
   const lastKey=g==='bfrA'?'bcr15c':g==='bfrB'?'bpi4':(ANK_KEYS[g]?ankLast(g):g);return sess.doneEx.includes(lastKey);}
@@ -1639,7 +1651,7 @@ $('tSkip').onclick=()=>{if(!sess)return; hush(); const st=sess.steps[sess.i];dbg
   sess.stepEnd=Date.now(); if(paused){paused=false;pauseStart=0;setL('tPause','Pause');} lastShown=null; tick(); syncTrack();};
 $('tStop').onclick=()=>finish(false);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')window.__hiddenAt=Date.now();dbg('app:',document.visibilityState,sess?'(in session)':'');if(document.visibilityState==='hidden'){if(sess&&paused&&Date.now()-tapPauseAt<2000){tapPauseAt=0;dbg('pause: undone, that tap was the swipe out of the app');pSrc='undo';$('tPause').click();}persist();if(sess&&!paused&&trackOn&&track.paused)track.play().catch(()=>{});}
-  if(document.visibilityState==='visible'){lastShown=null;tick();syncTrack();
+  if(document.visibilityState==='visible'){lastShown=null;tick();syncTrack();if(sess)watchSync();
   if(sess&&navigator.wakeLock&&!wake){navigator.wakeLock.request('screen').then(w=>wake=w).catch(()=>{});}}});
 (function(){const AUD={both:'<svg viewBox="0 0 48 24"><g><path d="M3 4h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-5 4v-4H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></g><g transform="translate(25 0)"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></g></svg>',cues:'<svg viewBox="0 0 24 24"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></svg>',voice:'<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>',off:'<svg viewBox="0 0 24 24"><g opacity=".45"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></g><path d="M4 20L20 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'};const NAMES={both:'Voice and cues',cues:'Cues only',voice:'Voice only',off:'Silent'};
   const b=$('tAud');const mode=()=>voice&&sound?'both':sound?'cues':voice?'voice':'off';

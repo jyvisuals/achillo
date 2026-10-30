@@ -13,6 +13,7 @@ export function registerPlugin(name){const a=window.__aa;const now=()=>performan
   render:async(o)=>{a.calls.push('render:'+o.items.length+':'+o.out);a.rendered=o;await new Promise(r=>setTimeout(r,a.renderMs||300));if(a.renderFail)throw new Error('render broke');return {path:'file:///cache/'+o.out,placed:o.items.length,duration:a.dur};},
   stopSpeaking:async()=>{a.calls.push('stopSpeaking');},
   haptic:async(o)=>{a.calls.push('hap:'+o.pattern+(o.secs?':'+o.secs:''));return {ok:true};},
+  watch:async(o)=>{a.calls.push('watch:'+(JSON.parse(o.json).type));(window.__watchMsgs=window.__watchMsgs||[]).push(JSON.parse(o.json));return {ok:true};},
   voices:async()=>({voices:[{id:'com.apple.voice.enhanced.en-US.Zoe',name:'Zoe',lang:'en-US',quality:'enhanced'}]}),
   nowPlaying:async(o)=>{a.calls.push('np:'+o.title+'|'+o.artist);},
   addListener:(n,f)=>{a.L[n]=f;return {remove(){}};},

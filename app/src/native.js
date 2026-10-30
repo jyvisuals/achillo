@@ -119,6 +119,9 @@ function makeNativeTrack() {
   AchAudio.addListener('routeLost', () => { if (playing) { pos = cur(); playing = false; } window.dispatchEvent(new Event('ach:routeLost')); });
   AchAudio.addListener('remote', (e) => { log('remote command:', e && e.cmd); window.dispatchEvent(new CustomEvent('ach:remote', { detail: e })); });
   AchAudio.addListener('log', (e) => log(e && e.msg));
+  // Apple Watch: commands from the wrist arrive like lock-screen commands; the plan goes out as JSON.
+  AchAudio.addListener('watch', (e) => { log('watch:', e && e.cmd); window.dispatchEvent(new CustomEvent('ach:remote', { detail: Object.assign({ from: 'watch' }, e || {}) })); });
+  window.addEventListener('ach:watch', (e) => { if (e.detail && e.detail.json) AchAudio.watch({ json: e.detail.json }).catch(() => {}); });
   // keep the JS clock honest, and notice if iOS paused the player behind our back
   setInterval(async () => {
     if (fb || !playing || silent || nowMs() < holdPoll) return;

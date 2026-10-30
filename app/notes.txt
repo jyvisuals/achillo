@@ -1,1 +1,1 @@
-Every build now has a version number (1.2.N) and a What to Test note in TestFlight.
+Apple Watch app (first version): your wrist taps the phases, the ring shows reps and sets with a pressure glow, tap to pause, swipe left to skip.

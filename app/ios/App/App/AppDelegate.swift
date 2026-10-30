@@ -3,6 +3,7 @@ import Capacitor
 import AVFoundation
 import MediaPlayer
 import CoreHaptics
+import WatchConnectivity
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -114,6 +115,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         CAPPluginMethod(name: "nowPlaying", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "render", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "haptic", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "watch", returnType: CAPPluginReturnPromise),
     ]
 
     private var player: AVAudioPlayer?
@@ -121,8 +123,16 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
     private var bgAt = Date.distantPast
     private let synth = AVSpeechSynthesizer()
     private var remoteReady = false
+    private let watchLink = WatchLink()
 
     override public func load() {
+        watchLink.onMessage = { [weak self] msg in
+            guard let self = self else { return }
+            // A pause from the wrist stops the cue track right away, even if the page is asleep.
+            if (msg["cmd"] as? String) == "pause" { self.player?.pause(); self.wantPlaying = false; self.updateNowPlayingRate() }
+            self.notifyListeners("watch", data: msg)
+        }
+        watchLink.start()
         synth.usesApplicationAudioSession = true
         NotificationCenter.default.addObserver(self, selector: #selector(routeChanged(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
         // Leaving the app: make sure the cue track keeps running (iOS sometimes stops it on the way out).
@@ -255,6 +265,11 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
     private func hum(_ t: Double, _ d: Double, _ i: Float, _ s: Float) -> CHHapticEvent {
         CHHapticEvent(eventType: .hapticContinuous, parameters: [CHHapticEventParameter(parameterID: .hapticIntensity, value: i), CHHapticEventParameter(parameterID: .hapticSharpness, value: s)], relativeTime: t, duration: d)
     }
+    @objc func watch(_ call: CAPPluginCall) {
+        watchLink.send(call.getString("json") ?? "")
+        call.resolve(["paired": watchLink.paired, "installed": watchLink.installed, "reachable": watchLink.reachable])
+    }
+
     @objc func haptic(_ call: CAPPluginCall) {
         let name = call.getString("pattern") ?? "tap"
         let raw = call.getDouble("secs") ?? 1
@@ -474,5 +489,36 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
                 self.notifyListeners("routeLost", data: [:])
             }
         }
+    }
+}
+
+// Talks to the Apple Watch app: the session plan goes out, pause/skip/end come back.
+final class WatchLink: NSObject, WCSessionDelegate {
+    var onMessage: (([String: Any]) -> Void)?
+    func start() {
+        guard WCSession.isSupported() else { return }
+        WCSession.default.delegate = self
+        WCSession.default.activate()
+    }
+    var paired: Bool { WCSession.isSupported() && WCSession.default.activationState == .activated && WCSession.default.isPaired }
+    var installed: Bool { paired && WCSession.default.isWatchAppInstalled }
+    var reachable: Bool { WCSession.isSupported() && WCSession.default.isReachable }
+    func send(_ json: String) {
+        guard installed, !json.isEmpty else { return }
+        let msg: [String: Any] = ["json": json]
+        if WCSession.default.isReachable {
+            WCSession.default.sendMessage(msg, replyHandler: nil) { _ in try? WCSession.default.updateApplicationContext(msg) }
+        } else {
+            try? WCSession.default.updateApplicationContext(msg)
+        }
+    }
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
+    func sessionDidBecomeInactive(_ session: WCSession) {}
+    func sessionDidDeactivate(_ session: WCSession) { WCSession.default.activate() }
+    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        DispatchQueue.main.async { self.onMessage?(message) }
+    }
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        DispatchQueue.main.async { self.onMessage?(userInfo) }
     }
 }
