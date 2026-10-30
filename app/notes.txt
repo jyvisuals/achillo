@@ -1,1 +1,2 @@
-Haptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds. Turn them on or off with Textures on the watch start screen.
+Quick one is back on the watch. The start screen shows the next quick one by name and highlights it when one is due.
+Haptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds.

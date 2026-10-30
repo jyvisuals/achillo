@@ -1495,6 +1495,8 @@ window.addEventListener('ach:open',e=>{const k=e.detail&&e.detail.kind;if(sess||
 let autoPaused=false;
 // ---- Apple Watch: the phone sends the whole plan; the watch runs the same timeline and taps your wrist.
 function watchSend(o){try{nativeEvt('watch',{json:JSON.stringify(o)});}catch(e){}}
+let __menuLast='';function watchMenu(){try{if(sess)return;const sn=snackNext();const o={type:'menu',snack:sn?ANK_DEF.find(x=>x[0]===sn)[2].split(' · ')[0]:'',due:!!(sn&&snackDue())};const j=JSON.stringify(o);if(j===__menuLast)return;__menuLast=j;watchSend(o);}catch(e){}}
+setInterval(watchMenu,60000);setTimeout(watchMenu,1500);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){__menuLast='';setTimeout(watchMenu,300);}});
 function planOf(stepsIn,title,pos,isPaused,mode){const idx={},ex=[];
   const steps=stepsIn.map(st=>{const k=st.ex;if(idx[k]==null){idx[k]=ex.length;const e=EX[k]||{};const nm=(e.name||k);const m=nm.match(/(\d+) of (\d+)\)?$/);
       const name=nm.replace(/\s*·\s*(set|round)\s+\d+\s+of\s+\d+$/,'').replace(/\s*\(\d+ of \d+\)$/,'').replace(/\s+hold \d+ of \d+$/,' hold');
@@ -1505,7 +1507,7 @@ function planOf(stepsIn,title,pos,isPaused,mode){const idx={},ex=[];
 function watchSync(){if(!sess||window.__extApply)return;watchSend(planOf(sess.steps,$('isoh').textContent,posSeconds(),paused,sess.mode));}
 // The watch can drive the session while this page is asleep: the app's native clock keeps the truth, and we catch up to it here.
 function applyExternal(d){window.__extApply=true;try{
-  if(d.cmd==='start'&&!sess){startSession(false,false,d.mode==='hips'?'hips':'home');}
+  if(d.cmd==='start'&&!sess){if(d.mode==='snack'){const sn=snackNext();if(sn)startSession(false,false,'snack:'+sn);}else startSession(false,false,d.mode==='hips'?'hips':'home');}
   if(!sess)return;
   if(d.cmd==='end'){finish(false);return;}
   if(d.pos==null)return;
@@ -1586,7 +1588,7 @@ function resumeSession(){
   if(sound){$('sNext').textContent='Session resumed. Tap Pause, then Resume, to restart the beeps.';}
   return true;
 }
-function finish(complete){try{document.querySelector('.wrap').classList.remove('mapmode','hipmode');}catch(e){}try{if(window.setPocket)setPocket(false);}catch(e){}stripKey=null;dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});watchSend({type:'end',complete:!!complete});
+function finish(complete){try{document.querySelector('.wrap').classList.remove('mapmode','hipmode');}catch(e){}try{if(window.setPocket)setPocket(false);}catch(e){}stripKey=null;dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});watchSend({type:'end',complete:!!complete});setTimeout(()=>{__menuLast='';watchMenu();},2500);
   clearInterval(timer);timer=null; stopTrack(); if(wake){try{wake.release()}catch(e){} wake=null;}
   const d=day(); const w=weekFor(today)||WEEKS[0]; const done=sess?sess.doneEx:[];
   const pressDone=false; const routineDone=false;

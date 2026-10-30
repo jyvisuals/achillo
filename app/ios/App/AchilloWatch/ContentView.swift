@@ -177,6 +177,13 @@ struct StartView: View {
                 } else {
                     Text("Achilló").font(.headline)
                 }
+                if m.snackDue {
+                    Button { m.start("snack") } label: {
+                        Text(m.snackName.isEmpty ? "Quick one" : "Quick one · \(m.snackName)").font(.system(size: 15, weight: .bold)).frame(maxWidth: .infinity).lineLimit(2)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(amber)
+                }
                 Button { m.start("home") } label: {
                     Text("Barefoot PT").font(.system(size: 16, weight: .bold)).frame(maxWidth: .infinity)
                 }
@@ -184,6 +191,11 @@ struct StartView: View {
                 .tint(teal)
                 Button { m.start("hips") } label: {
                     Text("Hips").font(.system(size: 15, weight: .semibold)).frame(maxWidth: .infinity)
+                }
+                if !m.snackDue {
+                    Button { m.start("snack") } label: {
+                        Text(m.snackName.isEmpty ? "Quick one" : "Quick one · \(m.snackName)").font(.system(size: 15, weight: .semibold)).frame(maxWidth: .infinity).lineLimit(2)
+                    }
                 }
                 Button { m.cycleStrength() } label: {
                     Text("Taps: " + ["Normal", "Strong", "Max"][min(2, max(0, m.strength))]).font(.system(size: 14, weight: .semibold)).frame(maxWidth: .infinity)

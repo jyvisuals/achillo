@@ -39,6 +39,11 @@ final class SessionModel: NSObject, ObservableObject {
         didSet { UserDefaults.standard.set(textures, forKey: "tapTextures") }
     }
     private var nextTexAt: Double = 0
+    // Next quick one, as the phone last reported it.
+    @Published var snackName: String = UserDefaults.standard.string(forKey: "snackName") ?? "" {
+        didSet { UserDefaults.standard.set(snackName, forKey: "snackName") }
+    }
+    @Published var snackDue: Bool = false
 
     private(set) var steps: [WStep] = []
     private(set) var exs: [WEx] = []
@@ -299,6 +304,7 @@ final class SessionModel: NSObject, ObservableObject {
     private func apply(_ d: [String: Any]) {
         let type = d["type"] as? String ?? ""
         if type == "end" { finish(complete: (d["complete"] as? Bool) ?? false); return }
+        if type == "menu" { snackName = d["snack"] as? String ?? ""; snackDue = (d["due"] as? Bool) ?? false; return }
         guard type == "plan" else { return }
         let at = Date(timeIntervalSince1970: num(d["at"]) / 1000)
         if let st = d["steps"] as? [[Any]] {
