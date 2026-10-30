@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.75",
+          "buildVersion": "75",
+          "date": "2026-10-30T20:51:48Z",
+          "localizedDescription": "Quick one is back on the watch. The start screen shows the next quick one by name and highlights it when one is due.\nHaptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.75.ipa",
+          "size": 1223838,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.74",
           "buildVersion": "74",
           "date": "2026-10-30T19:42:24Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.73.ipa",
           "size": 1211074,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.72",
-          "buildVersion": "72",
-          "date": "2026-10-30T13:18:19Z",
-          "localizedDescription": "Watch taps are stronger. Each cue is now a firmer, doubled tap. On the watch start screen, set Taps to Normal, Strong or Max.\nSkipping a rest or \"I'm ready\" on the phone now updates the watch too.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.72.ipa",
-          "size": 1211129,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.74",
-      "versionDate": "2026-10-30T19:42:24Z",
-      "versionDescription": "Haptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds. Turn them on or off with Textures on the watch start screen.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.74.ipa",
-      "size": 1216273
+      "version": "1.1.75",
+      "versionDate": "2026-10-30T20:51:48Z",
+      "versionDescription": "Quick one is back on the watch. The start screen shows the next quick one by name and highlights it when one is due.\nHaptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.75.ipa",
+      "size": 1223838
     }
   ],
   "news": []
