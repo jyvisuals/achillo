@@ -1,1 +1,1 @@
-Leaving the app no longer pauses the session (iOS's media pause on the way out is ignored).
+Every build now has a version number (1.2.N) and a What to Test note in TestFlight.
