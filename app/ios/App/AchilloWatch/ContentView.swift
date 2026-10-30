@@ -188,6 +188,9 @@ struct StartView: View {
                 Button { m.cycleStrength() } label: {
                     Text("Taps: " + ["Normal", "Strong", "Max"][min(2, max(0, m.strength))]).font(.system(size: 14, weight: .semibold)).frame(maxWidth: .infinity)
                 }
+                Button { m.toggleTextures() } label: {
+                    Text("Textures: " + (m.textures ? "On" : "Off")).font(.system(size: 14, weight: .semibold)).frame(maxWidth: .infinity)
+                }
                 Text(m.phoneReachable ? "Starts on your phone too; the phone plays the voice." : "Open Achilló on your phone to start a session.")
                     .font(.footnote)
                     .foregroundColor(muted)

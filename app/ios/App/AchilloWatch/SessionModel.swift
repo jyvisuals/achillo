@@ -34,6 +34,11 @@ final class SessionModel: NSObject, ObservableObject {
     @Published var strength: Int = UserDefaults.standard.object(forKey: "tapStrength") as? Int ?? 1 {
         didSet { UserDefaults.standard.set(strength, forKey: "tapStrength") }
     }
+    // Textures: ticks that speed up on the rise, slow on the lower, and a heartbeat on holds.
+    @Published var textures: Bool = UserDefaults.standard.object(forKey: "tapTextures") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(textures, forKey: "tapTextures") }
+    }
+    private var nextTexAt: Double = 0
 
     private(set) var steps: [WStep] = []
     private(set) var exs: [WEx] = []
@@ -127,15 +132,41 @@ final class SessionModel: NSObject, ObservableObject {
             let prev = lastIndex
             lastIndex = n.index
             lastSecond = -1
+            nextTexAt = 0.5   // let the start cue land first
             buzz(for: n, prev: prev)
         }
+        texture(n)
         let sec = Int(ceil(n.left))
         if sec != lastSecond {
             lastSecond = sec
             let k = n.step.kind
             if (k == "rest" || k == "setup") && n.step.secs >= 6 && sec >= 1 && sec <= 3 { cue(.countdown) }
             if k == "hold" && n.step.secs >= 8 && sec >= 1 && sec <= 3 { cue(.countdown) }
-            if k == "hold" && n.step.secs >= 20 && sec > 3 && sec % 10 == 0 && Double(sec) < n.step.secs - 1 { cue(.holdTick) }
+            if !textures && k == "hold" && n.step.secs >= 20 && sec > 3 && sec % 10 == 0 && Double(sec) < n.step.secs - 1 { cue(.holdTick) }
+        }
+    }
+
+    // Rise: gaps shrink 0.7 → 0.2 s. Lower: gaps grow 0.2 → 0.75 s. Hold: lub-dub every couple of seconds,
+    // handing over to the countdown taps for the last 3 s.
+    private func texture(_ n: Now) {
+        guard textures else { return }
+        let k = n.step.kind
+        guard k == "up" || k == "down" || k == "hold" else { return }
+        let elapsed = n.step.secs - n.left
+        guard elapsed >= nextTexAt, n.left > 0.25 else { return }
+        let firm: WKHapticType = strength == 0 ? .click : .start
+        switch k {
+        case "up":
+            WKInterfaceDevice.current().play(firm)
+            nextTexAt = elapsed + max(0.2, 0.7 - 0.5 * n.frac)
+        case "down":
+            WKInterfaceDevice.current().play(firm)
+            nextTexAt = elapsed + 0.2 + 0.55 * n.frac
+        default:
+            if n.step.secs >= 8 && n.left <= 3.2 { nextTexAt = n.step.secs; return }
+            WKInterfaceDevice.current().play(firm)
+            if strength > 0 { DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { WKInterfaceDevice.current().play(.click) } }
+            nextTexAt = elapsed + [3.0, 2.0, 1.5][min(2, max(0, strength))]
         }
     }
 
@@ -186,6 +217,14 @@ final class SessionModel: NSObject, ObservableObject {
     }
 
     func cycleStrength() { strength = (strength + 1) % 3; cue(.holdStart) }
+
+    func toggleTextures() {
+        textures.toggle()
+        guard textures else { cue(.control); return }
+        // a quick taste: five quickening ticks
+        var t = 0.0
+        for g in [0.5, 0.4, 0.3, 0.22, 0.2] { t += g; DispatchQueue.main.asyncAfter(deadline: .now() + t) { WKInterfaceDevice.current().play(.start) } }
+    }
 
     private func finish(complete: Bool) {
         guard active else { return }

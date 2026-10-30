@@ -1,3 +1,1 @@
-Boot-on PT is gone from the app.
-Watch taps are stronger. Each cue is now a firmer, doubled tap. On the watch start screen, set Taps to Normal, Strong or Max.
-Skipping a rest on the phone now updates the watch too.
+Haptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds. Turn them on or off with Textures on the watch start screen.
