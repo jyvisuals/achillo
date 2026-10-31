@@ -1,3 +1,2 @@
-Evening holds: the 2-minute wait before hold 4 is now your third doming set instead of dead time (doming runs 2 sets earlier, 1 here).
-If a BFR morning gets cut short during the cuff isometrics, restarting now gives you just the rest of BFR, not the whole routine again.
-A third Barefoot PT in one day is now stopped with "done twice today", as intended.
+Phone taps have their own button in the session controls. They switch off the moment the watch picks up the session, and only pressing the button turns them back on.
+On an Always On watch, the wrist-down view is now a plain ring and countdown, no glow.

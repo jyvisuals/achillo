@@ -117,7 +117,7 @@ textarea{width:100%;min-height:48px;padding:10px;border:1px solid var(--line);bo
 .sctl .ctlb.stop{background:color-mix(in srgb,var(--warn) 18%,var(--surface));border-color:color-mix(in srgb,var(--warn) 55%,transparent);color:var(--warn)}
 .sctl.paused .ctlb.go,.sctl.paused #tJump{display:none}.sctl.paused{grid-template-columns:1fr 1fr}
 .sctl.paused #tPause{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.sctl.aud{grid-template-columns:1fr 1fr;max-width:200px;margin-top:4px;margin-left:auto;margin-right:auto}.sctl.aud .ctlb{min-height:44px}.sctl.aud .ctlb.off{opacity:.55}
+.sctl.aud{grid-template-columns:repeat(4,1fr);max-width:272px;margin-top:4px;margin-left:auto;margin-right:auto}.sctl.aud .ctlb{min-height:44px}.sctl.aud .ctlb.off{opacity:.55}
 .snackpick{margin:8px 0 2px;font-size:14px}.snackpick small{font-size:12px}
 .jumplist{display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow:auto;width:100%}.jumprow{text-align:left;width:100%}.jumprow.done{opacity:.55}.jumprow.now{border-color:var(--hold)}
 .reps i.done{background:var(--hold)}
@@ -671,7 +671,7 @@ pre.rtext{display:none}
     <audio id="track" playsinline preload="auto" hidden></audio>
     <div class="audwarn" id="audWarn" hidden><span id="audWarnT">Audio didn't start.</span><button id="audRetry">Retry audio</button></div>
     <div class="verdict go" id="sDone" hidden></div>
-    <div class="sctl aud" id="audRow"><button id="tAud" class="ctlb" aria-label="Voice and cues"></button><button id="tVol" class="ctlb" aria-label="Cue volume"></button><button id="tPocket" class="ctlb" aria-label="Pocket mode" title="Pocket mode"><i class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 6.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 10v6m-2.6-2.6L12 16l2.6-2.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button></div>
+    <div class="sctl aud" id="audRow"><button id="tAud" class="ctlb" aria-label="Voice and cues"></button><button id="tVol" class="ctlb" aria-label="Cue volume"></button><button id="tHap" class="ctlb" aria-label="Phone taps" title="Phone taps"><i class="ic"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 8v8M20 8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></i><span class="l" id="tHapL">Taps</span></button><button id="tPocket" class="ctlb" aria-label="Pocket mode" title="Pocket mode"><i class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 6.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 10v6m-2.6-2.6L12 16l2.6-2.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button></div>
     <div class="sstrip" id="sessStrip" aria-hidden="true"></div><div class="stime" id="sessTime"></div>
   </section>
 
@@ -1511,6 +1511,11 @@ function planOf(stepsIn,title,pos,isPaused,mode){const idx={},ex=[];
       ex.push([name,e.reps||1,m?+m[1]:1,m?+m[2]:1,rest?1:0]);}
     return [st.kind,st.kind==='mark'?0:st.secs,idx[k],st.rep||0,st.label||''];});
   return {type:'plan',title,mode:mode||'',steps,ex,pos,at:Date.now(),paused:!!isPaused};}
+// Phone taps: on for each new session, off the moment the watch takes the session. Only a press turns them back on.
+let phoneTaps=true,phoneTapsWhy='',phoneTapsPinned=false;window.__phoneTaps=true; // pinned: pressed on by hand, so the watch can't turn them off again this session
+function setPhoneTaps(on,why){if(why==='button')phoneTapsPinned=on;else if(why==='new session')phoneTapsPinned=false;else if(phoneTapsPinned)return;if(phoneTaps===on)return;phoneTaps=on;window.__phoneTaps=on;phoneTapsWhy=why||'';dbg('phone taps:',on?'on':'off','('+(why||'button')+')');renderPhoneTaps();}
+function renderPhoneTaps(){const b=$('tHap');if(!b)return;b.classList.toggle('off',!phoneTaps);$('tHapL').textContent=phoneTaps?'Taps':phoneTapsWhy==='watch'?'Taps · watch':'Taps off';b.title=phoneTaps?'Phone taps on':'Phone taps off'+(phoneTapsWhy==='watch'?' (the watch has them)':'');}
+$('tHap').onclick=()=>setPhoneTaps(!phoneTaps,'button');
 function watchSync(){if(!sess||window.__extApply)return;watchSend(planOf(sess.steps,$('isoh').textContent,posSeconds(),paused,sess.mode));}
 // The watch can drive the session while this page is asleep: the app's native clock keeps the truth, and we catch up to it here.
 function applyExternal(d){window.__extApply=true;try{
@@ -1531,6 +1536,7 @@ function applyExternal(d){window.__extApply=true;try{
   lastShown=null;tick();persist();if(trackOn)syncTrack();
 }finally{window.__extApply=false;}}
 window.addEventListener('ach:remote',e=>{const c=e.detail&&e.detail.cmd;
+  if(e.detail&&e.detail.from==='watch'){setPhoneTaps(false,'watch');if(c==='ack')return;}
   if(e.detail&&e.detail.from==='watch'&&c==='start'&&sess){dbg('watch: start while running, resent the session');watchSync();return;}
   if(e.detail&&e.detail.from==='watch'&&(e.detail.pos!=null||c==='start'||c==='end')){applyExternal(e.detail);return;}
   if(c==='start'&&!sess){const md=e.detail.mode==='hips'?'hips':'home';startSession(false,false,md);return;}
@@ -1580,7 +1586,7 @@ function startSession(withPress,withRoutine,mode){dbg('session: start',mode||'')
   {const d=day();const L=homeLeft(d);if(mode==='home'&&(d.homeN||0)===1&&L.length&&L.every(k=>k==='calfman'||k==='pfwall')){d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: evening round, BFR-covered leftovers dropped');}}
   if(mode==='home'&&((day().homeN||0)>=2&&!(day().ankleDone||[]).some(isHome)||!homeList().length)){const d=day();if((d.homeN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Barefoot PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: fresh pass');}
   if(mode==='gym'&&!gymLeft(day()).length){const d=day();if((d.gymN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Boot-on PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: fresh pass');}
-  sess=build(withPress,withRoutine,mode); sess.t0=Date.now(); paused=false; pauseStart=0; lastShown=null;
+  sess=build(withPress,withRoutine,mode); sess.t0=Date.now(); setPhoneTaps(true,'new session'); paused=false; pauseStart=0; lastShown=null;
   enter(0,Date.now(),true); beep(780,150); sayStep(); beginRun(); persist(); startTrack(); watchSync();
 }
 function resumeSession(){

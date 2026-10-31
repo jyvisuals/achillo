@@ -340,6 +340,7 @@ final class SessionModel: NSObject, ObservableObject {
         if !active {
             active = true
             finished = nil
+            sendCmd("ack")   // tell the phone the wrist has the taps now
             lastIndex = -1
             startRuntime()
             startTimer()

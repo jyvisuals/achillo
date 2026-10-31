@@ -369,6 +369,8 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
                 planPos = to; planAt = Date()
                 if let p = player { p.currentTime = max(0, min(to, p.duration)) }
             }
+        case "ack":
+            notifyListeners("watch", data: ["from": "watch", "cmd": "ack"], retainUntilConsumed: true); return
         case "end":
             planActive = false
             player?.pause(); wantPlaying = false
@@ -395,8 +397,6 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         let raw = call.getDouble("secs") ?? 1
         let secs = max(0.2, min(raw, 6))
         let k = Float(max(0.3, min(call.getDouble("strength") ?? 1, 1)))
-        // The watch app is open and running the session: let the wrist do the buzzing.
-        if watchLink.reachable && planActive { call.resolve(["ok": true, "skipped": "watch"]); return }
         main {
             guard let e = self.engine() else { call.resolve(["ok": false]); return }
             var ev: [CHHapticEvent] = []

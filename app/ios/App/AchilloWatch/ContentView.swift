@@ -22,6 +22,7 @@ struct ContentView: View {
 // Style A: outer ring = reps, thin inner ring = sets, a glow behind the ring = how hard to push.
 struct SessionView: View {
     @EnvironmentObject var m: SessionModel
+    @Environment(\.isLuminanceReduced) private var dim   // wrist down on an Always On watch
     let n: SessionModel.Now
 
     private var waiting: Bool { n.step.kind == "rest" || n.step.kind == "setup" || n.ex.rest }
@@ -30,11 +31,16 @@ struct SessionView: View {
     var body: some View {
         ZStack {
             Color.black
-            // Whole-screen warmth on exertion: brightest at the edges, fades toward the numbers.
-            RadialGradient(colors: [amber.opacity(0.05), amber.opacity(0.32)], center: .center, startRadius: 20, endRadius: 140)
-                .opacity(waiting || m.paused ? 0 : m.effort(n))
-                .animation(.easeInOut(duration: 0.25), value: m.effort(n))
-            RingView(n: n, effort: m.effort(n), waiting: waiting)
+            if dim {
+                // Dimmed: just the ring outline, no glow, so the countdown reads at a glance.
+                RingView(n: n, effort: 0, waiting: waiting).opacity(0.55)
+            } else {
+                // Whole-screen warmth on exertion: brightest at the edges, fades toward the numbers.
+                RadialGradient(colors: [amber.opacity(0.05), amber.opacity(0.32)], center: .center, startRadius: 20, endRadius: 140)
+                    .opacity(waiting || m.paused ? 0 : m.effort(n))
+                    .animation(.easeInOut(duration: 0.25), value: m.effort(n))
+                RingView(n: n, effort: m.effort(n), waiting: waiting)
+            }
             VStack(spacing: 2) {
                 Text(header)
                     .font(.system(size: 13, weight: .bold))
