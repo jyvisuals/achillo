@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.76",
+          "buildVersion": "76",
+          "date": "2026-10-31T00:20:38Z",
+          "localizedDescription": "Watch taps now follow effort: they build as you press, stay dense through the hold, and thin out as you let go.\nWhile the watch app is running a session, the phone stops buzzing so the two don't fight.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.76.ipa",
+          "size": 1223997,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.75",
           "buildVersion": "75",
           "date": "2026-10-30T20:51:48Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.74.ipa",
           "size": 1216273,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.73",
-          "buildVersion": "73",
-          "date": "2026-10-30T18:20:09Z",
-          "localizedDescription": "Boot-on PT is gone from the app.\nWatch taps are stronger. Each cue is now a firmer, doubled tap. On the watch start screen, set Taps to Normal, Strong or Max.\nSkipping a rest on the phone now updates the watch too.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.73.ipa",
-          "size": 1211074,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.75",
-      "versionDate": "2026-10-30T20:51:48Z",
-      "versionDescription": "Quick one is back on the watch. The start screen shows the next quick one by name and highlights it when one is due.\nHaptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.75.ipa",
-      "size": 1223838
+      "version": "1.1.76",
+      "versionDate": "2026-10-31T00:20:38Z",
+      "versionDescription": "Watch taps now follow effort: they build as you press, stay dense through the hold, and thin out as you let go.\nWhile the watch app is running a session, the phone stops buzzing so the two don't fight.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.76.ipa",
+      "size": 1223997
     }
   ],
   "news": []
