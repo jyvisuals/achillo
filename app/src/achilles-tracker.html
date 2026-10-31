@@ -1291,7 +1291,7 @@ function renderMapTrend(){const el=$('trendMap');if(!el)return;if(!mapLog.length
     return '<div class="mb"><span>'+x.name+'</span><div class="bar"><i style="width:'+(avg==null?0:Math.round(avg/3*100))+'%"></i></div><span class="v">'+(avg==null?'—':avg.toFixed(1))+'</span></div>';}).join('');
   el.innerHTML='<div class="eyebrow">Calf map · left leg, last 3 sessions (0–3)</div><div class="mapbars">'+rows+'</div>';}
 renderMapTrend();
-window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k],recordDone:k=>recordDone(k),finish:c=>finish(c)};
+window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k],recordDone:k=>recordDone(k),finish:c=>finish(c),renderNow:()=>renderNow()};
 (function loop(){try{if(sess&&document.visibilityState==='visible')drawSegs();}catch(e){}requestAnimationFrame(loop);})();
 function setRing(frac,snap){if(snap){arc.classList.add('snap');}arc.style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,frac))));if(snap){void arc.offsetWidth;arc.classList.remove('snap');}}
 const ringEl=document.querySelector('.ring');
@@ -1427,13 +1427,17 @@ track.addEventListener('pause',()=>{if(trackOn&&sess&&!paused){setTimeout(()=>{i
 track.addEventListener('ended',()=>{if(sess&&trackOn){lastShown=null;tick();}});
 // Pre-render the next likely session's cue track while the page is idle, so Start is instant.
 const pre={key:null,url:null,busy:false}; window.__pre=pre;
+const preQ={key:null,url:null,busy:false}; // the next quick one, ready for a Start from the watch
 const listKey=l=>vol+':'+l.join('|');
 async function prebuild(mode,wp,wr){try{if(sess||pre.busy||!sound)return;preAssume=true;let b;try{b=build(wp,wr,mode);}finally{preAssume=false;}if(!b.list.length)return;const k=listKey(b.list);if(pre.key===k&&pre.url)return;
   pre.busy=true;const url=await buildTrackFor(b.steps);if(pre.url)URL.revokeObjectURL(pre.url);pre.key=k;pre.url=url;
   if(track.__prepare){track.__opts=voiceOpts();track.__prepare(url,voice?speechPlan(b.steps,b.list):[],{rate:prefs.rate,voice:prefs.voice},JSON.stringify(planOf(b.steps,mode==='hips'?'Hips':'Barefoot PT',0,false,mode||'home')));}}catch(e){}finally{pre.busy=false;}}
+async function prebuildQuick(){try{if(sess||preQ.busy||pre.busy||!sound||!track.__prepare)return;const sn=snackNext();if(!sn)return;const mode='snack:'+sn;const b=build(false,false,mode);if(!b.list.length)return;const k=listKey(b.list);if(preQ.key===k&&preQ.url)return;
+  preQ.busy=true;const url=await buildTrackFor(b.steps);if(preQ.url)URL.revokeObjectURL(preQ.url);preQ.key=k;preQ.url=url;
+  track.__opts=voiceOpts();track.__prepare(url,voice?speechPlan(b.steps,b.list):[],{rate:prefs.rate,voice:prefs.voice},JSON.stringify(planOf(b.steps,'Quick one',0,false,mode)),'quick');}catch(e){}finally{preQ.busy=false;}}
 let preHint=null;
 function hint(mode,wp,wr){preHint=[mode,wp,wr];}
-function prebuildNext(){if(!preHint||sess)return;const [m,wp,wr]=preHint;setTimeout(()=>prebuild(m,wp,wr),300);}
+function prebuildNext(){if(sess)return;const h=preHint;setTimeout(async()=>{if(h){const [m,wp,wr]=h;await prebuild(m,wp,wr);}await prebuildQuick();},300);}
 let trackStarting=false, trackGen=0;
 async function startTrack(){ // call from a user gesture
   if(!sound||!sess||trackStarting)return; trackStarting=true; try{await startTrack_();}finally{trackStarting=false;}}
@@ -1449,7 +1453,7 @@ async function startTrack_(){
   if(!window.__nativeApp){try{track.src=SILENT;await Promise.race([track.play(),new Promise(r=>setTimeout(r,800))]);}catch(e){}} // unlock (browsers only)
   if(!sess)return; sess.baked=false; track.__opts=voiceOpts();
   if(trackURL){URL.revokeObjectURL(trackURL);trackURL=null;}
-  const k=listKey(sess.list); if(pre.url&&pre.key===k){trackURL=pre.url;pre.url=null;pre.key=null;dbg('audio: using prebuilt track',ms());} else {trackURL=await buildTrack();dbg('audio: built track',ms());} if(!sess)return;
+  const k=listKey(sess.list);const hit=[pre,preQ].find(c=>c.url&&c.key===k); if(hit){trackURL=hit.url;hit.url=null;hit.key=null;dbg('audio: using prebuilt track',ms());} else {trackURL=await buildTrack();dbg('audio: built track',ms());} if(!sess)return;
   track.src=trackURL; track.loop=false; track.onloadedmetadata=()=>{try{track.currentTime=posSeconds();}catch(e){}};
   try{track.currentTime=posSeconds();}catch(e){}
   if(!sess)return;
@@ -1519,13 +1523,13 @@ $('tHap').onclick=()=>setPhoneTaps(!phoneTaps,'button');
 function watchSync(){if(!sess||window.__extApply)return;watchSend(planOf(sess.steps,$('isoh').textContent,posSeconds(),paused,sess.mode));}
 // The watch can drive the session while this page is asleep: the app's native clock keeps the truth, and we catch up to it here.
 function applyExternal(d){window.__extApply=true;try{
-  if(d.cmd==='start'&&!sess){setTimeout(()=>{if(sess)watchSync();},80);if(d.mode==='snack'){const sn=snackNext();if(sn)startSession(false,false,'snack:'+sn);}else startSession(false,false,d.mode==='hips'?'hips':'home');}
+  if(d.cmd==='start'&&!sess){setTimeout(()=>{if(sess)watchSync();},80);if(/^snack:/.test(d.mode||'')&&EX[(d.mode.slice(6))]||/^snack:/.test(d.mode||'')&&ANK_KEYS[d.mode.slice(6)])startSession(false,false,d.mode);else if(d.mode==='snack'){const sn=snackNext();if(sn)startSession(false,false,'snack:'+sn);}else startSession(false,false,d.mode==='hips'?'hips':'home');}
   if(!sess)return;
   if(d.cmd==='end'){finish(false);return;}
   if(d.pos==null)return;
   const offs=stepOffsets(),n=sess.steps.length,total=offs[n-1]+(sess.steps[n-1].kind==='mark'?0:sess.steps[n-1].secs);
   const now=Date.now(),pos=d.pos+(d.paused?0:Math.max(0,(now-d.at)/1000));
-  if(pos>=total-0.05){finish(true);return;}
+  if(pos>=total-0.05){const seen=new Set();for(let j=sess.i;j<n;j++){const k=sess.steps[j].ex;if(k&&!seen.has(k)){seen.add(k);if(!sess.doneEx.includes(k))sess.doneEx.push(k);recordDone(k);}}dbg('watch: finished while the phone slept');finish(true);return;}
   let idx=0;for(let i=0;i<n;i++){if(offs[i]<=pos)idx=i;else break;}
   while(idx<n-1&&sess.steps[idx].kind==='mark')idx++;
   if(idx>sess.i){const to=sess.steps[idx].ex;const seen=new Set();for(let j=sess.i;j<idx;j++){const k=sess.steps[j].ex;if(k&&k!==to&&!seen.has(k)){seen.add(k);recordDone(k);}}}

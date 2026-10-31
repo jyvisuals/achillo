@@ -276,7 +276,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
     @objc func preparePlan(_ call: CAPPluginCall) {
         let json = call.getString("json") ?? "", path = call.getString("path") ?? ""
         main {
-            if let o = Self.parse(json), !path.isEmpty { self.preparedPlan = o; self.preparedPath = path; self.preparedMode = (o["mode"] as? String) ?? "home" }
+            if let o = Self.parse(json), !path.isEmpty { self.prepared[Self.slotOf((o["mode"] as? String) ?? "home")] = (o, path) }
             call.resolve()
         }
     }
@@ -290,9 +290,9 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
     private var planAt = Date()
     private var planPaused = false
     private var planActive = false
-    private var preparedPlan: [String: Any]? = nil
-    private var preparedPath: String? = nil
-    private var preparedMode = "home"
+    // Ready-to-play sessions by kind: "home", "hips", "snack" (the next quick one).
+    private var prepared: [String: ([String: Any], String)] = [:]
+    private static func slotOf(_ mode: String) -> String { mode.hasPrefix("snack:") ? "snack" : mode }
 
     private static func parse(_ json: String) -> [String: Any]? {
         guard let d = json.data(using: .utf8) else { return nil }
@@ -331,10 +331,11 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         return j < planSteps.count ? planOffsets[j] : planTotal
     }
 
-    private func startPrepared() -> Bool {
-        guard let o = preparedPlan, let path = preparedPath else { return false }
+    private func startPrepared(_ slot: String) -> String? {
+        guard let entry = prepared[slot] else { return nil }
+        let (o, path) = entry
         guard let url = path.hasPrefix("file://") ? URL(string: path) : URL(fileURLWithPath: path),
-              let p = try? AVAudioPlayer(contentsOf: url) else { return false }
+              let p = try? AVAudioPlayer(contentsOf: url) else { return nil }
         activate()
         player?.stop()
         p.delegate = self
@@ -348,12 +349,13 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         loadPlan(fresh)
         p.currentTime = 0
         wantPlaying = p.play()
-        preparedPlan = nil
-        return true
+        prepared[slot] = nil
+        return (o["mode"] as? String) ?? slot
     }
 
     private func handleWatch(_ msg: [String: Any]) {
         let cmd = msg["cmd"] as? String ?? ""
+        var startedMode: String? = nil
         switch cmd {
         case "pause":
             if planActive && !planPaused { planPos = clockPos(); planAt = Date(); planPaused = true }
@@ -375,12 +377,13 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
             planActive = false
             player?.pause(); wantPlaying = false
         case "start":
-            if !planActive && preparedMode == ((msg["mode"] as? String) ?? "home") { _ = startPrepared() }
+            if !planActive, let m = startPrepared(Self.slotOf((msg["mode"] as? String) ?? "home")) { startedMode = m }
         default: break
         }
         updateNowPlayingRate()
         var out = msg
         out["from"] = "watch"
+        if let m = startedMode { out["mode"] = m }   // the exact session that began, e.g. snack:doming
         if planActive, var o = plan {
             planPos = clockPos(); planAt = Date()
             out["pos"] = planPos; out["at"] = planAt.timeIntervalSince1970 * 1000; out["paused"] = planPaused

@@ -1,2 +1,2 @@
-Phone taps have their own button in the session controls. They switch off the moment the watch picks up the session, and only pressing the button turns them back on.
-On an Always On watch, the wrist-down view is now a plain ring and countdown, no glow.
+Quick ones now start from the watch with the phone locked: the phone keeps the next quick one rendered and ready, same as Barefoot PT and Hips.
+A session that runs to the end while the phone sleeps is credited when you open the phone.

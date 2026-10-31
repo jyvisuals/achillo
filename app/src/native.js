@@ -27,7 +27,7 @@ function makeNativeTrack() {
   const emit = (t) => { (L[t] || []).forEach((f) => { try { f({ type: t }); } catch (e) {} }); if (t === 'loadedmetadata' && tr.onloadedmetadata) try { tr.onloadedmetadata(); } catch (e) {} };
   let pos = 0, t0 = 0, playing = false, dur = NaN, src = null, ready = Promise.resolve(), silent = true, gen = 0, seekGen = 0, holdPoll = 0;
   const cur = () => (playing ? pos + (nowMs() - t0) / 1000 : pos);
-  let cueUri = null, prepared = null, bakeGen = 0;
+  let cueUri = null, prepared = null, bakeGen = 0; const slots = {};   // prepared tracks by slot: pre (next session), quick (next quick one)
   async function writeTrack(url, myGen, name = 'cue-track.wav', alive = () => myGen === gen) {
     const buf = new Uint8Array(await (await fetch(url)).arrayBuffer());
     const CH = 3 * 174762; let first = true;
@@ -60,9 +60,10 @@ function makeNativeTrack() {
       if (!u || /^data:/.test(u)) { silent = true; ready = Promise.resolve(); return; }
       silent = false;
       ready = (async () => {
-        if (prepared && prepared.url === u && prepared.path && prepared.opts === tr.__opts) {
-          const r = await AchAudio.open({ path: prepared.path }); if (myGen !== gen) return; dur = r.duration; cueUri = prepared.cue;
-          log('using prepared track'); if (prepared.baked) window.dispatchEvent(new Event('ach:baked')); emit('loadedmetadata'); return;
+        const hit = Object.values(slots).find((p) => p && p.url === u && p.path && p.opts === tr.__opts);
+        if (hit) {
+          const r = await AchAudio.open({ path: hit.path }); if (myGen !== gen) return; dur = r.duration; cueUri = hit.cue;
+          log('using prepared track'); if (hit.baked) window.dispatchEvent(new Event('ach:baked')); emit('loadedmetadata'); return;
         }
         const uri = await writeTrack(u, myGen); if (!uri || myGen !== gen) return; cueUri = uri;
         const r = await AchAudio.open({ path: uri }); dur = r.duration; emit('loadedmetadata');
@@ -101,19 +102,21 @@ function makeNativeTrack() {
       } catch (e) { log('bake failed', e); return false; }
     },
     // Ahead of time: save and render the next likely session so Start plays immediately.
-    async __prepare(url, items, opts, planJson) {
+    async __prepare(url, items, opts, planJson, slot) {
       if (fb) return;
-      const key = url, o = tr.__opts;
-      if (prepared && prepared.url === key && prepared.opts === o) return;
-      const mine = { url: key, opts: o, path: null, cue: null }; prepared = mine; const T = nowMs();
+      slot = slot || 'pre';
+      const key = url, o = tr.__opts, cur = slots[slot];
+      if (cur && cur.url === key && cur.opts === o) return;
+      const mine = { url: key, opts: o, path: null, cue: null }; slots[slot] = mine; const T = nowMs();
+      const live = () => slots[slot] === mine;
       try {
-        const cue = await writeTrack(url, 0, 'pre-cue.wav', () => prepared === mine); if (!cue || prepared !== mine) return;
+        const cue = await writeTrack(url, 0, slot + '-cue.wav', live); if (!cue || !live()) return;
         mine.cue = cue;
-        const hand = () => { if (planJson && prepared === mine && mine.path) AchAudio.preparePlan({ json: planJson, path: mine.path }).catch(() => {}); };
-        if (!items || !items.length) { mine.path = cue; log('prepared cue track', Math.round(nowMs() - T) + 'ms'); hand(); return; }
-        const r = await AchAudio.render({ cuePath: cue, items, rate: opts.rate || 1.02, voice: opts.voice || '', out: 'pre-baked.wav' });
-        if (prepared === mine) { mine.path = r.path; mine.baked = true; log('prepared next session with voice:', r.placed, 'lines,', Math.round(nowMs() - T) + 'ms'); hand(); }
-      } catch (e) { log('prepare failed', e); if (prepared === mine) prepared = null; }
+        const hand = () => { if (planJson && live() && mine.path) AchAudio.preparePlan({ json: planJson, path: mine.path }).catch(() => {}); };
+        if (!items || !items.length) { mine.path = cue; log('prepared ' + slot + ' cue track', Math.round(nowMs() - T) + 'ms'); hand(); return; }
+        const r = await AchAudio.render({ cuePath: cue, items, rate: opts.rate || 1.02, voice: opts.voice || '', out: slot + '-baked.wav' });
+        if (live()) { mine.path = r.path; mine.baked = true; log('prepared ' + (slot === 'quick' ? 'next quick one' : 'next session') + ' with voice:', r.placed, 'lines,', Math.round(nowMs() - T) + 'ms'); hand(); }
+      } catch (e) { log('prepare failed', e); if (live()) slots[slot] = null; }
     },
   };
   AchAudio.addListener('ended', () => { pos = dur || cur(); playing = false; emit('ended'); });
