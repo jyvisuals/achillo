@@ -1507,7 +1507,7 @@ function planOf(stepsIn,title,pos,isPaused,mode){const idx={},ex=[];
 function watchSync(){if(!sess||window.__extApply)return;watchSend(planOf(sess.steps,$('isoh').textContent,posSeconds(),paused,sess.mode));}
 // The watch can drive the session while this page is asleep: the app's native clock keeps the truth, and we catch up to it here.
 function applyExternal(d){window.__extApply=true;try{
-  if(d.cmd==='start'&&!sess){if(d.mode==='snack'){const sn=snackNext();if(sn)startSession(false,false,'snack:'+sn);}else startSession(false,false,d.mode==='hips'?'hips':'home');}
+  if(d.cmd==='start'&&!sess){setTimeout(()=>{if(sess)watchSync();},80);if(d.mode==='snack'){const sn=snackNext();if(sn)startSession(false,false,'snack:'+sn);}else startSession(false,false,d.mode==='hips'?'hips':'home');}
   if(!sess)return;
   if(d.cmd==='end'){finish(false);return;}
   if(d.pos==null)return;

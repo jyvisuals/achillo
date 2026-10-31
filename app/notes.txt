@@ -1,1 +1,2 @@
-The whole watch screen now glows warm amber as you push: it builds on the press, holds steady on the hold, and fades as you let go.
+Quick one started from the watch now shows up on the watch too.
+The whole watch screen glows warm amber as you push.
