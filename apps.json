@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.77",
+          "buildVersion": "77",
+          "date": "2026-10-31T00:25:58Z",
+          "localizedDescription": "The whole watch screen now glows warm amber as you push: it builds on the press, holds steady on the hold, and fades as you let go.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.77.ipa",
+          "size": 1226309,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.76",
           "buildVersion": "76",
           "date": "2026-10-31T00:20:38Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.75.ipa",
           "size": 1223838,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.74",
-          "buildVersion": "74",
-          "date": "2026-10-30T19:42:24Z",
-          "localizedDescription": "Haptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds. Turn them on or off with Textures on the watch start screen.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.74.ipa",
-          "size": 1216273,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.76",
-      "versionDate": "2026-10-31T00:20:38Z",
-      "versionDescription": "Watch taps now follow effort: they build as you press, stay dense through the hold, and thin out as you let go.\nWhile the watch app is running a session, the phone stops buzzing so the two don't fight.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.76.ipa",
-      "size": 1223997
+      "version": "1.1.77",
+      "versionDate": "2026-10-31T00:25:58Z",
+      "versionDescription": "The whole watch screen now glows warm amber as you push: it builds on the press, holds steady on the hold, and fades as you let go.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.77.ipa",
+      "size": 1226309
     }
   ],
   "news": []
