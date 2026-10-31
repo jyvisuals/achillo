@@ -1,0 +1,13 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});const p=await b.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.clock.install({time:new Date('2026-10-30T22:00:00')});await p.goto('file:///home/claude/achilles-app/test/out/index.html');await p.waitForTimeout(1500);
+await p.evaluate(()=>__t.start(false,false,'home'));await p.clock.runFor(2000);
+const before=await p.evaluate(()=>({i:__t.sess.i,n:__t.sess.steps.length}));
+await p.clock.pauseAt(new Date(await p.evaluate(()=>Date.now())+500));
+const t0=await p.evaluate(()=>Date.now());
+await p.clock.setSystemTime(new Date(t0+600000));
+const mid=await p.evaluate(()=>!!__t.sess);
+await p.evaluate(()=>window.dispatchEvent(new Event('ach:routeLost')));
+const after=await p.evaluate(()=>__t.sess?{i:__t.sess.i,ex:__t.sess.steps[__t.sess.i].ex}:'no session');
+const log=await p.evaluate(()=>(window.__dbgLog||[]).slice(-6));
+console.log(JSON.stringify(before),mid,JSON.stringify(after),errs);await b.close();})();

@@ -1638,7 +1638,7 @@ $('sImg').onclick=()=>startSession(false,false,'imagery');
 $('sMap').onclick=()=>startSession(false,false,'map');
 $('sHips').onclick=()=>startSession(false,false,'hips');
 let pSrc='',tapPauseAt=0;
-$('tPause').onclick=e=>{if(!sess)return; paused=!paused; dbg('pause:',paused?'on':'off','('+(pSrc||'button')+')');pSrc='';
+$('tPause').onclick=e=>{if(!sess)return; if(!paused){const p0=posSeconds();tick();if(!sess)return;const p1=posSeconds();if(p1-p0>3)dbg('pause: caught up',p0.toFixed(1),'->',p1.toFixed(1),'first');} paused=!paused; dbg('pause:',paused?'on':'off','('+(pSrc||'button')+')');pSrc='';
   if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';try{speechSynthesis.cancel();}catch(e){}if(window.__nativeStopSpeak)window.__nativeStopSpeak();nativeEvt('paused');}
   else{sess.stepEnd+=Date.now()-pauseStart;pauseStart=0;lastShown=null;tick();$('audWarn').hidden=true;
     {const st=sess.steps[sess.i];if(st&&st.kind==='hold')nativeEvt('step',{kind:'hold',ex:st.ex,rep:st.rep,reps:1,secs:Math.max(1,Math.round((sess.stepEnd-Date.now())/1000)),quiet:false,rest:false,first:false});}
