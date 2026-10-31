@@ -1,2 +1,1 @@
-Watch taps now follow effort: they build as you press, stay dense through the hold, and thin out as you let go.
-While the watch app is running a session, the phone stops buzzing so the two don't fight.
+The whole watch screen now glows warm amber as you push: it builds on the press, holds steady on the hold, and fades as you let go.

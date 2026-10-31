@@ -30,6 +30,10 @@ struct SessionView: View {
     var body: some View {
         ZStack {
             Color.black
+            // Whole-screen warmth on exertion: brightest at the edges, fades toward the numbers.
+            RadialGradient(colors: [amber.opacity(0.05), amber.opacity(0.32)], center: .center, startRadius: 20, endRadius: 140)
+                .opacity(waiting || m.paused ? 0 : m.effort(n))
+                .animation(.easeInOut(duration: 0.25), value: m.effort(n))
             RingView(n: n, effort: m.effort(n), waiting: waiting)
             VStack(spacing: 2) {
                 Text(header)
