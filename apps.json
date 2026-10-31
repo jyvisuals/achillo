@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.83",
+          "buildVersion": "83",
+          "date": "2026-10-31T15:51:07Z",
+          "localizedDescription": "Quick ones now start from the watch with the phone locked: the phone keeps the next quick one rendered and ready, same as Barefoot PT and Hips.\nA session that runs to the end while the phone sleeps is credited when you open the phone.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.83.ipa",
+          "size": 1235841,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.82",
           "buildVersion": "82",
           "date": "2026-10-31T14:57:41Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.81.ipa",
           "size": 1226811,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.80",
-          "buildVersion": "80",
-          "date": "2026-10-31T02:49:01Z",
-          "localizedDescription": "Fixed: when the phone was in your pocket and audio dropped out, pausing could yank the session (and the watch) back many minutes. It now catches up to where you really are first.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.80.ipa",
-          "size": 1226403,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.82",
-      "versionDate": "2026-10-31T14:57:41Z",
-      "versionDescription": "Phone taps have their own button in the session controls. They switch off the moment the watch picks up the session, and only pressing the button turns them back on.\nOn an Always On watch, the wrist-down view is now a plain ring and countdown, no glow.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.82.ipa",
-      "size": 1234838
+      "version": "1.1.83",
+      "versionDate": "2026-10-31T15:51:07Z",
+      "versionDescription": "Quick ones now start from the watch with the phone locked: the phone keeps the next quick one rendered and ready, same as Barefoot PT and Hips.\nA session that runs to the end while the phone sleeps is credited when you open the phone.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.83.ipa",
+      "size": 1235841
     }
   ],
   "news": []
