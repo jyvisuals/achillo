@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.82",
+          "buildVersion": "82",
+          "date": "2026-10-31T14:57:41Z",
+          "localizedDescription": "Phone taps have their own button in the session controls. They switch off the moment the watch picks up the session, and only pressing the button turns them back on.\nOn an Always On watch, the wrist-down view is now a plain ring and countdown, no glow.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.82.ipa",
+          "size": 1234838,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.81",
           "buildVersion": "81",
           "date": "2026-10-31T02:56:49Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.80.ipa",
           "size": 1226403,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.79",
-          "buildVersion": "79",
-          "date": "2026-10-31T00:42:35Z",
-          "localizedDescription": "Sessions started from the watch now show up on the watch.\nTapping Start again on the watch mid-session no longer restarts the session on the phone.\nThe whole watch screen glows warm amber as you push.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.79.ipa",
-          "size": 1226348,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.81",
-      "versionDate": "2026-10-31T02:56:49Z",
-      "versionDescription": "Evening holds: the 2-minute wait before hold 4 is now your third doming set instead of dead time (doming runs 2 sets earlier, 1 here).\nIf a BFR morning gets cut short during the cuff isometrics, restarting now gives you just the rest of BFR, not the whole routine again.\nA third Barefoot PT in one day is now stopped with \"done twice today\", as intended.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.81.ipa",
-      "size": 1226811
+      "version": "1.1.82",
+      "versionDate": "2026-10-31T14:57:41Z",
+      "versionDescription": "Phone taps have their own button in the session controls. They switch off the moment the watch picks up the session, and only pressing the button turns them back on.\nOn an Always On watch, the wrist-down view is now a plain ring and countdown, no glow.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.82.ipa",
+      "size": 1234838
     }
   ],
   "news": []
