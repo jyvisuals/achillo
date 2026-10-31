@@ -1012,7 +1012,7 @@ MAP_M.forEach(x=>{
   EX['map_'+x.m+'_rate']={name:x.name+' · how clear?',reps:1,setup:0,phases:[['rest','Rate it',12,'How clearly did you feel it on the left? Tap 0 to 3.']],rest:0,base:'map_'+x.m,rate:x.m,muscle:x.m,side:'L'};
   MAP_LIST.push('map_'+x.m+'_R','map_'+x.m+'_L','map_'+x.m+'_rate');});
 EX.arest={name:'Rest between sets',reps:1,setup:0,phases:[['rest','Rest',15,'Fifteen seconds.']],rest:0};
-const ANK_KEYS={}; // base -> [expanded keys]
+const ANK_KEYS={},ANK_FULL={}; // base -> [expanded keys]; ANK_FULL: the whole block, for quick ones
 ANK_DEF.forEach(([k,sets,name,reps,setup,setupCue,phases,inBoot])=>{ANK_KEYS[k]=[];
   for(let i=1;i<=sets;i++){const key=sets>1?k+'_'+i:k; EX[key]={name:name+(sets>1?' · set '+i+' of '+sets:''),reps,setup:i===1?setup:0,setupCue,phases,rest:0,base:k,inBoot};
     if(i>1)ANK_KEYS[k].push('arest'); ANK_KEYS[k].push(key);}});
@@ -1032,9 +1032,14 @@ ANK_DEF.forEach(([k,sets,name,reps,setup,setupCue,phases,inBoot])=>{ANK_KEYS[k]=
   for(let i=1;i<=4;i++)EX['pfwall_'+i].name='Plantarflexion isometric · 30 s hold '+i+' of 4';
   // Chris's version: 3 sets of 3 × 15 s holds at 3–4/10.
   for(let i=1;i<=3;i++)EX['pfc_'+i]={name:'Plantarflexion isometric · 15 s holds · set '+i+' of 3',reps:3,setup:i===1?10:0,setupCue:'Boot off. Sit, knee slightly bent, a ball between the ball of your foot and the wall, foot pointed. Set the distance so the foot never comes up past {HINGE}.',phases:[['up','Press',2,'Press the ball of the foot into the ball.'],['hold','Hold',15,'Hold it. Three or four out of ten.'],['down','Release',2,'Ease off.'],['rest','Rest',8,'Rest.']],rest:0,base:'pfwall',inBoot:false};
-  const DAVID=['pfwall_1','circ_cw','pfrest','pfwall_2','circ_ccw','pfrest','pfwall_3','pfrest2','pfwall_4'],CHRIS=['pfc_1','arest','pfc_2','arest','pfc_3'];
+  // The 2-minute recovery before hold 4 is filled with the third doming set (it moves here from the doming block in the evening).
+  EX.pfdome=Object.assign({},EX.doming_3,{base:'pfwall',setup:6,setupCue:'Rest for the calf: foot off the ball, one set of doming while it recovers.'});
+  const DAVID=['pfwall_1','circ_cw','pfrest','pfwall_2','circ_ccw','pfrest','pfwall_3','arest','pfdome','arest','pfwall_4'],CHRIS=['pfc_1','arest','pfc_2','arest','pfc_3'];
+  const evening=()=>{try{return (day().homeN||0)>=1;}catch(e){return false;}};
   // Morning round gets Chris's version, evening round gets David's.
-  Object.defineProperty(ANK_KEYS,'pfwall',{get(){let n=0;try{n=day().homeN||0;}catch(e){}return n>=1?DAVID:CHRIS;},enumerable:true,configurable:true});})();
+  Object.defineProperty(ANK_KEYS,'pfwall',{get(){return evening()?DAVID:CHRIS;},enumerable:true,configurable:true});
+  const DOM3=ANK_KEYS.doming.slice(),DOM2=DOM3.slice(0,3);ANK_FULL.doming=DOM3;
+  Object.defineProperty(ANK_KEYS,'doming',{get(){return evening()&&ankBases().includes('pfwall')?DOM2:DOM3;},enumerable:true,configurable:true});})();
 // ---- Hips: Chris's daily hip mobility, one guided session.
 const HIP_NAMES={};const HIPS=[];
 (function(){const add=(g,name,key,o)=>{HIP_NAMES[g]=name;EX[key]=Object.assign({rest:0,base:g,hips:true},o);HIPS.push(key);};
@@ -1109,6 +1114,8 @@ function bfrPending(){const d=day();const v=verdictKind(TODAY);return bfrPlanned
 // Chris's pattern: calf raises under the cuff → cuff off 1–3 min (scar massage fills it) → band isometric under the cuff → deflate → the rest of the no-cuff work.
 function homeList(){const d=day();const left=homeLeft(d);
   if(!bfrPending())return left.flatMap(k=>ANK_KEYS[k]);
+  // The round was credited (calf raises + scar done) but the cuff isometrics were cut short: just finish those.
+  if(d.bfrA&&(d.homeN||0)>=1&&d.homeAt&&Date.now()-d.homeAt<4*3600e3&&!(d.ankleDone||[]).some(isHome))return ['bpi1','srest','bpi2','srest','bpi3','srest','bpi4','deflatex'];
   const gap=left.includes('scar')?ANK_KEYS.scar:['cuffoff'];
   const after=left.filter(k=>k!=='scar').flatMap(k=>ANK_KEYS[k]);
   const calf=d.bfrA?[]:['bcr30','srest','bcr15a','srest','bcr15b','srest','bcr15c','cuffdown'];
@@ -1284,7 +1291,7 @@ function renderMapTrend(){const el=$('trendMap');if(!el)return;if(!mapLog.length
     return '<div class="mb"><span>'+x.name+'</span><div class="bar"><i style="width:'+(avg==null?0:Math.round(avg/3*100))+'%"></i></div><span class="v">'+(avg==null?'—':avg.toFixed(1))+'</span></div>';}).join('');
   el.innerHTML='<div class="eyebrow">Calf map · left leg, last 3 sessions (0–3)</div><div class="mapbars">'+rows+'</div>';}
 renderMapTrend();
-window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k]};
+window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k],recordDone:k=>recordDone(k),finish:c=>finish(c)};
 (function loop(){try{if(sess&&document.visibilityState==='visible')drawSegs();}catch(e){}requestAnimationFrame(loop);})();
 function setRing(frac,snap){if(snap){arc.classList.add('snap');}arc.style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,frac))));if(snap){void arc.offsetWidth;arc.classList.remove('snap');}}
 const ringEl=document.querySelector('.ring');
@@ -1292,7 +1299,7 @@ function breathCue(st,left){ // 4 in, 6 out, repeating through the hold
   if(st.kind!=='hold'||st.secs<20){$('tBreath').textContent='';ringEl.classList.remove('breathe');return;}
   ringEl.classList.add('breathe'); const t=(st.secs-left)%10; $('tBreath').textContent=t<4?'breathe in':'breathe out';}
 function build(withPress,withRoutine,mode,forced){ if(withRoutine===undefined)withRoutine=true;
-  let list; if(forced&&forced.length)list=forced; else if(mode==='home')list=homeList(); else if(mode==='gym')list=gymLeft(day()).flatMap(k=>ANK_KEYS[k]); else if(mode&&mode.startsWith('snack:'))list=ANK_KEYS[mode.slice(6)].slice(); else if(mode==='ankle')list=ankList(); else if(mode&&mode.startsWith('ankle:'))list=ankList(mode.slice(6)); else if(mode==='bfrpress')list=BFR_PRESS.concat(withRoutine?ROUTINE:[]); else if(mode==='bfrquad')list=BFR_QUAD; else if(mode==='foot')list=ankList(); else if(mode==='imagery')list=['imagery']; else if(mode==='map')list=MAP_LIST.slice(); else if(mode==='hips')list=HIPS.slice(); else list=homeList();
+  let list; if(forced&&forced.length)list=forced; else if(mode==='home')list=homeList(); else if(mode==='gym')list=gymLeft(day()).flatMap(k=>ANK_KEYS[k]); else if(mode&&mode.startsWith('snack:')){const L=(ANK_FULL[mode.slice(6)]||ANK_KEYS[mode.slice(6)]).slice();const i=L.indexOf('pfdome');if(i>0)L.splice(i-1,3,'pfrest2');list=L;} else if(mode==='ankle')list=ankList(); else if(mode&&mode.startsWith('ankle:'))list=ankList(mode.slice(6)); else if(mode==='bfrpress')list=BFR_PRESS.concat(withRoutine?ROUTINE:[]); else if(mode==='bfrquad')list=BFR_QUAD; else if(mode==='foot')list=ankList(); else if(mode==='imagery')list=['imagery']; else if(mode==='map')list=MAP_LIST.slice(); else if(mode==='hips')list=HIPS.slice(); else list=homeList();
   const steps=[];
   list.forEach((k,ei)=>{const e=EX[k];if(!e)return;
     const H=t=>t&&t.replace('{HINGE}',bootFor(today).cur.deg+'°');
@@ -1571,7 +1578,7 @@ function startSession(withPress,withRoutine,mode){dbg('session: start',mode||'')
    if(mode==='gym'&&(d.gymN||0)===0&&gymLeft(d).length&&stale(d.gymAt)){d.gymN=1;d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: new round, morning leftovers dropped');}}
   // After a BFR morning, the only "leftovers" are what BFR covered (calf raise, wall isometric). That round is done: start the evening fresh.
   {const d=day();const L=homeLeft(d);if(mode==='home'&&(d.homeN||0)===1&&L.length&&L.every(k=>k==='calfman'||k==='pfwall')){d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: evening round, BFR-covered leftovers dropped');}}
-  if(mode==='home'&&!homeList().length){const d=day();if((d.homeN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Barefoot PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: fresh pass');}
+  if(mode==='home'&&((day().homeN||0)>=2&&!(day().ankleDone||[]).some(isHome)||!homeList().length)){const d=day();if((d.homeN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Barefoot PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: fresh pass');}
   if(mode==='gym'&&!gymLeft(day()).length){const d=day();if((d.gymN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Boot-on PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: fresh pass');}
   sess=build(withPress,withRoutine,mode); sess.t0=Date.now(); paused=false; pauseStart=0; lastShown=null;
   enter(0,Date.now(),true); beep(780,150); sayStep(); beginRun(); persist(); startTrack(); watchSync();
