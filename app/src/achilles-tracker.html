@@ -1524,6 +1524,7 @@ function applyExternal(d){window.__extApply=true;try{
   lastShown=null;tick();persist();if(trackOn)syncTrack();
 }finally{window.__extApply=false;}}
 window.addEventListener('ach:remote',e=>{const c=e.detail&&e.detail.cmd;
+  if(e.detail&&e.detail.from==='watch'&&c==='start'&&sess){dbg('watch: start while running, resent the session');watchSync();return;}
   if(e.detail&&e.detail.from==='watch'&&(e.detail.pos!=null||c==='start'||c==='end')){applyExternal(e.detail);return;}
   if(c==='start'&&!sess){const md=e.detail.mode==='hips'?'hips':'home';startSession(false,false,md);return;}
   if(!sess)return;

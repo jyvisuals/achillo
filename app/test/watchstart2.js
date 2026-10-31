@@ -1,0 +1,10 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});const p=await b.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file:///home/claude/achilles-app/test/out/index.html');await p.waitForTimeout(1500);
+const go=d=>p.evaluate(d=>window.dispatchEvent(new CustomEvent('ach:remote',{detail:d})),d);
+await go({from:'watch',cmd:'start',mode:'snack'});await p.waitForTimeout(400);
+await p.evaluate(()=>__t.jump&&0);await p.click('#tSkip');await p.waitForTimeout(300);
+const i1=await p.evaluate(()=>__t.sess.i);
+await go({from:'watch',cmd:'start',mode:'snack',pos:0,at:Date.now(),paused:false});await p.waitForTimeout(400);
+const i2=await p.evaluate(()=>__t.sess.i);
+console.log('i before',i1,'after repeat start',i2,'plans',await p.evaluate(()=>(window.__watchMsgs||[]).filter(x=>x.type==='plan').length),errs);await b.close();})();

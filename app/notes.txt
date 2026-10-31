@@ -1,2 +1,3 @@
-Quick one started from the watch now shows up on the watch too.
+Sessions started from the watch now show up on the watch.
+Tapping Start again on the watch mid-session no longer restarts the session on the phone.
 The whole watch screen glows warm amber as you push.
