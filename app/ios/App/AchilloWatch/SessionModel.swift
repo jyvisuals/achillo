@@ -282,9 +282,14 @@ final class SessionModel: NSObject, ObservableObject {
         var m: [String: Any] = ["cmd": c]
         for (k, v) in extra { m[k] = v }
         let s = WCSession.default
-        guard s.activationState == .activated, s.isReachable else { return }
-        s.sendMessage(m, replyHandler: nil, errorHandler: nil)
+        guard s.activationState == .activated else { pendingCmds.append(m); return }
+        if s.isReachable {
+            s.sendMessage(m, replyHandler: nil, errorHandler: { _ in s.transferUserInfo(m) })
+        } else if c == "start" || c == "snooze" || c == "markRound" {
+            s.transferUserInfo(m)   // queued: wakes the phone app in the background when it can
+        }
     }
+    private var pendingCmds: [[String: Any]] = []
 
     // MARK: plans from the phone
 
@@ -353,7 +358,11 @@ final class SessionModel: NSObject, ObservableObject {
 extension SessionModel: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         let ctx = session.receivedApplicationContext
-        DispatchQueue.main.async { self.phoneReachable = session.isReachable }
+        DispatchQueue.main.async {
+            self.phoneReachable = session.isReachable
+            let q = self.pendingCmds; self.pendingCmds = []
+            for m in q { if let c = m["cmd"] as? String { self.sendCmd(c, m.filter { $0.key != "cmd" }) } }
+        }
         if !ctx.isEmpty { receive(ctx) }
     }
     func sessionReachabilityDidChange(_ session: WCSession) {

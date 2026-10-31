@@ -1,2 +1,1 @@
-Quick ones now start from the watch with the phone locked: the phone keeps the next quick one rendered and ready, same as Barefoot PT and Hips.
-A session that runs to the end while the phone sleeps is credited when you open the phone.
+Reminders now work from the wrist: when a quick one or a round is due, the watch notification has a Start button that begins it with the phone locked. Snooze and "Done already" work from the watch too.

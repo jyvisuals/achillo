@@ -4,6 +4,7 @@ import AVFoundation
 import MediaPlayer
 import CoreHaptics
 import WatchConnectivity
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -373,6 +374,14 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
             }
         case "ack":
             notifyListeners("watch", data: ["from": "watch", "cmd": "ack"], retainUntilConsumed: true); return
+        case "snooze":   // from a reminder on the wrist: same reminder again in 20 minutes, no page needed
+            let c = UNMutableNotificationContent()
+            c.title = msg["title"] as? String ?? "Achilló"; c.body = msg["body"] as? String ?? ""; c.sound = .default
+            c.categoryIdentifier = msg["category"] as? String ?? "SNACK"
+            let req = UNNotificationRequest(identifier: "snooze-\(Int(Date().timeIntervalSince1970))", content: c, trigger: UNTimeIntervalNotificationTrigger(timeInterval: 20 * 60, repeats: false))
+            UNUserNotificationCenter.current().add(req, withCompletionHandler: nil); return
+        case "markRound":
+            notifyListeners("watch", data: ["from": "watch", "cmd": "markRound"], retainUntilConsumed: true); return
         case "end":
             planActive = false
             player?.pause(); wantPlaying = false
