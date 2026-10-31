@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.79",
+          "buildVersion": "79",
+          "date": "2026-10-31T00:42:35Z",
+          "localizedDescription": "Sessions started from the watch now show up on the watch.\nTapping Start again on the watch mid-session no longer restarts the session on the phone.\nThe whole watch screen glows warm amber as you push.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.79.ipa",
+          "size": 1226348,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.77",
           "buildVersion": "77",
           "date": "2026-10-31T00:25:58Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.76.ipa",
           "size": 1223997,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.75",
-          "buildVersion": "75",
-          "date": "2026-10-30T20:51:48Z",
-          "localizedDescription": "Quick one is back on the watch. The start screen shows the next quick one by name and highlights it when one is due.\nHaptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.75.ipa",
-          "size": 1223838,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.77",
-      "versionDate": "2026-10-31T00:25:58Z",
-      "versionDescription": "The whole watch screen now glows warm amber as you push: it builds on the press, holds steady on the hold, and fades as you let go.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.77.ipa",
-      "size": 1226309
+      "version": "1.1.79",
+      "versionDate": "2026-10-31T00:42:35Z",
+      "versionDescription": "Sessions started from the watch now show up on the watch.\nTapping Start again on the watch mid-session no longer restarts the session on the phone.\nThe whole watch screen glows warm amber as you push.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.79.ipa",
+      "size": 1226348
     }
   ],
   "news": []
