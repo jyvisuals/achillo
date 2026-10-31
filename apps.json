@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.84",
+          "buildVersion": "84",
+          "date": "2026-10-31T16:07:19Z",
+          "localizedDescription": "Reminders now work from the wrist: when a quick one or a round is due, the watch notification has a Start button that begins it with the phone locked. Snooze and \"Done already\" work from the watch too.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.84.ipa",
+          "size": 1251561,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.83",
           "buildVersion": "83",
           "date": "2026-10-31T15:51:07Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.82.ipa",
           "size": 1234838,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.81",
-          "buildVersion": "81",
-          "date": "2026-10-31T02:56:49Z",
-          "localizedDescription": "Evening holds: the 2-minute wait before hold 4 is now your third doming set instead of dead time (doming runs 2 sets earlier, 1 here).\nIf a BFR morning gets cut short during the cuff isometrics, restarting now gives you just the rest of BFR, not the whole routine again.\nA third Barefoot PT in one day is now stopped with \"done twice today\", as intended.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.81.ipa",
-          "size": 1226811,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.83",
-      "versionDate": "2026-10-31T15:51:07Z",
-      "versionDescription": "Quick ones now start from the watch with the phone locked: the phone keeps the next quick one rendered and ready, same as Barefoot PT and Hips.\nA session that runs to the end while the phone sleeps is credited when you open the phone.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.83.ipa",
-      "size": 1235841
+      "version": "1.1.84",
+      "versionDate": "2026-10-31T16:07:19Z",
+      "versionDescription": "Reminders now work from the wrist: when a quick one or a round is due, the watch notification has a Start button that begins it with the phone locked. Snooze and \"Done already\" work from the watch too.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.84.ipa",
+      "size": 1251561
     }
   ],
   "news": []
