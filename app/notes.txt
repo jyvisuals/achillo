@@ -1,2 +1,2 @@
-Quick one is back on the watch. The start screen shows the next quick one by name and highlights it when one is due.
-Haptic textures on the watch: ticks speed up as you rise, slow down as you lower, and a heartbeat pulses through holds.
+Watch taps now follow effort: they build as you press, stay dense through the hold, and thin out as you let go.
+While the watch app is running a session, the phone stops buzzing so the two don't fight.

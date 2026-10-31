@@ -146,32 +146,32 @@ final class SessionModel: NSObject, ObservableObject {
             lastSecond = sec
             let k = n.step.kind
             if (k == "rest" || k == "setup") && n.step.secs >= 6 && sec >= 1 && sec <= 3 { cue(.countdown) }
-            if k == "hold" && n.step.secs >= 8 && sec >= 1 && sec <= 3 { cue(.countdown) }
+            if !textures && k == "hold" && n.step.secs >= 8 && sec >= 1 && sec <= 3 { cue(.countdown) }
             if !textures && k == "hold" && n.step.secs >= 20 && sec > 3 && sec % 10 == 0 && Double(sec) < n.step.secs - 1 { cue(.holdTick) }
         }
     }
 
-    // Rise: gaps shrink 0.7 → 0.2 s. Lower: gaps grow 0.2 → 0.75 s. Hold: lub-dub every couple of seconds,
-    // handing over to the countdown taps for the last 3 s.
+    // Tap density follows effort: sparse → dense as you press, steady and dense through the hold,
+    // then thinning soft clicks as you let go. Rests stay quiet apart from the 3-2-1.
     private func texture(_ n: Now) {
         guard textures else { return }
         let k = n.step.kind
         guard k == "up" || k == "down" || k == "hold" else { return }
         let elapsed = n.step.secs - n.left
-        guard elapsed >= nextTexAt, n.left > 0.25 else { return }
+        guard elapsed >= nextTexAt, n.left > 0.2 else { return }
+        let holdGap = [0.9, 0.6, 0.45][min(2, max(0, strength))]
         let firm: WKHapticType = strength == 0 ? .click : .start
         switch k {
         case "up":
             WKInterfaceDevice.current().play(firm)
-            nextTexAt = elapsed + max(0.2, 0.7 - 0.5 * n.frac)
-        case "down":
+            nextTexAt = elapsed + max(holdGap, 1.1 - (1.1 - holdGap) * n.frac)
+        case "hold":
             WKInterfaceDevice.current().play(firm)
-            nextTexAt = elapsed + 0.2 + 0.55 * n.frac
+            nextTexAt = elapsed + holdGap
         default:
-            if n.step.secs >= 8 && n.left <= 3.2 { nextTexAt = n.step.secs; return }
-            WKInterfaceDevice.current().play(firm)
-            if strength > 0 { DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { WKInterfaceDevice.current().play(.click) } }
-            nextTexAt = elapsed + [3.0, 2.0, 1.5][min(2, max(0, strength))]
+            if n.frac > 0.7 { nextTexAt = n.step.secs; return }   // fully let go before the step ends
+            WKInterfaceDevice.current().play(.click)
+            nextTexAt = elapsed + holdGap + 0.9 * n.frac
         }
     }
 
