@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.87",
+          "buildVersion": "87",
+          "date": "2026-11-01T19:28:16Z",
+          "localizedDescription": "Watch battery: the session clock kept ticking ten times a second after a session ended. It now stops when the session does.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.87.ipa",
+          "size": 1256338,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.86",
           "buildVersion": "86",
           "date": "2026-11-01T03:00:25Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.85.ipa",
           "size": 1252214,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.84",
-          "buildVersion": "84",
-          "date": "2026-10-31T16:07:19Z",
-          "localizedDescription": "Reminders now work from the wrist: when a quick one or a round is due, the watch notification has a Start button that begins it with the phone locked. Snooze and \"Done already\" work from the watch too.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.84.ipa",
-          "size": 1251561,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.86",
-      "versionDate": "2026-11-01T03:00:25Z",
-      "versionDescription": "Reopening the app mid-session now shows a card: where you were, with Resume, Restart this exercise, or End. Unfinished exercises are never credited.\nSkipped exercises show as skipped (not done) in the day log; they still count toward the round.\nVoice and Cues are separate switches now, with a short preview when you turn one on. The watch and home screen both say when the next quick one is due and what your interval is.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.86.ipa",
-      "size": 1256142
+      "version": "1.1.87",
+      "versionDate": "2026-11-01T19:28:16Z",
+      "versionDescription": "Watch battery: the session clock kept ticking ten times a second after a session ended. It now stops when the session does.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.87.ipa",
+      "size": 1256338
     }
   ],
   "news": []
