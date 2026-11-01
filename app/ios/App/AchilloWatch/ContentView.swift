@@ -206,6 +206,9 @@ struct StartView: View {
                     Button { m.start("snack") } label: {
                         Text(m.snackName.isEmpty ? "Quick one" : "Quick one · \(m.snackName)").font(.system(size: 15, weight: .semibold)).frame(maxWidth: .infinity).lineLimit(2)
                     }
+                    if !m.snackNext.isEmpty {
+                        Text("Next at \(m.snackNext)").font(.footnote).foregroundColor(muted)
+                    }
                 }
                 Button { m.cycleStrength() } label: {
                     Text("Taps: " + ["Normal", "Strong", "Max"][min(2, max(0, m.strength))]).font(.system(size: 14, weight: .semibold)).frame(maxWidth: .infinity)

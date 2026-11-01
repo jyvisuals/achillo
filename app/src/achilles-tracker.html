@@ -109,6 +109,7 @@ textarea{width:100%;min-height:48px;padding:10px;border:1px solid var(--line);bo
 .strip i.nd{box-shadow:0 -3px 0 0 var(--hold)}
 .envnote{font-size:12.5px;line-height:1.35;padding:8px 10px;border-radius:10px;background:var(--tint);border:1px solid var(--line);margin:6px 0 2px}.envnote a{color:var(--accent);font-weight:600}
 .sctl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:360px;margin-left:auto;margin-right:auto}
+.resumecard{margin:6px 0 10px;padding:12px 14px;border-radius:14px;background:var(--tint);border:1px solid color-mix(in srgb,var(--line) 70%,transparent)}.resumecard .rc-t{font-weight:700;margin-bottom:4px}.resumecard .rc-b{color:var(--muted);font-size:14px;margin-bottom:10px}.resumecard .rc-btns{display:flex;gap:8px;flex-wrap:wrap}.resumecard .pill.go{background:var(--accent);color:#07110d}
 .sctl .ctlb{min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;padding:6px}
 .sctl .ctlb .l{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .sctl .ic{display:block;width:26px;height:26px}.sctl .ic svg{width:26px;height:26px;fill:currentColor}.sctl.aud #tAud .ic{width:auto}.sctl.aud #tAud .ic svg{width:auto;height:26px}.sctl .ic-play{display:none}.sctl.paused #tPause .ic-pause{display:none}.sctl.paused #tPause .ic-play{display:block}
@@ -117,7 +118,7 @@ textarea{width:100%;min-height:48px;padding:10px;border:1px solid var(--line);bo
 .sctl .ctlb.stop{background:color-mix(in srgb,var(--warn) 18%,var(--surface));border-color:color-mix(in srgb,var(--warn) 55%,transparent);color:var(--warn)}
 .sctl.paused .ctlb.go,.sctl.paused #tJump{display:none}.sctl.paused{grid-template-columns:1fr 1fr}
 .sctl.paused #tPause{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.sctl.aud{grid-template-columns:repeat(4,1fr);max-width:272px;margin-top:4px;margin-left:auto;margin-right:auto}.sctl.aud .ctlb{min-height:44px}.sctl.aud .ctlb.off{opacity:.55}
+.sctl.aud{grid-template-columns:repeat(5,1fr);max-width:330px;margin-top:4px;margin-left:auto;margin-right:auto}.sctl.aud .ctlb{min-height:44px}.sctl.aud .ctlb.off{opacity:.55}
 .snackpick{margin:8px 0 2px;font-size:14px}.snackpick small{font-size:12px}
 .jumplist{display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow:auto;width:100%}.jumprow{text-align:left;width:100%}.jumprow.done{opacity:.55}.jumprow.now{border-color:var(--hold)}
 .reps i.done{background:var(--hold)}
@@ -659,7 +660,7 @@ pre.rtext{display:none}
         <div class="cue" id="tCue"></div>
         <div class="reps" id="reps" aria-label="Reps done"></div>
         <div class="muted" style="font-size:13px" id="sNext"></div>
-        <div class="sctl" id="ctlRow">
+        <div class="resumecard" id="resumeCard" hidden><div class="rc-t">Picking up where you stopped</div><div class="rc-b" id="rcBody"></div><div class="rc-btns"><button id="rcResume" class="pill go">Resume</button><button id="rcRestart" class="pill">Restart this exercise</button><button id="rcEnd" class="pill">End session</button></div></div><div class="sctl" id="ctlRow">
           <button id="tPause" class="ctlb"><i class="ic ic-pause"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></i><i class="ic ic-play"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z"/></svg></i><span class="l">Pause</span></button>
           <button id="tSkip" class="ctlb go"><i class="ic"><svg viewBox="0 0 24 24"><path d="M6 5.5v13l8.5-6.5z"/><rect x="16" y="5" width="2.5" height="14" rx="1"/></svg></i><span class="l">Skip</span></button>
           <button id="tJump" class="ctlb"><i class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="2.4" rx="1.2"/><rect x="4" y="11" width="11" height="2.4" rx="1.2"/><rect x="4" y="16" width="14" height="2.4" rx="1.2"/></svg></i><span class="l">Jump</span></button>
@@ -671,7 +672,7 @@ pre.rtext{display:none}
     <audio id="track" playsinline preload="auto" hidden></audio>
     <div class="audwarn" id="audWarn" hidden><span id="audWarnT">Audio didn't start.</span><button id="audRetry">Retry audio</button></div>
     <div class="verdict go" id="sDone" hidden></div>
-    <div class="sctl aud" id="audRow"><button id="tAud" class="ctlb" aria-label="Voice and cues"></button><button id="tVol" class="ctlb" aria-label="Cue volume"></button><button id="tHap" class="ctlb" aria-label="Phone taps" title="Phone taps"><i class="ic"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 8v8M20 8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></i><span class="l" id="tHapL">Taps</span></button><button id="tPocket" class="ctlb" aria-label="Pocket mode" title="Pocket mode"><i class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 6.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 10v6m-2.6-2.6L12 16l2.6-2.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button></div>
+    <div class="sctl aud" id="audRow"><button id="tVoice" class="ctlb" aria-label="Voice"></button><button id="tCues" class="ctlb" aria-label="Cues"></button><button id="tVol" class="ctlb" aria-label="Cue volume"></button><button id="tHap" class="ctlb" aria-label="Phone taps" title="Phone taps"><i class="ic"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 8v8M20 8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></i><span class="l" id="tHapL">Taps</span></button><button id="tPocket" class="ctlb" aria-label="Pocket mode" title="Pocket mode"><i class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 6.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 10v6m-2.6-2.6L12 16l2.6-2.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button></div>
     <div class="sstrip" id="sessStrip" aria-hidden="true"></div><div class="stime" id="sessTime"></div>
   </section>
 
@@ -1105,7 +1106,11 @@ const isGym=k=>false; // Boot-on PT retired Oct 30
 // Quick ones: Chris's "pick a drill every hour or so" — one boot-on exercise, all its sets, rotating least-recent first.
 const SNACK_POOL=['toeyoga2','doming','invev','bandsup','pfwall'];
 function snackLast(){const d=day();const a=d.snacks||[];return a.length?a[a.length-1].t:0;}
-function snackDue(){const cad=Math.max(30,Number(prefs.cadence)||60);return Date.now()-snackLast()>=(cad-5)*60000;}
+function snackCad(){return Math.max(30,Number(prefs.cadence)||60);}
+function snackDue(){return Date.now()-snackLast()>=(snackCad()-5)*60000;}
+function snackNextAt(){const l=snackLast();return l?new Date(l+snackCad()*60000):null;}
+function fmtClock(t){return t.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});}
+function nextUpLine(){const n=snackNextAt();return (snackDue()||!n?'Quick one is due':'Next quick one at '+fmtClock(n))+' · every '+snackCad()+' min';}
 function snackNext(){const d=day();const a=d.snacks||[];const last={};a.forEach(x=>{last[x.k]=x.t;});
   const y=days[keyOf(new Date(today.getTime()-DAY))];(y&&y.snacks||[]).forEach(x=>{if(!last[x.k])last[x.k]=x.t;});
   const pool=SNACK_POOL.filter(k=>(prefs.pool||SNACK_POOL).includes(k));return (pool.length?pool:SNACK_POOL).slice().sort((p,q)=>(last[p]||0)-(last[q]||0))[0];}
@@ -1456,7 +1461,7 @@ async function startTrack_(){
   if(!window.__nativeApp){try{track.src=SILENT;await Promise.race([track.play(),new Promise(r=>setTimeout(r,800))]);}catch(e){}} // unlock (browsers only)
   if(!sess)return; sess.baked=false; track.__opts=voiceOpts();
   if(trackURL){URL.revokeObjectURL(trackURL);trackURL=null;}
-  const k=listKey(sess.list);const hit=[pre,preQ].find(c=>c.url&&c.key===k); if(hit){trackURL=hit.url;hit.url=null;hit.key=null;dbg('audio: using prebuilt track',ms());} else {trackURL=await buildTrack();dbg('audio: built track',ms());} if(!sess)return;
+  const k=listKey(sess.list);const hit=[pre,preQ].find(c=>c.url&&c.key===k); if(hit){trackURL=hit.url;hit.url=null;hit.key=null;dbg('audio: using prebuilt track',ms());} else {flash('Preparing audio…',4000);trackURL=await buildTrack();dbg('audio: built track',ms());unflash('Preparing audio…');} if(!sess)return;
   if(myGen!==trackGen||paused||!sound){dbg('audio: start dropped,',myGen!==trackGen?'restarted':paused?'paused meanwhile':'sound off');return;}
   track.src=trackURL; track.loop=false; track.onloadedmetadata=()=>{try{track.currentTime=posSeconds();}catch(e){}};
   try{track.currentTime=posSeconds();}catch(e){}
@@ -1491,10 +1496,11 @@ function lockInfo(){try{if(!sess)return;if(!('mediaSession' in navigator)&&!wind
   if(window.__nativeNowPlaying)window.__nativeNowPlaying(title,(paused?'Paused · ':'')+sub);
   if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title,artist:(paused?'Paused · ':'')+sub,album:'Achilló'});}catch(e){}}
 // Check exercises off the moment they finish, not at the end of the session.
-function recordDone(key){try{nativeEvt('done',{key});if(sess&&sess.mode&&sess.mode.startsWith('snack:'))return;const d=day();let changed=false;
+function recordDone(key,how){try{nativeEvt('done',{key});if(sess&&sess.mode&&sess.mode.startsWith('snack:'))return;const d=day();let changed=false;
   if(EX[key]&&EX[key].hips){if(key===HIPS_LAST&&!d.hips){d.hips=1;persist();queueSave(TODAY);renderTasks();renderLog();}return;}
   const base=EX[key]&&EX[key].base;
-  if(base&&key===ankLast(base)&&!(d.ankleDone||[]).includes(base)){d.ankleDone=(d.ankleDone||[]).concat(base);changed=true;sess.ankNew=(sess.ankNew||0)+1;if(isHome(base))d.homeAt=Date.now();if(isGym(base))d.gymAt=Date.now();
+  if(base&&key===ankLast(base)&&!(d.ankleDone||[]).includes(base)){d.ankleDone=(d.ankleDone||[]).concat(base);changed=true;
+    if(how==='skipped'&&!(sess&&sess.doneEx.some(k=>EX[k]&&EX[k].base===base))){d.ankleSkip=(d.ankleSkip||[]).filter(x=>x!==base).concat(base);}else d.ankleSkip=(d.ankleSkip||[]).filter(x=>x!==base);sess.ankNew=(sess.ankNew||0)+1;if(isHome(base))d.homeAt=Date.now();if(isGym(base))d.gymAt=Date.now();
     if(isHome(base)&&!homeLeft(d).length)d.homeN=Math.min((d.homeN||0)+1,2); if(isGym(base)&&!gymLeft(d).length)d.gymN=Math.min((d.gymN||0)+1,2);
     if(!ankLeft(d).length){d.ankle=Math.min((d.ankle||0)+1,2);d.ankleDone=[];d.foot=1;sess.ankRound=true;}}
   if(key==='bcr15c'&&!d.bfrA){d.bfrA=1;changed=true;}
@@ -1510,7 +1516,7 @@ window.addEventListener('ach:open',e=>{const k=e.detail&&e.detail.kind;if(sess||
 let autoPaused=false;
 // ---- Apple Watch: the phone sends the whole plan; the watch runs the same timeline and taps your wrist.
 function watchSend(o){try{nativeEvt('watch',{json:JSON.stringify(o)});}catch(e){}}
-let __menuLast='';function watchMenu(){try{if(sess)return;const sn=snackNext();const o={type:'menu',snack:sn?ANK_DEF.find(x=>x[0]===sn)[2].split(' · ')[0]:'',due:!!(sn&&snackDue())};const j=JSON.stringify(o);if(j===__menuLast)return;__menuLast=j;watchSend(o);}catch(e){}}
+let __menuLast='';function watchMenu(){try{if(sess)return;const sn=snackNext();const nx=snackNextAt();const o={type:'menu',snack:sn?ANK_DEF.find(x=>x[0]===sn)[2].split(' · ')[0]:'',due:!!(sn&&snackDue()),next:nx&&!snackDue()?fmtClock(nx):''};const j=JSON.stringify(o);if(j===__menuLast)return;__menuLast=j;watchSend(o);}catch(e){}}
 setInterval(watchMenu,60000);setTimeout(watchMenu,1500);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){__menuLast='';setTimeout(watchMenu,300);}});
 function planOf(stepsIn,title,pos,isPaused,mode){const idx={},ex=[];
   const steps=stepsIn.map(st=>{const k=st.ex;if(idx[k]==null){idx[k]=ex.length;const e=EX[k]||{};const nm=(e.name||k);const m=nm.match(/(\d+) of (\d+)\)?$/);
@@ -1523,7 +1529,7 @@ function planOf(stepsIn,title,pos,isPaused,mode){const idx={},ex=[];
 let phoneTaps=true,phoneTapsWhy='',phoneTapsPinned=false;window.__phoneTaps=true; // pinned: pressed on by hand, so the watch can't turn them off again this session
 function setPhoneTaps(on,why){if(why==='button')phoneTapsPinned=on;else if(why==='new session')phoneTapsPinned=false;else if(phoneTapsPinned)return;if(phoneTaps===on)return;phoneTaps=on;window.__phoneTaps=on;phoneTapsWhy=why||'';dbg('phone taps:',on?'on':'off','('+(why||'button')+')');renderPhoneTaps();}
 function renderPhoneTaps(){const b=$('tHap');if(!b)return;b.classList.toggle('off',!phoneTaps);$('tHapL').textContent=phoneTaps?'Taps':phoneTapsWhy==='watch'?'Taps · watch':'Taps off';b.title=phoneTaps?'Phone taps on':'Phone taps off'+(phoneTapsWhy==='watch'?' (the watch has them)':'');}
-$('tHap').onclick=()=>setPhoneTaps(!phoneTaps,'button');
+$('tHap').onclick=()=>{setPhoneTaps(!phoneTaps,'button');if(phoneTaps&&window.__buzz)window.__buzz('up',1);};
 function watchSync(){if(!sess||window.__extApply)return;watchSend(planOf(sess.steps,$('isoh').textContent,posSeconds(),paused,sess.mode));}
 // The watch can drive the session while this page is asleep: the app's native clock keeps the truth, and we catch up to it here.
 function applyExternal(d){window.__extApply=true;try{
@@ -1607,10 +1613,21 @@ function resumeSession(){
   paused=!!saved.paused; pauseStart=saved.pauseStart||0;
   if(paused&&pauseStart){/* keep stepEnd where it was; resume shifts it */}
   lastShown=null; beginRun();
-  if(sound){$('sNext').textContent='Session resumed. Tap Pause, then Resume, to restart the beeps.';}
+  showResumeCard();
   return true;
 }
+// Reopened mid-session: hold here and let Jon choose. Finished exercises stay credited; the unfinished one isn't.
+function showResumeCard(){if(!sess)return;if(!paused){pSrc='resume';$('tPause').click();}
+  const st=sess.steps[sess.i];const e=EX[st.ex]||{};const left=Math.max(0,Math.ceil((sess.stepEnd-(pauseStart||Date.now()))/1000));
+  const bl=[];sess.list.forEach(k=>{if(REST_KEY.test(k)||!EX[k])return;const g=groupOf(k);if(!bl.includes(g))bl.push(g);});const cur=bl.indexOf(groupOf(st.ex))+1;
+  $('rcBody').textContent=(e.name||st.ex)+(cur?' · exercise '+cur+' of '+bl.length:'')+' · '+(st.label||st.kind)+', '+left+' s left';
+  $('resumeCard').hidden=false;$('sNext').textContent='';dbg('resume card shown at',st.ex,st.kind);}
+function hideResumeCard(){$('resumeCard').hidden=true;}
+$('rcResume').onclick=()=>{hideResumeCard();if(paused){pSrc='resume';$('tPause').click();}};
+$('rcRestart').onclick=()=>{if(!sess)return;hideResumeCard();const ex=sess.steps[sess.i].ex;let j=sess.i;while(j>0&&sess.steps[j-1].ex===ex)j--;enter(j,Date.now(),false);pauseStart=Date.now();lastShown=null;if(paused){pSrc='resume';$('tPause').click();}else tick();dbg('resume: restarted',ex);};
+$('rcEnd').onclick=()=>{hideResumeCard();finish(false);};
 function finish(complete){try{document.querySelector('.wrap').classList.remove('mapmode','hipmode');}catch(e){}try{if(window.setPocket)setPocket(false);}catch(e){}stripKey=null;dbg('session: finish',complete?'complete':'ended early',sess&&sess.mode);nativeEvt('session',{active:false});watchSend({type:'end',complete:!!complete});setTimeout(()=>{__menuLast='';watchMenu();},2500);
+  try{hideResumeCard();}catch(e){}
   clearInterval(timer);timer=null; stopTrack(); if(wake){try{wake.release()}catch(e){} wake=null;}
   const d=day(); const w=weekFor(today)||WEEKS[0]; const done=sess?sess.doneEx:[];
   const pressDone=false; const routineDone=false;
@@ -1651,8 +1668,8 @@ function renderAnkle(){const el=$('ankList');if(!el)return;el.innerHTML='';const
   bases.forEach(k=>{if(k==='bootback')return;const def=ANK_DEF.find(x=>x[0]===k);
     
     if(!def[7]&&!el.childElementCount){const h=document.createElement('div');h.className='ankh';h.textContent='Barefoot PT · home';el.appendChild(h);}
-    const r=document.createElement('div');r.className='ankrow'+(done.includes(k)?' done':'');
-    const t=document.createElement('span');t.textContent=(done.includes(k)?'✓ ':'')+def[2]+' · '+(def[1]>1?def[1]+'×':'')+(def[3]>1?def[3]:'')+(k==='scar'?'3 min':'');
+    const skipped=(d.ankleSkip||[]).includes(k)&&done.includes(k);const r=document.createElement('div');r.className='ankrow'+(done.includes(k)?' done':'');
+    const t=document.createElement('span');t.textContent=(skipped?'↷ skipped · ':done.includes(k)?'✓ ':'')+def[2]+' · '+(def[1]>1?def[1]+'×':'')+(def[3]>1?def[3]:'')+(k==='scar'?'3 min':'');
     const b=document.createElement('button');b.className='pill';b.textContent=done.includes(k)?'Again':'Go';b.onclick=()=>startSession(false,false,'ankle:'+k);
     r.append(t,b);el.appendChild(r);});}
 $('sImg').onclick=()=>startSession(false,false,'imagery');
@@ -1671,7 +1688,7 @@ const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(
 const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);if(d)return d[2];if(HIP_NAMES[g])return HIP_NAMES[g];if(g==='bfrA')return 'BFR seated calf raise';if(g==='bfrB')return 'BFR ball press';if(/^map_/.test(g)){const m=MAP_M.find(x=>'map_'+x.m===g);if(m)return 'Calf map · '+m.name;}return EX[g]?EX[g].name:g;};
 function jumpTo(idx){if(!sess)return;hush();$('jumpList').hidden=true;dbg('jump: to step',idx,sess.steps[idx]&&sess.steps[idx].ex);
   // Skipping forward past an exercise counts it as done.
-  if(idx>sess.i){const to=sess.steps[idx]&&sess.steps[idx].ex;const seen=new Set();for(let j=sess.i;j<idx&&j<sess.steps.length;j++){const k=sess.steps[j].ex;if(k&&k!==to&&!seen.has(k)){seen.add(k);recordDone(k);}}}
+  if(idx>sess.i){const to=sess.steps[idx]&&sess.steps[idx].ex;const seen=new Set();for(let j=sess.i;j<idx&&j<sess.steps.length;j++){const k=sess.steps[j].ex;if(k&&k!==to&&!seen.has(k)){seen.add(k);recordDone(k,'skipped');}}}
   while(idx<sess.steps.length&&sess.steps[idx].kind==='mark')idx++;
   if(idx>=sess.steps.length){finish(true);return;}
   if(paused){paused=false;pauseStart=0;setL('tPause','Pause');}
@@ -1694,17 +1711,20 @@ $('tSkip').onclick=()=>{if(!sess)return; hush(); const st=sess.steps[sess.i];dbg
     let i=sess.i; while(i+1<sess.steps.length&&sess.steps[i+1].kind!=='mark')i++; sess.i=i;}
   sess.stepEnd=Date.now(); if(paused){paused=false;pauseStart=0;setL('tPause','Pause');} lastShown=null; tick(); syncTrack(); watchSync();};
 $('tStop').onclick=()=>finish(false);
+$('tPause').addEventListener('click',()=>{if(pSrc!=='resume')hideResumeCard();},true);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')window.__hiddenAt=Date.now();dbg('app:',document.visibilityState,sess?'(in session)':'');if(document.visibilityState==='hidden'){if(sess&&paused&&Date.now()-tapPauseAt<2000){tapPauseAt=0;dbg('pause: undone, that tap was the swipe out of the app');pSrc='undo';$('tPause').click();}persist();if(sess&&!paused&&trackOn&&track.paused)track.play().catch(()=>{});}
   if(document.visibilityState==='visible'){lastShown=null;tick();syncTrack();if(sess)watchSync();
   if(sess&&navigator.wakeLock&&!wake){navigator.wakeLock.request('screen').then(w=>wake=w).catch(()=>{});}}});
-(function(){const AUD={both:'<svg viewBox="0 0 48 24"><g><path d="M3 4h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-5 4v-4H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></g><g transform="translate(25 0)"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></g></svg>',cues:'<svg viewBox="0 0 24 24"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></svg>',voice:'<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>',off:'<svg viewBox="0 0 24 24"><g opacity=".45"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></g><path d="M4 20L20 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'};const NAMES={both:'Voice and cues',cues:'Cues only',voice:'Voice only',off:'Silent'};
-  const b=$('tAud');const mode=()=>voice&&sound?'both':sound?'cues':voice?'voice':'off';
-  const set=()=>{const m=mode();b.innerHTML='<i class="ic">'+AUD[m]+'</i>';b.setAttribute('aria-label',NAMES[m]);b.title=NAMES[m];b.classList.toggle('off',m==='off');};set();audRefresh=set;
-  b.onclick=()=>{const m=mode();const next={both:'cues',cues:'voice',voice:'off',off:'both'}[m];const wasSound=sound;
-    voice=(next==='both'||next==='voice');sound=(next==='both'||next==='cues');
-    try{localStorage.setItem('ach:voice',voice?'1':'0');localStorage.setItem('ach:sound',sound?'1':'0');}catch(e){}
-    set();flash(NAMES[next]);if(!sound&&wasSound)stopTrack();else if(sound&&!wasSound&&sess)startTrack();else if(sess&&sound&&sess.baked&&!voice){stopTrack();startTrack();}if(voice)speak(NAMES[next]+'.');};})();
-let flashT=null;function flash(t){const n=$('sNext');if(!n)return;const keep=n.dataset.keep||n.textContent;n.dataset.keep=keep;n.textContent=t;n.style.color='var(--accent)';clearTimeout(flashT);flashT=setTimeout(()=>{n.textContent=n.dataset.keep||'';n.style.color='';delete n.dataset.keep;},1600);}
+(function(){const VOICE='<svg viewBox="0 0 24 24"><path d="M3 4h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-5 4v-4H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>',CUES='<svg viewBox="0 0 24 24"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></svg>';
+  const bv=$('tVoice'),bc=$('tCues');
+  const set=()=>{bv.innerHTML='<i class="ic">'+VOICE+'</i>';bv.classList.toggle('off',!voice);bv.title=voice?'Voice on':'Voice off';bc.innerHTML='<i class="ic">'+CUES+'</i>';bc.classList.toggle('off',!sound);bc.title=sound?'Cues on':'Cues off';};set();audRefresh=set;
+  const save=()=>{try{localStorage.setItem('ach:voice',voice?'1':'0');localStorage.setItem('ach:sound',sound?'1':'0');}catch(e){}};
+  bv.onclick=()=>{voice=!voice;save();set();flash(voice?'Voice on':'Voice off');if(voice)speak('Voice on.');else hush();
+    if(sess&&sound&&sess.baked){stopTrack();startTrack();}else if(!sess)prebuildNext();};
+  bc.onclick=()=>{const was=sound;sound=!sound;save();set();flash(sound?'Cues on':'Cues off');
+    if(!sound&&was)stopTrack();else if(sound&&!was){beep(880,120);if(sess)startTrack();else prebuildNext();}};})();
+let flashT=null;function flash(t,ms){const n=$('sNext');if(!n)return;const keep=n.dataset.keep||n.textContent;n.dataset.keep=keep;n.textContent=t;n.style.color='var(--accent)';clearTimeout(flashT);flashT=setTimeout(()=>{n.textContent=n.dataset.keep||'';n.style.color='';delete n.dataset.keep;},ms||1600);}
+function unflash(t){const n=$('sNext');if(n&&n.textContent===t){clearTimeout(flashT);n.textContent=n.dataset.keep||'';n.style.color='';delete n.dataset.keep;}}
 (function(){const b=$('tVol');const VOL={'0.5':'<svg viewBox="0 0 24 24"><path d="M5 9v6h3.5L13 19V5L8.5 9z"/><circle cx="17" cy="12" r="1.6"/></svg>','1':'<svg viewBox="0 0 24 24"><path d="M5 9v6h3.5L13 19V5L8.5 9z"/><path d="M16 9a4.2 4.2 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>','1.8':'<svg viewBox="0 0 24 24"><path d="M5 9v6h3.5L13 19V5L8.5 9z"/><path d="M16 9a4.2 4.2 0 0 1 0 6M18.8 6.5a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'};const L={0.5:'Cues soft',1:'Cues normal',1.8:'Cues louder'};
   const set=()=>{b.innerHTML='<i class="ic">'+(VOL[String(vol)]||VOL['1'])+'</i>';b.setAttribute('aria-label',L[vol]||'Cues normal');b.title=L[vol]||'Cues normal';};set();volRefresh=set;
   b.onclick=()=>{vol=vol===0.5?1:vol===1?1.8:0.5;try{localStorage.setItem('ach:vol',String(vol))}catch(e){};set();flash(L[vol]);pre.key=null;if(pre.url){URL.revokeObjectURL(pre.url);pre.url=null;}if(sess&&sound){stopTrack();startTrack();}else prebuildNext();};})();
@@ -1793,7 +1813,7 @@ function renderLog(){const el=document.getElementById('log');el.innerHTML='';
     const v=d&&verdictOf(d.morning);
     const a=document.createElement('div');a.className='num';a.textContent=dt.toLocaleDateString(undefined,{month:'short',day:'numeric'});
     const b=document.createElement('div');
-    b.textContent=d?([(d.iso||isoPlanned(dt))?'press '+(d.iso||0)+'/'+isoPlanned(dt):'',(d.bfr?'BFR':''),(d.routine?'routine':''),(d.ankle?'Chris’s program ×'+d.ankle:''),(d.hingeSet!=null?'hinge → '+d.hingeSet+'°':''),((d.snacks||[]).length?'quick ones ×'+d.snacks.length:''),((d.ankleDone||[]).length?(d.ankleDone||[]).length+' Chris exercises':''),(d.imagery?'imagery ×'+d.imagery:''),(d.health&&d.health.steps!=null?Math.round(d.health.steps).toLocaleString()+' steps'+(d.health.asym!=null?', asym '+d.health.asym.toFixed(1)+'%':''):''),(d.gym&&d.gym.bike&&d.gym.bike.min?'bike '+d.gym.bike.min+'m':''),(d.legExt?'leg ext'+(d.gym&&d.gym.legExt&&d.gym.legExt.wt?' '+d.gym.legExt.wt+'lb':''):''),(d.aspirin&&d.aspirin.AM&&d.aspirin.PM?'aspirin ✓✓':d.aspirin&&(d.aspirin.AM||d.aspirin.PM)?'aspirin ✓':''),(d.notes?'“'+d.notes.slice(0,36)+(d.notes.length>36?'…':'')+'”':'')].filter(Boolean).join(' · ')):'Nothing logged';
+    b.textContent=d?([(d.iso||isoPlanned(dt))?'press '+(d.iso||0)+'/'+isoPlanned(dt):'',(d.bfr?'BFR':''),(d.routine?'routine':''),(d.ankle?'Chris’s program ×'+d.ankle:''),(d.hingeSet!=null?'hinge → '+d.hingeSet+'°':''),((d.snacks||[]).length?'quick ones ×'+d.snacks.length:''),((d.ankleDone||[]).length?(d.ankleDone||[]).length+' Chris exercises':''),((d.ankleSkip||[]).length?(d.ankleSkip||[]).length+' skipped':''),(d.imagery?'imagery ×'+d.imagery:''),(d.health&&d.health.steps!=null?Math.round(d.health.steps).toLocaleString()+' steps'+(d.health.asym!=null?', asym '+d.health.asym.toFixed(1)+'%':''):''),(d.gym&&d.gym.bike&&d.gym.bike.min?'bike '+d.gym.bike.min+'m':''),(d.legExt?'leg ext'+(d.gym&&d.gym.legExt&&d.gym.legExt.wt?' '+d.gym.legExt.wt+'lb':''):''),(d.aspirin&&d.aspirin.AM&&d.aspirin.PM?'aspirin ✓✓':d.aspirin&&(d.aspirin.AM||d.aspirin.PM)?'aspirin ✓':''),(d.notes?'“'+d.notes.slice(0,36)+(d.notes.length>36?'…':'')+'”':'')].filter(Boolean).join(' · ')):'Nothing logged';
     if(!d)b.className='muted';
     const c=document.createElement('span');c.className='dot'+(v?' '+v[0]:'');c.title=v?v[1]:'No morning check';
     r.append(a,b,c);el.appendChild(r);}
@@ -1806,7 +1826,7 @@ function renderNow(){preHint=null;_renderNow();prebuildNext();if(weekFor(today))
   const sn=snackNext(),h=new Date().getHours();
   if(sn&&h>=7&&h<23&&verdictKind(TODAY)!=='back'&&![...bb.children].some(x=>/^Quick one/.test(x.textContent))){
     const q=document.createElement('button');const nm=ANK_DEF.find(x=>x[0]===sn)[2].split(' · ')[0];
-    q.textContent='Quick one · '+nm;q.title=snackDue()?'All sets, a few minutes. Boot on.':'Next one around '+new Date(snackLast()+55*60000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+    q.textContent='Quick one · '+nm;q.title=snackDue()?'All sets, a few minutes.':'Next one around '+new Date(snackLast()+snackCad()*60000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
     q.onclick=()=>startSession(false,false,'snack:'+sn);bb.appendChild(q);}
   if(h>=7&&h<23){const pk=document.createElement('button');pk.textContent='Pick a quick one';pk.onclick=toggleSnackPick;bb.appendChild(pk);}
   const b=document.createElement('button');b.textContent='Log gym';b.onclick=openGym;bb.appendChild(b);
@@ -1883,7 +1903,7 @@ function _renderNow(){
       hint(homeLeft(d).length?'home':'gym',false,false);btn(partial?'Resume evening round':'Start evening round',()=>startSession(false,false,homeLeft(d).length?'home':'gym'),true);snackBtn(btn);img();return;}
     // between rounds: one quick exercise an hour, rotating
     if(rounds>=1&&h>=7&&h<23){const sn=snackNext();if(sn){const due=snackDue();const nm=ANK_DEF.find(x=>x[0]===sn)[2].split(' · ')[0];
-      if(due){txt.textContent=(rounds>=2?'Both rounds done. ':(h<16?'Morning round done. ':''))+'Quick one: '+nm+', all sets, a few minutes. Boot on. Chris: one drill every hour or so between rounds.';hint('snack:'+sn,false,false);btn('Quick one · '+nm,()=>startSession(false,false,'snack:'+sn),true);img();return;}
+      if(due){txt.textContent=(rounds>=2?'Both rounds done. ':(h<16?'Morning round done. ':''))+'Quick one: '+nm+', all sets, a few minutes. '+nextUpLine()+'.';hint('snack:'+sn,false,false);btn('Quick one · '+nm,()=>startSession(false,false,'snack:'+sn),true);img();return;}
       else{const last=snackLast();txt.textContent=(rounds>=2?'Both rounds done. ':'')+'Next quick one around '+new Date(last+55*60000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+(rounds===1?'; evening round '+fmtHM(prefs.evening)+'.':'.');btn('Quick one · '+nm,()=>startSession(false,false,'snack:'+sn));img();return;}}}
   }
   const isoN=isoTarget(),isoK=d.iso||0;
