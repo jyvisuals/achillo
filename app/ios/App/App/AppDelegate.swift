@@ -378,7 +378,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
             let c = UNMutableNotificationContent()
             c.title = msg["title"] as? String ?? "Achilló"; c.body = msg["body"] as? String ?? ""; c.sound = .default
             c.categoryIdentifier = msg["category"] as? String ?? "SNACK"
-            let req = UNNotificationRequest(identifier: "snooze-\(Int(Date().timeIntervalSince1970))", content: c, trigger: UNTimeIntervalNotificationTrigger(timeInterval: 20 * 60, repeats: false))
+            let req = UNNotificationRequest(identifier: String(9000 + Int.random(in: 0..<900)), content: c, trigger: UNTimeIntervalNotificationTrigger(timeInterval: 20 * 60, repeats: false))
             UNUserNotificationCenter.current().add(req, withCompletionHandler: nil); return
         case "markRound":
             notifyListeners("watch", data: ["from": "watch", "cmd": "markRound"], retainUntilConsumed: true); return

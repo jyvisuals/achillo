@@ -1,1 +1,1 @@
-Reminders now work from the wrist: when a quick one or a round is due, the watch notification has a Start button that begins it with the phone locked. Snooze and "Done already" work from the watch too.
+Fixes from the code review: pausing right after Start now really stops the audio; exports include your whole history, not just the last 40 days (import brings preferences back too); reopening a session can no longer double-count BFR; snoozed reminders survive; a quick one only counts when you finish it; and the app rolls over at midnight if left open.

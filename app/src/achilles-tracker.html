@@ -815,6 +815,8 @@ const pad=n=>String(n).padStart(2,'0');
 const keyOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const today=new Date(); today.setHours(0,0,0,0);
 const TODAY=keyOf(today);
+// Left open across midnight: everything keys off TODAY, so reload once the clock says tomorrow (after any running session).
+setInterval(()=>{try{if(keyOf(new Date())!==TODAY&&!sess&&document.visibilityState==='visible'){dbg('day rolled over, reloading');location.reload();}}catch(e){}},60000);
 const daysBetween=(a,b)=>Math.round((b-a)/DAY);
 const fmt=d=>d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
 
@@ -874,6 +876,7 @@ let db=null, mode='local';
 const local={get(k){try{return JSON.parse(localStorage.getItem('ach:'+k)||'null')}catch(e){return null}},
   set(k,v){try{localStorage.setItem('ach:'+k,JSON.stringify(v))}catch(e){}}};
 const days={}; let settings={}; let chain=null;
+function allDays(){const out=Object.assign({},days);try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ach:day:')&&!out[k.slice(8)]){const v=local.get(k.slice(4));if(v)out[k.slice(8)]=v;}}}catch(e){}return out;}
 // Two copies of the app (Safari + the Claude app, or two devices) can both touch the same day. Progress only ever
 // goes up, so merging two records means taking the max of each counter and the union of what's done.
 function mergeDay(a,b){a=a||{};b=b||{};const o=Object.assign({},a,b);
@@ -1102,7 +1105,7 @@ const isGym=k=>false; // Boot-on PT retired Oct 30
 // Quick ones: Chris's "pick a drill every hour or so" — one boot-on exercise, all its sets, rotating least-recent first.
 const SNACK_POOL=['toeyoga2','doming','invev','bandsup','pfwall'];
 function snackLast(){const d=day();const a=d.snacks||[];return a.length?a[a.length-1].t:0;}
-function snackDue(){return Date.now()-snackLast()>=55*60000;}
+function snackDue(){const cad=Math.max(30,Number(prefs.cadence)||60);return Date.now()-snackLast()>=(cad-5)*60000;}
 function snackNext(){const d=day();const a=d.snacks||[];const last={};a.forEach(x=>{last[x.k]=x.t;});
   const y=days[keyOf(new Date(today.getTime()-DAY))];(y&&y.snacks||[]).forEach(x=>{if(!last[x.k])last[x.k]=x.t;});
   const pool=SNACK_POOL.filter(k=>(prefs.pool||SNACK_POOL).includes(k));return (pool.length?pool:SNACK_POOL).slice().sort((p,q)=>(last[p]||0)-(last[q]||0))[0];}
@@ -1291,7 +1294,7 @@ function renderMapTrend(){const el=$('trendMap');if(!el)return;if(!mapLog.length
     return '<div class="mb"><span>'+x.name+'</span><div class="bar"><i style="width:'+(avg==null?0:Math.round(avg/3*100))+'%"></i></div><span class="v">'+(avg==null?'—':avg.toFixed(1))+'</span></div>';}).join('');
   el.innerHTML='<div class="eyebrow">Calf map · left leg, last 3 sessions (0–3)</div><div class="mapbars">'+rows+'</div>';}
 renderMapTrend();
-window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k],recordDone:k=>recordDone(k),finish:c=>finish(c),renderNow:()=>renderNow()};
+window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k],recordDone:k=>recordDone(k),finish:c=>finish(c),renderNow:()=>renderNow(),allDays:()=>allDays()};
 (function loop(){try{if(sess&&document.visibilityState==='visible')drawSegs();}catch(e){}requestAnimationFrame(loop);})();
 function setRing(frac,snap){if(snap){arc.classList.add('snap');}arc.style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,frac))));if(snap){void arc.offsetWidth;arc.classList.remove('snap');}}
 const ringEl=document.querySelector('.ring');
@@ -1454,10 +1457,11 @@ async function startTrack_(){
   if(!sess)return; sess.baked=false; track.__opts=voiceOpts();
   if(trackURL){URL.revokeObjectURL(trackURL);trackURL=null;}
   const k=listKey(sess.list);const hit=[pre,preQ].find(c=>c.url&&c.key===k); if(hit){trackURL=hit.url;hit.url=null;hit.key=null;dbg('audio: using prebuilt track',ms());} else {trackURL=await buildTrack();dbg('audio: built track',ms());} if(!sess)return;
+  if(myGen!==trackGen||paused||!sound){dbg('audio: start dropped,',myGen!==trackGen?'restarted':paused?'paused meanwhile':'sound off');return;}
   track.src=trackURL; track.loop=false; track.onloadedmetadata=()=>{try{track.currentTime=posSeconds();}catch(e){}};
   try{track.currentTime=posSeconds();}catch(e){}
-  if(!sess)return;
-  try{await track.play();trackOn=true;dbg('audio: playing at',track.currentTime.toFixed(1),'of',track.duration,ms());
+  if(!sess||myGen!==trackGen||paused||!sound)return;
+  try{await track.play();if(myGen!==trackGen||paused||!sound){try{track.pause();}catch(e){}dbg('audio: paused right after start');return;}trackOn=true;dbg('audio: playing at',track.currentTime.toFixed(1),'of',track.duration,ms());
     if(voice&&!sess.baked&&track.__bake){const g=myGen;track.__bake(speechPlan(sess.steps,sess.list),{rate:prefs.rate,voice:prefs.voice}).then(ok=>{if(!ok&&g===trackGen)dbg('audio: live voice (not baked)');});}}catch(e){trackOn=false;dbg('audio: play failed',e&&e.message,track.__lastError||'');}
   lockInfo();
   setTimeout(async()=>{if(!sess||paused||!sound||myGen!==trackGen)return;let ok;const t1=track.currentTime;
@@ -1473,7 +1477,7 @@ async function startTrack_(){
     navigator.mediaSession.setActionHandler('previoustrack',()=>{if(!sess)return;const g=groupOf(sess.steps[sess.i].ex);let j=sess.i;while(j>0&&(sess.steps[j].kind==='mark'||REST_KEY.test(sess.steps[j].ex)||groupOf(sess.steps[j].ex)===g))j--;const gg=groupOf(sess.steps[j].ex);while(j>0&&groupOf(sess.steps[j-1].ex)===gg&&sess.steps[j-1].kind!=='mark')j--;jumpTo(j);});
     navigator.mediaSession.setActionHandler('seekbackward',null);navigator.mediaSession.setActionHandler('seekforward',null);}}catch(e){}
 }
-function persist(){try{if(sess)localStorage.setItem('ach:sess',JSON.stringify({list:sess.list,withPress:sess.withPress,withRoutine:sess.withRoutine,mode:sess.mode,i:sess.i,stepEnd:sess.stepEnd,doneEx:sess.doneEx,paused,pauseStart,day:TODAY}));else localStorage.removeItem('ach:sess');}catch(e){}}
+function persist(){try{if(sess)localStorage.setItem('ach:sess',JSON.stringify({list:sess.list,withPress:sess.withPress,withRoutine:sess.withRoutine,mode:sess.mode,i:sess.i,stepEnd:sess.stepEnd,doneEx:sess.doneEx,bfrCounted:!!sess.bfrCounted,ankNew:sess.ankNew||0,t0:sess.t0||0,paused,pauseStart,day:TODAY}));else localStorage.removeItem('ach:sess');}catch(e){}}
 let pauseStart=0;
 function enter(idx,fromEnd,quiet){ // move to step idx, ending fromEnd + its length
   sess.i=idx; const st=sess.steps[idx]; sess.stepEnd=fromEnd+st.secs*1000;
@@ -1555,7 +1559,7 @@ window.addEventListener('ach:interrupt',e=>{const began=!!(e.detail&&e.detail.be
   else if(autoPaused){autoPaused=false;if(sess&&paused)$('tPause').click();}});
 window.addEventListener('ach:markRound',()=>{const d=day();if((d.ankle||0)>=2)return;d.ankle=(d.ankle||0)+1;d.ankleDone=[];d.foot=1;queueSave(TODAY);renderAll();setStatus('Round logged from the reminder.');});
 window.addEventListener('ach:seed',e=>{const sd=e.detail&&e.detail.days;if(!sd)return;let n=0;Object.keys(sd).forEach(k=>{const before=JSON.stringify(days[k]||null);days[k]=mergeDay(days[k],JSON.parse(JSON.stringify(sd[k])));if(JSON.stringify(days[k])!==before){local.set('day:'+k,days[k]);n++;}});if(n){renderAll();setStatus('Imported '+n+' day'+(n>1?'s':'')+' from the web log.');}});
-window.addEventListener('ach:state?',()=>{const d=day();const b=bootFor(today);nativeEvt('state',{today:TODAY,rounds:d.ankle||0,partial:(d.ankleDone||[]).length,imagery:d.imagery||0,bfr:d.bfr||0,snackLast:snackLast(),snackName:(()=>{const s=snackNext();return s?ANK_DEF.find(x=>x[0]===s)[2].split(' · ')[0]:'';})(),hingeToday:b.changeToday&&b.cur.deg<30?b.cur.deg:null,hingeSet:d.hingeSet||null,hingeNext:b.next?{date:keyOf(b.next.from),deg:b.next.deg}:null,checked:!!verdictKind(TODAY),log:days});});
+window.addEventListener('ach:state?',()=>{const d=day();const b=bootFor(today);nativeEvt('state',{today:TODAY,rounds:d.ankle||0,partial:(d.ankleDone||[]).length,imagery:d.imagery||0,bfr:d.bfr||0,snackLast:snackLast(),snackName:(()=>{const s=snackNext();return s?ANK_DEF.find(x=>x[0]===s)[2].split(' · ')[0]:'';})(),hingeToday:b.changeToday&&b.cur.deg<30?b.cur.deg:null,hingeSet:d.hingeSet||null,hingeNext:b.next?{date:keyOf(b.next.from),deg:b.next.deg}:null,checked:!!verdictKind(TODAY),log:allDays()});});
 function advance(quiet){
   let i=sess.i+1;
   while(i<sess.steps.length&&sess.steps[i].kind==='mark'){if(!sess.doneEx.includes(sess.steps[i].ex)){sess.doneEx.push(sess.steps[i].ex);recordDone(sess.steps[i].ex);}i++;}
@@ -1599,7 +1603,7 @@ function resumeSession(){
   // Abandoned for over 3 hours: count what was finished, then drop it.
   const ref=saved.paused?Date.now():saved.stepEnd;
   if(Date.now()-ref>3*3600*1000){sess=build(saved.withPress,saved.withRoutine!==false,saved.mode||'',saved.list);sess.i=saved.i;sess.stepEnd=0;sess.doneEx=saved.doneEx||[];finish(false);return false;}
-  sess=build(saved.withPress,saved.withRoutine!==false,saved.mode||'',saved.list); sess.i=saved.i; sess.stepEnd=saved.stepEnd; sess.doneEx=saved.doneEx||[];
+  sess=build(saved.withPress,saved.withRoutine!==false,saved.mode||'',saved.list); sess.i=saved.i; sess.stepEnd=saved.stepEnd; sess.doneEx=saved.doneEx||[]; sess.bfrCounted=!!saved.bfrCounted; sess.ankNew=saved.ankNew||0; sess.t0=saved.t0||Date.now();
   paused=!!saved.paused; pauseStart=saved.pauseStart||0;
   if(paused&&pauseStart){/* keep stepEnd where it was; resume shifts it */}
   lastShown=null; beginRun();
@@ -1620,7 +1624,7 @@ function finish(complete){try{document.querySelector('.wrap').classList.remove('
   const ankNew=sess?(sess.ankNew||0):0; const ankRound=!!(sess&&sess.ankRound);
   if(footDone)d.foot=1; if(imgDone)d.imagery=Math.min((d.imagery||0)+1,2);
   const wasMode=sess?sess.mode:''; const sT0=sess&&sess.t0; const nEx=new Set((done||[]).map(k=>groupOf(k)).filter(g=>!REST_KEY.test(g))).size;
-  let snackDone=false; if(wasMode.startsWith('snack:')&&done.length){const k=wasMode.slice(6);d.snacks=(d.snacks||[]).concat({k,t:Date.now()});snackDone=true;}
+  let snackDone=false; const lastKey=sess?[...sess.list].reverse().find(k=>!REST_KEY.test(k)):null; if(wasMode.startsWith('snack:')&&(complete||(lastKey&&done.includes(lastKey)))){const k=wasMode.slice(6);d.snacks=(d.snacks||[]).concat({k,t:Date.now()});snackDone=true;}
   chain=null; const pDone=pressDone||bfrPressDone;
   if(pDone)chain=!hadFoot&&new Date().getHours()<21?'foot':((d.imagery||0)<2?'imagery':null);
   else if(footDone||ankRound)chain=(d.imagery||0)<2?'imagery':null;
@@ -2036,10 +2040,12 @@ function renderSettings(){
   $('diagShare').onclick=()=>{const t=diagText();if(window.__shareDiag)window.__shareDiag(t);else{try{navigator.clipboard.writeText(t);$('dataHint').textContent='Diagnostics copied to the clipboard.';}catch(e){}}};
   // data
   $('expBtn').onclick=()=>{if(window.__nativeApp&&!$('shareLog').hidden){$('shareLog').click();return;}
-    const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),app:'Achilló',days,settings,prefs},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='achillo-log-'+TODAY+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);$('dataHint').textContent='Exported.';};
+    const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),app:'Achilló',days:allDays(),settings,prefs},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='achillo-log-'+TODAY+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);$('dataHint').textContent='Exported.';};
   $('impBtn').onclick=()=>{const box=$('impBox');if(box.hidden){box.hidden=false;box.focus();$('dataHint').textContent='Paste the export, then tap Import again.';return;}
     try{const j=JSON.parse(box.value);const src=j.days||j;let n=0;Object.keys(src).forEach(k=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(k))return;const before=JSON.stringify(days[k]||null);days[k]=mergeDay(days[k],src[k]);if(JSON.stringify(days[k])!==before){local.set('day:'+k,days[k]);if(db)save(k);n++;}});
-      $('dataHint').textContent='Imported '+n+' day'+(n===1?'':'s')+'.';box.hidden=true;box.value='';renderAll();}catch(e){$('dataHint').textContent='That didn\'t parse as a log export.';}};
+      let extra='';if(j.prefs&&typeof j.prefs==='object'){Object.assign(prefs,j.prefs);try{local.set('prefs',prefs);}catch(e){}extra+=', preferences';}
+      if(j.settings&&typeof j.settings==='object'){Object.assign(settings,j.settings);try{local.set('settings',settings);}catch(e){}extra+=', settings';}
+      $('dataHint').textContent='Imported '+n+' day'+(n===1?'':'s')+extra+'.';box.hidden=true;box.value='';renderAll();}catch(e){$('dataHint').textContent='That didn\'t parse as a log export.';}};
 }
 
 // ===== app shell (v2): tabs, rings, full-screen session, sheet, round-done =====

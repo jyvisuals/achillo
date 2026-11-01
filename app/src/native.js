@@ -205,7 +205,8 @@ async function reschedule(reason) {
   if (perm.display !== 'granted') { const r = await LocalNotifications.requestPermissions(); if (r.display !== 'granted') { log('notifications not allowed'); return; } }
 
   const pending = await LocalNotifications.getPending();
-  if (pending.notifications.length) await LocalNotifications.cancel({ notifications: pending.notifications.map((n) => ({ id: n.id })) });
+  const ours = pending.notifications.filter((n) => Number(n.id) < 9000);   // snoozes live at 9000+ and survive a rebuild
+  if (ours.length) await LocalNotifications.cancel({ notifications: ours.map((n) => ({ id: n.id })) });
   const P = prefs();
   if (!P.remind) { log('reminders off'); return; }
   const [mH, mM] = hm(P.morning), [eH, eM] = hm(P.evening), [iH, iM] = hm(P.imageryAt);
@@ -242,7 +243,7 @@ async function reschedule(reason) {
       const end = at(dk, lastH, 5).getTime();
       let first = true;
       while (t.getTime() <= end) {
-        note(L, new Date(t), 'Quick one', first && isToday && st.snackName ? `${st.snackName}: all sets, a few minutes. Boot on.` : 'One boot-on drill, all sets, a few minutes.', 'snack');
+        note(L, new Date(t), 'Quick one', first && isToday && st.snackName ? `${st.snackName}: all sets, a few minutes.` : 'One drill, all sets, a few minutes.', 'snack');
         t = new Date(t.getTime() + cad * 60000);
         first = false;
       }
@@ -250,7 +251,7 @@ async function reschedule(reason) {
 
     // Evening round
     if (rounds < 2) {
-      note(L, at(dk, eH, eM), 'Evening round', 'Barefoot PT (no cuff), then Boot-on PT.', 'round');
+      note(L, at(dk, eH, eM), 'Evening round', 'Barefoot PT, no cuff.', 'round');
       { const n2 = new Date(at(dk, eH, eM).getTime() + 90 * 60000); if (n2.getHours() < 23) note(L, n2, 'Evening round', 'Still time for round two.', 'round'); }
     }
     // Imagery
@@ -259,6 +260,7 @@ async function reschedule(reason) {
     if (dk === VISIT.day) note(L, at(dk, VISIT.h, VISIT.m), 'Duke follow-up', VISIT.body, 'open');
   }
 
+  while (L.length > 56) { let j = -1; for (let i = L.length - 1; i >= 0; i--) if (L[i].extra && L[i].extra.kind === 'snack') { j = i; break; } if (j < 0) break; L.splice(j, 1); }
   if (L.length) await LocalNotifications.schedule({ notifications: L });
   log(`scheduled ${L.length} (${reason})`);
 }
