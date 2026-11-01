@@ -1,3 +1,1 @@
-Reopening the app mid-session now shows a card: where you were, with Resume, Restart this exercise, or End. Unfinished exercises are never credited.
-Skipped exercises show as skipped (not done) in the day log; they still count toward the round.
-Voice and Cues are separate switches now, with a short preview when you turn one on. The watch and home screen both say when the next quick one is due and what your interval is.
+Watch battery: the session clock kept ticking ten times a second after a session ended. It now stops when the session does.

@@ -236,6 +236,8 @@ final class SessionModel: NSObject, ObservableObject {
         guard active else { return }
         active = false
         paused = false
+        timer?.invalidate(); timer = nil   // the 10 Hz clock only runs during a session
+        tick = Date()
         finished = complete ? "Round done" : "Session ended"
         if complete { cue(.done) }
         stopRuntime()
