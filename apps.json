@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.85",
+          "buildVersion": "85",
+          "date": "2026-11-01T02:30:06Z",
+          "localizedDescription": "Fixes from the code review: pausing right after Start now really stops the audio; exports include your whole history, not just the last 40 days (import brings preferences back too); reopening a session can no longer double-count BFR; snoozed reminders survive; a quick one only counts when you finish it; and the app rolls over at midnight if left open.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.85.ipa",
+          "size": 1252214,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.84",
           "buildVersion": "84",
           "date": "2026-10-31T16:07:19Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.83.ipa",
           "size": 1235841,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.82",
-          "buildVersion": "82",
-          "date": "2026-10-31T14:57:41Z",
-          "localizedDescription": "Phone taps have their own button in the session controls. They switch off the moment the watch picks up the session, and only pressing the button turns them back on.\nOn an Always On watch, the wrist-down view is now a plain ring and countdown, no glow.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.82.ipa",
-          "size": 1234838,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.84",
-      "versionDate": "2026-10-31T16:07:19Z",
-      "versionDescription": "Reminders now work from the wrist: when a quick one or a round is due, the watch notification has a Start button that begins it with the phone locked. Snooze and \"Done already\" work from the watch too.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.84.ipa",
-      "size": 1251561
+      "version": "1.1.85",
+      "versionDate": "2026-11-01T02:30:06Z",
+      "versionDescription": "Fixes from the code review: pausing right after Start now really stops the audio; exports include your whole history, not just the last 40 days (import brings preferences back too); reopening a session can no longer double-count BFR; snoozed reminders survive; a quick one only counts when you finish it; and the app rolls over at midnight if left open.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.85.ipa",
+      "size": 1252214
     }
   ],
   "news": []
