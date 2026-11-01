@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.86",
+          "buildVersion": "86",
+          "date": "2026-11-01T03:00:25Z",
+          "localizedDescription": "Reopening the app mid-session now shows a card: where you were, with Resume, Restart this exercise, or End. Unfinished exercises are never credited.\nSkipped exercises show as skipped (not done) in the day log; they still count toward the round.\nVoice and Cues are separate switches now, with a short preview when you turn one on. The watch and home screen both say when the next quick one is due and what your interval is.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.86.ipa",
+          "size": 1256142,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.85",
           "buildVersion": "85",
           "date": "2026-11-01T02:30:06Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.84.ipa",
           "size": 1251561,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.83",
-          "buildVersion": "83",
-          "date": "2026-10-31T15:51:07Z",
-          "localizedDescription": "Quick ones now start from the watch with the phone locked: the phone keeps the next quick one rendered and ready, same as Barefoot PT and Hips.\nA session that runs to the end while the phone sleeps is credited when you open the phone.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.83.ipa",
-          "size": 1235841,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.85",
-      "versionDate": "2026-11-01T02:30:06Z",
-      "versionDescription": "Fixes from the code review: pausing right after Start now really stops the audio; exports include your whole history, not just the last 40 days (import brings preferences back too); reopening a session can no longer double-count BFR; snoozed reminders survive; a quick one only counts when you finish it; and the app rolls over at midnight if left open.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.85.ipa",
-      "size": 1252214
+      "version": "1.1.86",
+      "versionDate": "2026-11-01T03:00:25Z",
+      "versionDescription": "Reopening the app mid-session now shows a card: where you were, with Resume, Restart this exercise, or End. Unfinished exercises are never credited.\nSkipped exercises show as skipped (not done) in the day log; they still count toward the round.\nVoice and Cues are separate switches now, with a short preview when you turn one on. The watch and home screen both say when the next quick one is due and what your interval is.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.86.ipa",
+      "size": 1256142
     }
   ],
   "news": []
