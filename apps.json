@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.93",
+          "buildVersion": "93",
+          "date": "2026-11-02T13:07:47Z",
+          "localizedDescription": "Phone cue sounds (the plucks, breaths and 3-2-1) are about three times louder at every volume setting. The voice is unchanged.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.93.ipa",
+          "size": 1271682,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.92",
           "buildVersion": "92",
           "date": "2026-11-02T12:48:14Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.91.ipa",
           "size": 1264776,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.90",
-          "buildVersion": "90",
-          "date": "2026-11-02T01:49:46Z",
-          "localizedDescription": "The five sound and tap buttons are tucked behind one pill under the controls. It reads what is on (Voice · Cues · Taps); tap it to open them, tap Done to close.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.90.ipa",
-          "size": 1262275,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.92",
-      "versionDate": "2026-11-02T12:48:14Z",
-      "versionDescription": "Watch: the background session that keeps taps going with the screen off is now retried whenever you raise your wrist, and the watch tells you (\"Taps pause when the screen sleeps\") if it is not running.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.92.ipa",
-      "size": 1271575
+      "version": "1.1.93",
+      "versionDate": "2026-11-02T13:07:47Z",
+      "versionDescription": "Phone cue sounds (the plucks, breaths and 3-2-1) are about three times louder at every volume setting. The voice is unchanged.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.93.ipa",
+      "size": 1271682
     }
   ],
   "news": []
