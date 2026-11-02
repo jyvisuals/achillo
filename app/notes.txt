@@ -1,1 +1,1 @@
-Watch: the background session that keeps taps going with the screen off is now retried whenever you raise your wrist, and the watch tells you ("Taps pause when the screen sleeps") if it is not running.
+Phone cue sounds (the plucks, breaths and 3-2-1) are about three times louder at every volume setting. The voice is unchanged.

@@ -1429,7 +1429,8 @@ async function buildTrackFor(steps){
   });
   pluck(total-2.6,523,.09);pluck(total-2.1,659,.09);pluck(total-1.6,784,.1);
   const bufs=await Promise.all(jobs.map(j=>j[0]));
-  jobs.forEach(([_,t,g],k)=>{const b=bufs[k];let o=Math.round(t*SR);if(o<0)o=0;const n=Math.min(b.length,dst.length-o);for(let q=0;q<n;q++)dst[o+q]+=b[q]*g*.5*vol;});
+  jobs.forEach(([_,t,g],k)=>{const b=bufs[k];let o=Math.round(t*SR);if(o<0)o=0;const n=Math.min(b.length,dst.length-o);for(let q=0;q<n;q++)dst[o+q]+=b[q]*g*1.6*vol;});   // cues sit well under the voice; 1.6 is about three times the old level
+  for(let q=0;q<dst.length;q++){const v=dst[q];if(v>0.95||v<-0.95)dst[q]=Math.tanh(v);}   // soft limit where cues overlap
   return URL.createObjectURL(wavFromBuffer({length:dst.length,sampleRate:SR,getChannelData:()=>dst}));
 }
 function stopTrack(){trackOn=false;if(sess)sess.baked=false;try{track.pause();track.removeAttribute('src');track.load();}catch(e){} if(trackURL){URL.revokeObjectURL(trackURL);trackURL=null;}}
