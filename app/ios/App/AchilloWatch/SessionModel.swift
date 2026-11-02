@@ -39,6 +39,12 @@ final class SessionModel: NSObject, ObservableObject {
         didSet { UserDefaults.standard.set(textures, forKey: "tapTextures") }
     }
     private var nextTexAt: Double = 0
+    // A quarter-second white flash on the push and the release, for when the watch is in view.
+    @Published var flash = false
+    private func flashScreen() {
+        flash = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) { [weak self] in self?.flash = false }
+    }
     // Next quick one, as the phone last reported it.
     @Published var snackName: String = UserDefaults.standard.string(forKey: "snackName") ?? "" {
         didSet { UserDefaults.standard.set(snackName, forKey: "snackName") }
@@ -147,33 +153,21 @@ final class SessionModel: NSObject, ObservableObject {
             lastSecond = sec
             let k = n.step.kind
             if (k == "rest" || k == "setup") && n.step.secs >= 6 && sec >= 1 && sec <= 3 { cue(.countdown) }
-            if !textures && k == "hold" && n.step.secs >= 8 && sec >= 1 && sec <= 3 { cue(.countdown) }
+            if k == "hold" && n.step.secs >= 8 && sec >= 1 && sec <= 3 { cue(.countdown) }
             if !textures && k == "hold" && n.step.secs >= 20 && sec > 3 && sec % 10 == 0 && Double(sec) < n.step.secs - 1 { cue(.holdTick) }
         }
     }
 
-    // Tap density follows effort: sparse → dense as you press, steady and dense through the hold,
-    // then thinning soft clicks as you let go. Rests stay quiet apart from the 3-2-1.
+    // Hold: a faint heartbeat (lub-dub of clicks) every second or so, handing over to the countdown taps at the end.
+    // The press and the release are single events (see pattern), so nothing else runs during them.
     private func texture(_ n: Now) {
-        guard textures else { return }
-        let k = n.step.kind
-        guard k == "up" || k == "down" || k == "hold" else { return }
+        guard textures, n.step.kind == "hold" else { return }
         let elapsed = n.step.secs - n.left
-        guard elapsed >= nextTexAt, n.left > 0.2 else { return }
-        let holdGap = [0.9, 0.6, 0.45][min(2, max(0, strength))]
-        let firm: WKHapticType = strength == 0 ? .click : .start
-        switch k {
-        case "up":
-            WKInterfaceDevice.current().play(firm)
-            nextTexAt = elapsed + max(holdGap, 1.1 - (1.1 - holdGap) * n.frac)
-        case "hold":
-            WKInterfaceDevice.current().play(firm)
-            nextTexAt = elapsed + holdGap
-        default:
-            if n.frac > 0.7 { nextTexAt = n.step.secs; return }   // fully let go before the step ends
-            WKInterfaceDevice.current().play(.click)
-            nextTexAt = elapsed + holdGap + 0.9 * n.frac
-        }
+        guard elapsed >= nextTexAt, n.left > 0.25 else { return }
+        if n.step.secs >= 8 && n.left <= 3.2 { nextTexAt = n.step.secs; return }
+        WKInterfaceDevice.current().play(.click)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) { WKInterfaceDevice.current().play(.click) }
+        nextTexAt = elapsed + [1.3, 1.0, 0.75][min(2, max(0, strength))]
     }
 
     private func buzz(for n: Now, prev: Int) {
@@ -196,26 +190,28 @@ final class SessionModel: NSObject, ObservableObject {
     // picking the firmer ones and stacking them with gaps the wrist can tell apart.
     enum Cue { case up, down, holdStart, holdTick, countdown, rest, getSet, newExercise, lastRep, done, control }
 
+    // One big hit on the push, a faint heartbeat through the hold, a thud-and-fall on the release.
     private func pattern(_ c: Cue) -> [(WKHapticType, Double)] {
+        let big: WKHapticType = strength == 0 ? .notification : .failure
         switch c {
-        case .up: return [(.directionUp, 0), (.directionUp, 0.32)]
-        case .down: return [(.directionDown, 0), (.directionDown, 0.5)]
-        case .holdStart: return [(.start, 0), (.start, 0.2)]
-        case .holdTick: return [(.start, 0)]
+        case .up: return [(big, 0)]
+        case .down: return [(.stop, 0), (.directionDown, 0.3)]
+        case .holdStart: return [(big, 0)]                      // a hold begins with the same push
+        case .holdTick: return [(.click, 0)]
         case .countdown: return [(.start, 0)]
-        case .rest: return [(.stop, 0), (.stop, 0.35)]
-        case .getSet: return [(.retry, 0)]
+        case .rest: return [(.retry, 0)]                        // settle
+        case .getSet: return [(.start, 0)]
         case .newExercise: return [(.notification, 0)]
-        case .lastRep: return [(.notification, 0)]
-        case .done: return [(.success, 0)]
+        case .lastRep: return [(.notification, 0), (big, 0.35)] // heads-up, then the push
+        case .done: return [(.success, 0), (.success, 0.4)]
         case .control: return [(.start, 0)]
         }
     }
 
     func cue(_ c: Cue) {
         var p = pattern(c)
-        if strength == 0 { p = Array(p.prefix(1)) }
-        if strength == 2, let last = p.last { p.append((c == .countdown || c == .holdTick || c == .control ? .start : .notification, last.1 + 0.25)) }
+        if strength == 2, (c == .up || c == .holdStart || c == .lastRep), let last = p.last { p.append((.notification, last.1 + 0.3)) }
+        if c == .up || c == .holdStart || c == .down || c == .lastRep { flashScreen() }
         for (t, d) in p {
             if d == 0 { WKInterfaceDevice.current().play(t) }
             else { DispatchQueue.main.asyncAfter(deadline: .now() + d) { WKInterfaceDevice.current().play(t) } }
@@ -227,9 +223,10 @@ final class SessionModel: NSObject, ObservableObject {
     func toggleTextures() {
         textures.toggle()
         guard textures else { cue(.control); return }
-        // a quick taste: five quickening ticks
-        var t = 0.0
-        for g in [0.5, 0.4, 0.3, 0.22, 0.2] { t += g; DispatchQueue.main.asyncAfter(deadline: .now() + t) { WKInterfaceDevice.current().play(.start) } }
+        // a quick taste: the push, three heartbeats, the release
+        cue(.up)
+        for i in 1...3 { DispatchQueue.main.asyncAfter(deadline: .now() + 0.9 * Double(i)) { WKInterfaceDevice.current().play(.click); DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) { WKInterfaceDevice.current().play(.click) } } }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.6) { [weak self] in self?.cue(.down) }
     }
 
     private func finish(complete: Bool) {
