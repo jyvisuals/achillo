@@ -238,7 +238,8 @@ final class SessionModel: NSObject, ObservableObject {
         paused = false
         timer?.invalidate(); timer = nil   // the 10 Hz clock only runs during a session
         tick = Date()
-        finished = complete ? "Round done" : "Session ended"
+        let what = title == "Quick one" ? "Quick one" : title == "Hips" ? "Hips" : "Round"
+        finished = complete ? "\(what) done" : "Session ended"
         if complete { cue(.done) }
         stopRuntime()
     }
@@ -282,16 +283,18 @@ final class SessionModel: NSObject, ObservableObject {
     func start(_ mode: String) { sendCmd("start", ["mode": mode]) }
 
     func sendCmd(_ c: String, _ extra: [String: Any] = [:]) {
-        var m: [String: Any] = ["cmd": c]
+        var m: [String: Any] = ["cmd": c, "at": Date().timeIntervalSince1970 * 1000]
         for (k, v) in extra { m[k] = v }
         let s = WCSession.default
         guard s.activationState == .activated else { pendingCmds.append(m); return }
         if s.isReachable {
             s.sendMessage(m, replyHandler: nil, errorHandler: { _ in s.transferUserInfo(m) })
-        } else if c == "start" || c == "snooze" || c == "markRound" {
-            s.transferUserInfo(m)   // queued: wakes the phone app in the background when it can
+        } else {
+            s.transferUserInfo(m)   // queued in order; the phone applies it at the tapped time when it reconnects
+            DispatchQueue.main.async { self.queuedCmds += 1 }
         }
     }
+    @Published var queuedCmds = 0   // commands waiting for the phone
     private var pendingCmds: [[String: Any]] = []
 
     // MARK: plans from the phone
@@ -312,6 +315,7 @@ final class SessionModel: NSObject, ObservableObject {
     private func apply(_ d: [String: Any]) {
         let type = d["type"] as? String ?? ""
         if type == "end" { finish(complete: (d["complete"] as? Bool) ?? false); return }
+        queuedCmds = 0
         if type == "menu" { snackName = d["snack"] as? String ?? ""; snackDue = (d["due"] as? Bool) ?? false; snackNext = d["next"] as? String ?? ""; return }
         guard type == "plan" else { return }
         let at = Date(timeIntervalSince1970: num(d["at"]) / 1000)

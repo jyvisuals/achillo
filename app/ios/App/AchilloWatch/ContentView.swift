@@ -71,6 +71,10 @@ struct SessionView: View {
                         .padding(.horizontal, 26)
                 }
                 Spacer(minLength: 0)
+                if !m.phoneReachable {
+                    Text(m.queuedCmds > 0 ? "Phone out of reach · \(m.queuedCmds) waiting" : "Phone out of reach")
+                        .font(.system(size: 10, weight: .semibold)).foregroundColor(amber).padding(.bottom, 2)
+                }
             }
             .padding(.vertical, 22)
             if m.paused { PausedOverlay() }

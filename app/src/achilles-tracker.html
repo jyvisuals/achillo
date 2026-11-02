@@ -874,18 +874,20 @@ function bootFor(d){let cur=BOOT[0],next=null;for(let i=0;i<BOOT.length;i++){if(
 
 // ---------- storage: db when available, browser storage otherwise ----------
 let db=null, mode='local';
+let storeFail=false;
 const local={get(k){try{return JSON.parse(localStorage.getItem('ach:'+k)||'null')}catch(e){return null}},
-  set(k,v){try{localStorage.setItem('ach:'+k,JSON.stringify(v))}catch(e){}}};
+  set(k,v){try{localStorage.setItem('ach:'+k,JSON.stringify(v));if(storeFail){storeFail=false;}return true;}catch(e){storeFail=true;try{dbg('storage: write failed',k,e&&e.message);}catch(x){}return false;}}};
 const days={}; let settings={}; let chain=null;
 function allDays(){const out=Object.assign({},days);try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ach:day:')&&!out[k.slice(8)]){const v=local.get(k.slice(4));if(v)out[k.slice(8)]=v;}}}catch(e){}return out;}
 // Two copies of the app (Safari + the Claude app, or two devices) can both touch the same day. Progress only ever
 // goes up, so merging two records means taking the max of each counter and the union of what's done.
 function mergeDay(a,b){a=a||{};b=b||{};const o=Object.assign({},a,b);
   const mx=k=>{if(a[k]!=null||b[k]!=null)o[k]=Math.max(+a[k]||0,+b[k]||0);};
-  ['iso','ankle','bfr','imagery','routine','foot','bfrA','bfrSkip'].forEach(mx);
+  ['iso','ankle','bfr','imagery','routine','foot','bfrA','bfrSkip','homeN','gymN','hips','homeAt','gymAt'].forEach(mx);
   const an=+a.ankle||0, bn=+b.ankle||0;
   if(an!==bn)o.ankleDone=(an>bn?a:b).ankleDone||[]; else o.ankleDone=[...new Set([...(a.ankleDone||[]),...(b.ankleDone||[])])];
   if(!o.ankleDone.length)delete o.ankleDone;
+  {const sk=[...new Set([...(a.ankleSkip||[]),...(b.ankleSkip||[])])].filter(k=>(o.ankleDone||[]).includes(k)||an===bn);if(sk.length)o.ankleSkip=sk;else delete o.ankleSkip;}
   o.legExt=!!(a.legExt||b.legExt);
   if(a.aspirin||b.aspirin)o.aspirin=Object.assign({},a.aspirin||{},b.aspirin||{});
   if(a.gym||b.gym)o.gym=Object.assign({},a.gym||{},b.gym||{});
@@ -893,13 +895,14 @@ function mergeDay(a,b){a=a||{};b=b||{};const o=Object.assign({},a,b);
   if(a.hingeSet!=null||b.hingeSet!=null)o.hingeSet=Math.min(a.hingeSet!=null?a.hingeSet:99,b.hingeSet!=null?b.hingeSet:99);
   if(a.health||b.health)o.health=Object.assign({},a.health||{},b.health||{});
   if(a.snacks||b.snacks){const m={};[...(a.snacks||[]),...(b.snacks||[])].forEach(x=>{m[x.t]=x;});o.snacks=Object.values(m).sort((p,q)=>p.t-q.t);}
-  const n=b.notes||a.notes;if(n)o.notes=n;else delete o.notes;
+  const n=('notes' in b)?b.notes:a.notes;if(n)o.notes=n;else delete o.notes;   // an emptied note is a deletion, not a missing field
   return o;}
 async function save(dayKey){
   let body=JSON.parse(JSON.stringify(days[dayKey]||{}));
   if(db){try{const snap=await db.collection('days').doc(dayKey).get();if(snap&&snap.exists){body=mergeDay(snap.data(),body);days[dayKey]=JSON.parse(JSON.stringify(body));}}catch(e){}}
-  local.set('day:'+dayKey,body);nativeEvt('saved',{day:dayKey});
+  const okLocal=local.set('day:'+dayKey,body);if(okLocal)nativeEvt('saved',{day:dayKey});
   if(db){try{await db.collection('days').doc(dayKey).set(body);dirty=false;setStatus('Synced to your log.');return}catch(e){setStatus('Could not save to your log ('+(e&&e.code||'error')+'). Kept on this device.')}}
+  if(!okLocal){dirty=true;setStatus('Could not save on this phone (storage full or blocked). Export your log from Settings so nothing is lost.');return;}
   dirty=false;
 }
 async function saveSettings(){
@@ -907,7 +910,10 @@ async function saveSettings(){
   local.set('settings',settings);
 }
 let saveTimer=null, dirty=false;
-function queueSave(k){dirty=true;clearTimeout(saveTimer);saveTimer=setTimeout(()=>save(k),600);}
+let saveKey=null;
+function queueSave(k){dirty=true;saveKey=k;try{local.set('day:'+k,days[k]);}catch(e){}clearTimeout(saveTimer);saveTimer=setTimeout(()=>{saveTimer=null;save(k);},600);}
+function flushSave(){if(saveTimer){clearTimeout(saveTimer);saveTimer=null;if(saveKey)save(saveKey);}}
+window.addEventListener('pagehide',flushSave);
 function setStatus(t){document.getElementById('status').textContent=t;}
 function day(){return days[TODAY]||(days[TODAY]={iso:0,routine:0,legExt:false});}
 
@@ -1299,7 +1305,7 @@ function renderMapTrend(){const el=$('trendMap');if(!el)return;if(!mapLog.length
     return '<div class="mb"><span>'+x.name+'</span><div class="bar"><i style="width:'+(avg==null?0:Math.round(avg/3*100))+'%"></i></div><span class="v">'+(avg==null?'—':avg.toFixed(1))+'</span></div>';}).join('');
   el.innerHTML='<div class="eyebrow">Calf map · left leg, last 3 sessions (0–3)</div><div class="mapbars">'+rows+'</div>';}
 renderMapTrend();
-window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k],recordDone:k=>recordDone(k),finish:c=>finish(c),renderNow:()=>renderNow(),allDays:()=>allDays()};
+window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k],recordDone:k=>recordDone(k),finish:c=>finish(c),renderNow:()=>renderNow(),allDays:()=>allDays(),mergeDay:(a,b)=>mergeDay(a,b),get today(){return TODAY;},queue:()=>queueSave(TODAY)};
 (function loop(){try{if(sess&&document.visibilityState==='visible')drawSegs();}catch(e){}requestAnimationFrame(loop);})();
 function setRing(frac,snap){if(snap){arc.classList.add('snap');}arc.style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,frac))));if(snap){void arc.offsetWidth;arc.classList.remove('snap');}}
 const ringEl=document.querySelector('.ring');
@@ -1366,7 +1372,7 @@ function show(){const s=sess.steps[sess.i]; const e=EX[s.ex];
     setRing(s.kind==='up'?0:s.kind==='down'?1:s.kind==='hold'?1:1,true); requestAnimationFrame(()=>setRing(target)); }
   else setRing(target);
   breathCue(s,sess.left);
-  setL('tSkip',e.speakCue?'Next':(s.kind==='rest'||/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/.test(s.ex))&&s.kind!=='setup'&&!s.long?'Skip rest':(s.kind==='setup'||s.long)?(s.kind==='setup'?'I\'m ready':'Skip rest'):'Skip exercise');
+  setL('tSkip',e.speakCue?'Next':(s.kind==='rest'||/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/.test(s.ex))&&s.kind!=='setup'&&!s.long?'Skip rest':(s.kind==='setup'||s.long)?(s.kind==='setup'?'I\'m ready':'Skip rest'):(/ · set \d+ of \d+/.test(e.name||'')?'Skip set':'Skip exercise'));
 }
 // Wall-clock engine: every step has an absolute end time, so the countdown stays true if the screen locks,
 // you switch apps, or Safari reloads the page. State is saved so a reload resumes mid-session.
@@ -1535,7 +1541,9 @@ function watchSync(){if(!sess||window.__extApply)return;watchSend(planOf(sess.st
 function applyExternal(d){window.__extApply=true;try{
   if(d.cmd==='start'&&!sess){setTimeout(()=>{if(sess)watchSync();},80);if(/^snack:/.test(d.mode||'')&&EX[(d.mode.slice(6))]||/^snack:/.test(d.mode||'')&&ANK_KEYS[d.mode.slice(6)])startSession(false,false,d.mode);else if(d.mode==='snack'){const sn=snackNext();if(sn)startSession(false,false,'snack:'+sn);}else startSession(false,false,d.mode==='hips'?'hips':'home');}
   if(!sess)return;
-  if(d.cmd==='end'){finish(false);return;}
+  if(d.cmd==='end'){if(d.pos!=null){const offs=stepOffsets(),n=sess.steps.length;const pos=d.pos;let idx=0;for(let i=0;i<n;i++){if(offs[i]<=pos)idx=i;else break;}
+      if(idx>sess.i){const to=sess.steps[idx].ex;const seen=new Set();for(let j=sess.i;j<idx;j++){const k=sess.steps[j].ex;if(k&&k!==to&&!seen.has(k)){seen.add(k);if(!sess.doneEx.includes(k))sess.doneEx.push(k);recordDone(k);}}dbg('watch: ended at',pos.toFixed(0),'s, credited through step',idx);}}
+    finish(false);return;}
   if(d.pos==null)return;
   const offs=stepOffsets(),n=sess.steps.length,total=offs[n-1]+(sess.steps[n-1].kind==='mark'?0:sess.steps[n-1].secs);
   const now=Date.now(),pos=d.pos+(d.paused?0:Math.max(0,(now-d.at)/1000));
@@ -1564,7 +1572,7 @@ window.addEventListener('ach:interrupt',e=>{const began=!!(e.detail&&e.detail.be
   if(began){if(sess&&!paused&&sound&&trackOn){autoPaused=true;pSrc='interruption';$('tPause').click();}else dbg('audio: interruption ignored (nothing playing)');}
   else if(autoPaused){autoPaused=false;if(sess&&paused)$('tPause').click();}});
 window.addEventListener('ach:markRound',()=>{const d=day();if((d.ankle||0)>=2)return;d.ankle=(d.ankle||0)+1;d.ankleDone=[];d.foot=1;queueSave(TODAY);renderAll();setStatus('Round logged from the reminder.');});
-window.addEventListener('ach:seed',e=>{const sd=e.detail&&e.detail.days;if(!sd)return;let n=0;Object.keys(sd).forEach(k=>{const before=JSON.stringify(days[k]||null);days[k]=mergeDay(days[k],JSON.parse(JSON.stringify(sd[k])));if(JSON.stringify(days[k])!==before){local.set('day:'+k,days[k]);n++;}});if(n){renderAll();setStatus('Imported '+n+' day'+(n>1?'s':'')+' from the web log.');}});
+window.addEventListener('ach:seed',e=>{const sd=e.detail&&e.detail.days;if(!sd)return;if(local.get('seeded'))return;local.set('seeded',1);let n=0;Object.keys(sd).forEach(k=>{const before=JSON.stringify(days[k]||null);days[k]=mergeDay(JSON.parse(JSON.stringify(sd[k])),days[k]);if(JSON.stringify(days[k])!==before){local.set('day:'+k,days[k]);n++;}});if(n){renderAll();setStatus('Imported '+n+' day'+(n>1?'s':'')+' from the web log.');}});
 window.addEventListener('ach:state?',()=>{const d=day();const b=bootFor(today);nativeEvt('state',{today:TODAY,rounds:d.ankle||0,partial:(d.ankleDone||[]).length,imagery:d.imagery||0,bfr:d.bfr||0,snackLast:snackLast(),snackName:(()=>{const s=snackNext();return s?ANK_DEF.find(x=>x[0]===s)[2].split(' · ')[0]:'';})(),hingeToday:b.changeToday&&b.cur.deg<30?b.cur.deg:null,hingeSet:d.hingeSet||null,hingeNext:b.next?{date:keyOf(b.next.from),deg:b.next.deg}:null,checked:!!verdictKind(TODAY),log:allDays()});});
 function advance(quiet){
   let i=sess.i+1;
@@ -1676,6 +1684,7 @@ $('sImg').onclick=()=>startSession(false,false,'imagery');
 $('sMap').onclick=()=>startSession(false,false,'map');
 $('sHips').onclick=()=>startSession(false,false,'hips');
 let pSrc='',tapPauseAt=0;
+function pausedUI(){setL('tPause',paused?'Resume':'Pause');$('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused;}
 $('tPause').onclick=e=>{if(!sess)return; if(!paused){const p0=posSeconds();tick();if(!sess)return;const p1=posSeconds();if(p1-p0>3)dbg('pause: caught up',p0.toFixed(1),'->',p1.toFixed(1),'first');} paused=!paused; dbg('pause:',paused?'on':'off','('+(pSrc||'button')+')');pSrc='';
   if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';try{speechSynthesis.cancel();}catch(e){}if(window.__nativeStopSpeak)window.__nativeStopSpeak();nativeEvt('paused');}
   else{sess.stepEnd+=Date.now()-pauseStart;pauseStart=0;lastShown=null;tick();$('audWarn').hidden=true;
@@ -1691,7 +1700,7 @@ function jumpTo(idx){if(!sess)return;hush();$('jumpList').hidden=true;dbg('jump:
   if(idx>sess.i){const to=sess.steps[idx]&&sess.steps[idx].ex;const seen=new Set();for(let j=sess.i;j<idx&&j<sess.steps.length;j++){const k=sess.steps[j].ex;if(k&&k!==to&&!seen.has(k)){seen.add(k);recordDone(k,'skipped');}}}
   while(idx<sess.steps.length&&sess.steps[idx].kind==='mark')idx++;
   if(idx>=sess.steps.length){finish(true);return;}
-  if(paused){paused=false;pauseStart=0;setL('tPause','Pause');}
+  if(paused){paused=false;pauseStart=0;pausedUI();}
   enter(idx,Date.now(),false); lastShown=null; tick(); persist(); syncTrack(); watchSync();}
 function sessGroups(){const out=[];sess.steps.forEach((st,i)=>{if(st.kind==='mark'||REST_KEY.test(st.ex))return;const g=groupOf(st.ex);if(!out.find(x=>x.g===g))out.push({g,i});});return out;}
 function groupDone(g){const d=day();if((d.ankleDone||[]).includes(g))return true;
@@ -1709,10 +1718,10 @@ $('tSkip').onclick=()=>{if(!sess)return; hush(); const st=sess.steps[sess.i];dbg
   const isRest=st.kind==='setup'||st.long||st.kind==='rest'||/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/.test(st.ex);
   if(!(isRest||EX[st.ex].speakCue)){ // skip the rest of this exercise (imagery: just this scene)
     let i=sess.i; while(i+1<sess.steps.length&&sess.steps[i+1].kind!=='mark')i++; sess.i=i;}
-  sess.stepEnd=Date.now(); if(paused){paused=false;pauseStart=0;setL('tPause','Pause');} lastShown=null; tick(); syncTrack(); watchSync();};
+  sess.stepEnd=Date.now(); if(paused){paused=false;pauseStart=0;pausedUI();} lastShown=null; tick(); syncTrack(); watchSync();};
 $('tStop').onclick=()=>finish(false);
 $('tPause').addEventListener('click',()=>{if(pSrc!=='resume')hideResumeCard();},true);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')window.__hiddenAt=Date.now();dbg('app:',document.visibilityState,sess?'(in session)':'');if(document.visibilityState==='hidden'){if(sess&&paused&&Date.now()-tapPauseAt<2000){tapPauseAt=0;dbg('pause: undone, that tap was the swipe out of the app');pSrc='undo';$('tPause').click();}persist();if(sess&&!paused&&trackOn&&track.paused)track.play().catch(()=>{});}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')window.__hiddenAt=Date.now();dbg('app:',document.visibilityState,sess?'(in session)':'');if(document.visibilityState==='hidden'){flushSave();if(sess&&paused&&Date.now()-tapPauseAt<800){tapPauseAt=0;dbg('pause: undone, that tap was the swipe out of the app');pSrc='undo';$('tPause').click();}persist();if(sess&&!paused&&trackOn&&track.paused)track.play().catch(()=>{});}
   if(document.visibilityState==='visible'){lastShown=null;tick();syncTrack();if(sess)watchSync();
   if(sess&&navigator.wakeLock&&!wake){navigator.wakeLock.request('screen').then(w=>wake=w).catch(()=>{});}}});
 (function(){const VOICE='<svg viewBox="0 0 24 24"><path d="M3 4h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7l-5 4v-4H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>',CUES='<svg viewBox="0 0 24 24"><rect x="3" y="9" width="2.6" height="6" rx="1.3"/><rect x="8" y="5" width="2.6" height="14" rx="1.3"/><rect x="13" y="8" width="2.6" height="8" rx="1.3"/><rect x="18" y="3" width="2.6" height="18" rx="1.3"/></svg>';

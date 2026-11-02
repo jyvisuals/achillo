@@ -357,20 +357,25 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
     private func handleWatch(_ msg: [String: Any]) {
         let cmd = msg["cmd"] as? String ?? ""
         var startedMode: String? = nil
+        // Commands carry the moment they were tapped on the wrist; a queued command (phone was out of reach) still lands at the right time.
+        let tapped: Date = { if let ms = msg["at"] as? Double, ms > 0 { return min(Date(), Date(timeIntervalSince1970: ms / 1000)) }; return Date() }()
+        func posAt(_ t: Date) -> Double { planPaused ? planPos : max(0, planPos + t.timeIntervalSince(planAt)) }
+        var endPos: Double? = nil
         switch cmd {
         case "pause":
-            if planActive && !planPaused { planPos = clockPos(); planAt = Date(); planPaused = true }
+            if planActive && !planPaused { planPos = posAt(tapped); planAt = Date(); planPaused = true }
+            if let p = player, planActive { p.currentTime = max(0, min(planPos, p.duration)) }
             player?.pause(); wantPlaying = false
         case "play":
             if planActive && planPaused {
-                planAt = Date(); planPaused = false
-                if let p = player { activate(); p.currentTime = max(0, min(planPos, p.duration)); wantPlaying = p.play() }
+                planAt = tapped; planPaused = false   // time since the wrist tap counts
+                if let p = player { activate(); p.currentTime = max(0, min(clockPos(), p.duration)); wantPlaying = p.play() }
             }
         case "skip":
             if planActive {
-                let to = skipTarget(from: clockPos())
-                planPos = to; planAt = Date()
-                if let p = player { p.currentTime = max(0, min(to, p.duration)) }
+                let to = skipTarget(from: posAt(tapped))
+                planPos = to; planAt = planPaused ? Date() : tapped
+                if let p = player { p.currentTime = max(0, min(clockPos(), p.duration)) }
             }
         case "ack":
             notifyListeners("watch", data: ["from": "watch", "cmd": "ack"], retainUntilConsumed: true); return
@@ -383,6 +388,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
         case "markRound":
             notifyListeners("watch", data: ["from": "watch", "cmd": "markRound"], retainUntilConsumed: true); return
         case "end":
+            if planActive { endPos = posAt(tapped) }
             planActive = false
             player?.pause(); wantPlaying = false
         case "start":
@@ -399,6 +405,7 @@ public class AchAudioPlugin: CAPPlugin, CAPBridgedPlugin, AVAudioPlayerDelegate 
             o["pos"] = planPos; o["at"] = planAt.timeIntervalSince1970 * 1000; o["paused"] = planPaused; o["type"] = "plan"
             if let d = try? JSONSerialization.data(withJSONObject: o), let j = String(data: d, encoding: .utf8) { watchLink.send(j) }
         } else if cmd == "end" {
+            if let e = endPos { out["pos"] = e; out["at"] = Date().timeIntervalSince1970 * 1000; out["paused"] = true }
             watchLink.send("{\"type\":\"end\",\"complete\":false}")
         }
         notifyListeners("watch", data: out, retainUntilConsumed: true)
