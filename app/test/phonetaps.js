@@ -5,7 +5,7 @@ const go=d=>p.evaluate(d=>window.dispatchEvent(new CustomEvent('ach:remote',{det
 const st=()=>p.evaluate(()=>[window.__phoneTaps,document.querySelector('#tHapL').textContent]);
 await p.evaluate(()=>__t.start(false,false,'snack:doming'));await p.waitForTimeout(300);const a=await st();
 await go({from:'watch',cmd:'ack'});await p.waitForTimeout(100);const b2=await st();
-await p.click('#tHap');const c=await st();
+await p.click('#tAudTog');await p.click('#tHap');const c=await st();
 await go({from:'watch',cmd:'pause'});await p.waitForTimeout(200);const d=await st();
 await p.evaluate(()=>__t.finish(false));await p.evaluate(()=>__t.start(false,false,'snack:doming'));await p.waitForTimeout(300);const e=await st();
 console.log('start',a,'| ack',b2,'| press',c,'| watch pause',d,'| new session',e,errs);await b.close();})();
