@@ -1,1 +1,1 @@
-Watch cues redesigned: one big hit on the push, a faint heartbeat through the hold, a thud-and-fall on the release, and a 3-2-1 at the end of holds. The screen flashes white on push and release. Taps uses Apple's strongest patterns on Strong and Max.
+Watch: the background session that keeps taps going with the screen off is now retried whenever you raise your wrist, and the watch tells you ("Taps pause when the screen sleeps") if it is not running.

@@ -61,6 +61,7 @@ final class SessionModel: NSObject, ObservableObject {
     private var lastSecond = -1
     private var timer: Timer?
     private var runtime: WKExtendedRuntimeSession?
+    @Published var backgroundOK = false   // true while the background session is running (taps continue with the screen off)
 
     struct Now {
         let index: Int
@@ -379,6 +380,8 @@ extension SessionModel: WCSessionDelegate {
 // MARK: keep running with your wrist down (a physical-therapy session)
 
 extension SessionModel: WKExtendedRuntimeSessionDelegate {
+    // The background session is what keeps taps coming once the screen sleeps. It can only be started while the
+    // app is frontmost, so a plan that arrives in the background has to wait for the next wrist raise; ensureRuntime() retries then.
     fileprivate func startRuntime() {
         if let r = runtime, r.state == .running || r.state == .scheduled { return }
         let r = WKExtendedRuntimeSession()
@@ -386,13 +389,19 @@ extension SessionModel: WKExtendedRuntimeSessionDelegate {
         r.start()
         runtime = r
     }
+    func ensureRuntime() { if active { startRuntime() } }
     fileprivate func stopRuntime() {
         runtime?.invalidate()
         runtime = nil
+        backgroundOK = false
     }
     func extendedRuntimeSession(_ extendedRuntimeSession: WKExtendedRuntimeSession, didInvalidateWith reason: WKExtendedRuntimeSessionInvalidationReason, error: Error?) {
-        DispatchQueue.main.async { if self.runtime === extendedRuntimeSession { self.runtime = nil } }
+        DispatchQueue.main.async {
+            if self.runtime === extendedRuntimeSession { self.runtime = nil; self.backgroundOK = false }
+            // Expired or refused while a session is still running: try again shortly (works once the app is frontmost).
+            if self.active { DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.ensureRuntime() } }
+        }
     }
-    func extendedRuntimeSessionDidStart(_ extendedRuntimeSession: WKExtendedRuntimeSession) {}
+    func extendedRuntimeSessionDidStart(_ extendedRuntimeSession: WKExtendedRuntimeSession) { DispatchQueue.main.async { self.backgroundOK = true } }
     func extendedRuntimeSessionWillExpire(_ extendedRuntimeSession: WKExtendedRuntimeSession) {}
 }

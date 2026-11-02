@@ -43,10 +43,12 @@ final class WatchDelegate: NSObject, WKApplicationDelegate, UNUserNotificationCe
 struct AchilloWatchApp: App {
     @WKApplicationDelegateAdaptor(WatchDelegate.self) private var delegate
     @StateObject private var model = SessionModel.shared
+    @Environment(\.scenePhase) private var phase
 
     var body: some Scene {
         WindowGroup {
             ContentView().environmentObject(model)
         }
+        .onChange(of: phase) { _, p in if p == .active { model.ensureRuntime() } }
     }
 }
