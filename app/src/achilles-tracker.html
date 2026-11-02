@@ -118,7 +118,8 @@ textarea{width:100%;min-height:48px;padding:10px;border:1px solid var(--line);bo
 .sctl .ctlb.stop{background:color-mix(in srgb,var(--warn) 18%,var(--surface));border-color:color-mix(in srgb,var(--warn) 55%,transparent);color:var(--warn)}
 .sctl.paused .ctlb.go,.sctl.paused #tJump{display:none}.sctl.paused{grid-template-columns:1fr 1fr}
 .sctl.paused #tPause{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.sctl.aud{grid-template-columns:repeat(5,1fr);max-width:330px;margin-top:4px;margin-left:auto;margin-right:auto}.sctl.aud .ctlb{min-height:44px}.sctl.aud .ctlb.off{opacity:.55}
+.sctl.aud[hidden],.wrap.focus .sctl.aud[hidden]{display:none!important}.audtog{display:flex;justify-content:center;margin-top:6px}.audtog .ctlb{min-height:38px;padding:4px 14px;border-radius:999px;gap:8px;font-size:13px;color:var(--muted)}.audtog .ctlb .ic,.audtog .ctlb .ic svg{width:18px;height:18px}.audtog .ctlb.open{color:var(--ink,inherit)}
+.sctl.aud{grid-template-columns:repeat(5,1fr);max-width:330px;margin-top:6px;margin-left:auto;margin-right:auto}.sctl.aud .ctlb{min-height:44px}.sctl.aud .ctlb.off{opacity:.55}
 .snackpick{margin:8px 0 2px;font-size:14px}.snackpick small{font-size:12px}
 .jumplist{display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow:auto;width:100%}.jumprow{text-align:left;width:100%}.jumprow.done{opacity:.55}.jumprow.now{border-color:var(--hold)}
 .reps i.done{background:var(--hold)}
@@ -672,7 +673,7 @@ pre.rtext{display:none}
     <audio id="track" playsinline preload="auto" hidden></audio>
     <div class="audwarn" id="audWarn" hidden><span id="audWarnT">Audio didn't start.</span><button id="audRetry">Retry audio</button></div>
     <div class="verdict go" id="sDone" hidden></div>
-    <div class="sctl aud" id="audRow"><button id="tVoice" class="ctlb" aria-label="Voice"></button><button id="tCues" class="ctlb" aria-label="Cues"></button><button id="tVol" class="ctlb" aria-label="Cue volume"></button><button id="tHap" class="ctlb" aria-label="Phone taps" title="Phone taps"><i class="ic"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 8v8M20 8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></i><span class="l" id="tHapL">Taps</span></button><button id="tPocket" class="ctlb" aria-label="Pocket mode" title="Pocket mode"><i class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 6.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 10v6m-2.6-2.6L12 16l2.6-2.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button></div>
+    <div class="audtog"><button id="tAudTog" class="ctlb" aria-label="Sound and taps" title="Sound and taps"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2.2" fill="var(--card,#0b1512)"/><circle cx="15" cy="12" r="2.2" fill="var(--card,#0b1512)"/><circle cx="7" cy="17" r="2.2" fill="var(--card,#0b1512)"/></svg></i><span class="l" id="tAudTogL">Sound &amp; taps</span></button></div><div class="sctl aud" id="audRow" hidden><button id="tVoice" class="ctlb" aria-label="Voice"></button><button id="tCues" class="ctlb" aria-label="Cues"></button><button id="tVol" class="ctlb" aria-label="Cue volume"></button><button id="tHap" class="ctlb" aria-label="Phone taps" title="Phone taps"><i class="ic"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 8v8M20 8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></i><span class="l" id="tHapL">Taps</span></button><button id="tPocket" class="ctlb" aria-label="Pocket mode" title="Pocket mode"><i class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 6.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 10v6m-2.6-2.6L12 16l2.6-2.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button></div>
     <div class="sstrip" id="sessStrip" aria-hidden="true"></div><div class="stime" id="sessTime"></div>
   </section>
 
@@ -1534,7 +1535,7 @@ function planOf(stepsIn,title,pos,isPaused,mode){const idx={},ex=[];
 // Phone taps: on for each new session, off the moment the watch takes the session. Only a press turns them back on.
 let phoneTaps=true,phoneTapsWhy='',phoneTapsPinned=false;window.__phoneTaps=true; // pinned: pressed on by hand, so the watch can't turn them off again this session
 function setPhoneTaps(on,why){if(why==='button')phoneTapsPinned=on;else if(why==='new session')phoneTapsPinned=false;else if(phoneTapsPinned)return;if(phoneTaps===on)return;phoneTaps=on;window.__phoneTaps=on;phoneTapsWhy=why||'';dbg('phone taps:',on?'on':'off','('+(why||'button')+')');renderPhoneTaps();}
-function renderPhoneTaps(){const b=$('tHap');if(!b)return;b.classList.toggle('off',!phoneTaps);$('tHapL').textContent=phoneTaps?'Taps':phoneTapsWhy==='watch'?'Taps · watch':'Taps off';b.title=phoneTaps?'Phone taps on':'Phone taps off'+(phoneTapsWhy==='watch'?' (the watch has them)':'');}
+function renderPhoneTaps(){try{renderAudTog();}catch(e){}const b=$('tHap');if(!b)return;b.classList.toggle('off',!phoneTaps);$('tHapL').textContent=phoneTaps?'Taps':phoneTapsWhy==='watch'?'Taps · watch':'Taps off';b.title=phoneTaps?'Phone taps on':'Phone taps off'+(phoneTapsWhy==='watch'?' (the watch has them)':'');}
 $('tHap').onclick=()=>{setPhoneTaps(!phoneTaps,'button');if(phoneTaps&&window.__buzz)window.__buzz('up',1);};
 function watchSync(){if(!sess||window.__extApply)return;watchSend(planOf(sess.steps,$('isoh').textContent,posSeconds(),paused,sess.mode));}
 // The watch can drive the session while this page is asleep: the app's native clock keeps the truth, and we catch up to it here.
@@ -1608,7 +1609,7 @@ function startSession(withPress,withRoutine,mode){dbg('session: start',mode||'')
   {const d=day();const L=homeLeft(d);if(mode==='home'&&(d.homeN||0)===1&&L.length&&L.every(k=>k==='calfman'||k==='pfwall')){d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: evening round, BFR-covered leftovers dropped');}}
   if(mode==='home'&&((day().homeN||0)>=2&&!(day().ankleDone||[]).some(isHome)||!homeList().length)){const d=day();if((d.homeN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Barefoot PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isHome(k));dbg('home: fresh pass');}
   if(mode==='gym'&&!gymLeft(day()).length){const d=day();if((d.gymN||0)>=2){$('nowDone').hidden=false;$('nowDone').textContent='Boot-on PT done twice today.';return;}d.ankleDone=(d.ankleDone||[]).filter(k=>!isGym(k));dbg('gym: fresh pass');}
-  sess=build(withPress,withRoutine,mode); sess.t0=Date.now(); setPhoneTaps(true,'new session'); paused=false; pauseStart=0; lastShown=null;
+  sess=build(withPress,withRoutine,mode); sess.t0=Date.now(); setPhoneTaps(true,'new session'); $('audRow').hidden=true; renderAudTog(); paused=false; pauseStart=0; lastShown=null;
   enter(0,Date.now(),true); beep(780,150); sayStep(); beginRun(); persist(); startTrack(); watchSync();
 }
 function resumeSession(){
@@ -1684,6 +1685,10 @@ $('sImg').onclick=()=>startSession(false,false,'imagery');
 $('sMap').onclick=()=>startSession(false,false,'map');
 $('sHips').onclick=()=>startSession(false,false,'hips');
 let pSrc='',tapPauseAt=0;
+function audSummary(){const on=[voice?'Voice':null,sound?'Cues':null,phoneTaps?'Taps':null].filter(Boolean);return on.length?on.join(' · '):'Silent';}
+function renderAudTog(){const b=$('tAudTog');if(!b)return;const open=!$('audRow').hidden;b.classList.toggle('open',open);$('tAudTogL').textContent=open?'Done':audSummary();}
+$('tAudTog').onclick=()=>{$('audRow').hidden=!$('audRow').hidden;renderAudTog();};
+['tVoice','tCues','tHap','tVol'].forEach(id=>{const b=$(id);if(b)b.addEventListener('click',()=>setTimeout(renderAudTog,0));});
 function pausedUI(){setL('tPause',paused?'Resume':'Pause');$('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused;}
 $('tPause').onclick=e=>{if(!sess)return; if(!paused){const p0=posSeconds();tick();if(!sess)return;const p1=posSeconds();if(p1-p0>3)dbg('pause: caught up',p0.toFixed(1),'->',p1.toFixed(1),'first');} paused=!paused; dbg('pause:',paused?'on':'off','('+(pSrc||'button')+')');pSrc='';
   if(paused){pauseStart=Date.now();$('tPhase').textContent='Paused';try{speechSynthesis.cancel();}catch(e){}if(window.__nativeStopSpeak)window.__nativeStopSpeak();nativeEvt('paused');}
