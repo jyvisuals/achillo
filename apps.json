@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.88",
+          "buildVersion": "88",
+          "date": "2026-11-02T01:08:43Z",
+          "localizedDescription": "Reliability fixes from the second review: syncing or importing can no longer roll a finished round backward; a cleared note stays cleared; the bundled history seed applies once and never overwrites your corrections; a failed save now says so instead of pretending; notes and check-ins save instantly and flush when you leave the app.\nWatch: Pause, Skip and End now reach the phone even when it was out of reach, applied at the moment you tapped, and the watch says \"Phone out of reach\" when that happens. Ending from the watch credits what you did while the phone slept. Finish text says Quick one done / Hips done / Round done.\nPhone: Skip while paused no longer leaves the controls looking paused; the skip button says \"Skip set\" when that is what it does; the swipe-out pause undo is tighter (0.8 s) so a deliberate pause then switching apps stays paused.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.88.ipa",
+          "size": 1261897,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.87",
           "buildVersion": "87",
           "date": "2026-11-01T19:28:16Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.86.ipa",
           "size": 1256142,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.85",
-          "buildVersion": "85",
-          "date": "2026-11-01T02:30:06Z",
-          "localizedDescription": "Fixes from the code review: pausing right after Start now really stops the audio; exports include your whole history, not just the last 40 days (import brings preferences back too); reopening a session can no longer double-count BFR; snoozed reminders survive; a quick one only counts when you finish it; and the app rolls over at midnight if left open.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.85.ipa",
-          "size": 1252214,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.87",
-      "versionDate": "2026-11-01T19:28:16Z",
-      "versionDescription": "Watch battery: the session clock kept ticking ten times a second after a session ended. It now stops when the session does.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.87.ipa",
-      "size": 1256338
+      "version": "1.1.88",
+      "versionDate": "2026-11-02T01:08:43Z",
+      "versionDescription": "Reliability fixes from the second review: syncing or importing can no longer roll a finished round backward; a cleared note stays cleared; the bundled history seed applies once and never overwrites your corrections; a failed save now says so instead of pretending; notes and check-ins save instantly and flush when you leave the app.\nWatch: Pause, Skip and End now reach the phone even when it was out of reach, applied at the moment you tapped, and the watch says \"Phone out of reach\" when that happens. Ending from the watch credits what you did while the phone slept. Finish text says Quick one done / Hips done / Round done.\nPhone: Skip while paused no longer leaves the controls looking paused; the skip button says \"Skip set\" when that is what it does; the swipe-out pause undo is tighter (0.8 s) so a deliberate pause then switching apps stays paused.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.88.ipa",
+      "size": 1261897
     }
   ],
   "news": []
