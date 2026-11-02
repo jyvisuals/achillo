@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.91",
+          "buildVersion": "91",
+          "date": "2026-11-02T12:44:21Z",
+          "localizedDescription": "Watch cues redesigned: one big hit on the push, a faint heartbeat through the hold, a thud-and-fall on the release, and a 3-2-1 at the end of holds. The screen flashes white on push and release. Taps uses Apple's strongest patterns on Strong and Max.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.91.ipa",
+          "size": 1264776,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.90",
           "buildVersion": "90",
           "date": "2026-11-02T01:49:46Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.88.ipa",
           "size": 1261897,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.87",
-          "buildVersion": "87",
-          "date": "2026-11-01T19:28:16Z",
-          "localizedDescription": "Watch battery: the session clock kept ticking ten times a second after a session ended. It now stops when the session does.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.87.ipa",
-          "size": 1256338,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.90",
-      "versionDate": "2026-11-02T01:49:46Z",
-      "versionDescription": "The five sound and tap buttons are tucked behind one pill under the controls. It reads what is on (Voice · Cues · Taps); tap it to open them, tap Done to close.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.90.ipa",
-      "size": 1262275
+      "version": "1.1.91",
+      "versionDate": "2026-11-02T12:44:21Z",
+      "versionDescription": "Watch cues redesigned: one big hit on the push, a faint heartbeat through the hold, a thud-and-fall on the release, and a 3-2-1 at the end of holds. The screen flashes white on push and release. Taps uses Apple's strongest patterns on Strong and Max.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.91.ipa",
+      "size": 1264776
     }
   ],
   "news": []
