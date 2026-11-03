@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.95",
+          "buildVersion": "95",
+          "date": "2026-11-03T11:16:51Z",
+          "localizedDescription": "No more screen flash on the watch.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.95.ipa",
+          "size": 1274695,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.94",
           "buildVersion": "94",
           "date": "2026-11-03T01:42:54Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.93.ipa",
           "size": 1271682,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.92",
-          "buildVersion": "92",
-          "date": "2026-11-02T12:48:14Z",
-          "localizedDescription": "Watch: the background session that keeps taps going with the screen off is now retried whenever you raise your wrist, and the watch tells you (\"Taps pause when the screen sleeps\") if it is not running.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.92.ipa",
-          "size": 1271575,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.94",
-      "versionDate": "2026-11-03T01:42:54Z",
-      "versionDescription": "Watch: a session started on the phone now shows on the watch even if the watch app was opened later or woke from a wrist-down. The phone keeps the running session and the Quick one menu side by side, so one no longer overwrites the other.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.94.ipa",
-      "size": 1277281
+      "version": "1.1.95",
+      "versionDate": "2026-11-03T11:16:51Z",
+      "versionDescription": "No more screen flash on the watch.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.95.ipa",
+      "size": 1274695
     }
   ],
   "news": []
