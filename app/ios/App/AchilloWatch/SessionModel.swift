@@ -212,7 +212,6 @@ final class SessionModel: NSObject, ObservableObject {
     func cue(_ c: Cue) {
         var p = pattern(c)
         if strength == 2, (c == .up || c == .holdStart || c == .lastRep), let last = p.last { p.append((.notification, last.1 + 0.3)) }
-        if c == .up || c == .holdStart || c == .down || c == .lastRep { flashScreen() }
         for (t, d) in p {
             if d == 0 { WKInterfaceDevice.current().play(t) }
             else { DispatchQueue.main.asyncAfter(deadline: .now() + d) { WKInterfaceDevice.current().play(t) } }

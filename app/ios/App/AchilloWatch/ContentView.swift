@@ -80,7 +80,6 @@ struct SessionView: View {
                 }
             }
             .padding(.vertical, 22)
-            Color.white.opacity(m.flash ? 0.85 : 0).animation(.easeOut(duration: 0.18), value: m.flash).allowsHitTesting(false)
             if m.paused { PausedOverlay() }
         }
         .ignoresSafeArea()
