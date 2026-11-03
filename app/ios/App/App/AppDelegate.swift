@@ -644,14 +644,16 @@ final class WatchLink: NSObject, WCSessionDelegate {
     var paired: Bool { WCSession.isSupported() && WCSession.default.activationState == .activated && WCSession.default.isPaired }
     var installed: Bool { paired && WCSession.default.isWatchAppInstalled }
     var reachable: Bool { WCSession.isSupported() && WCSession.default.isReachable }
+    // The shared context always carries the latest session state AND the latest menu, under separate keys, so one
+    // never clobbers the other and a watch app opened later still sees the running session. Live messages are extra.
+    private var ctx: [String: Any] = [:]
     func send(_ json: String) {
         guard installed, !json.isEmpty else { return }
-        let msg: [String: Any] = ["json": json]
-        if WCSession.default.isReachable {
-            WCSession.default.sendMessage(msg, replyHandler: nil) { _ in try? WCSession.default.updateApplicationContext(msg) }
-        } else {
-            try? WCSession.default.updateApplicationContext(msg)
-        }
+        let type = (try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [String: Any])?["type"] as? String ?? ""
+        ctx[type == "menu" ? "menu" : "plan"] = json
+        ctx["stamp"] = Date().timeIntervalSince1970
+        try? WCSession.default.updateApplicationContext(ctx)
+        if WCSession.default.isReachable { WCSession.default.sendMessage(["json": json], replyHandler: nil, errorHandler: nil) }
     }
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
     func sessionDidBecomeInactive(_ session: WCSession) {}

@@ -305,14 +305,25 @@ final class SessionModel: NSObject, ObservableObject {
     }
 
     fileprivate func receive(_ d: [String: Any]) {
-        guard let json = d["json"] as? String, let data = json.data(using: .utf8),
-              let o = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return }
-        DispatchQueue.main.async { self.apply(o) }
+        // A live message carries one "json"; the shared context carries "menu" and "plan" side by side.
+        for key in ["json", "menu", "plan"] {
+            guard let json = d[key] as? String, let data = json.data(using: .utf8),
+                  let o = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { continue }
+            DispatchQueue.main.async { self.apply(o) }
+        }
+    }
+    // On every return to the front, re-read the shared context in case a plan arrived while we were asleep.
+    func refreshFromPhone() {
+        let s = WCSession.default
+        guard s.activationState == .activated else { return }
+        let ctx = s.receivedApplicationContext
+        if !ctx.isEmpty { receive(ctx) }
+        ensureRuntime()
     }
 
     private func apply(_ d: [String: Any]) {
         let type = d["type"] as? String ?? ""
-        if type == "end" { finish(complete: (d["complete"] as? Bool) ?? false); return }
+        if type == "end" { if active { finish(complete: (d["complete"] as? Bool) ?? false) }; return }
         queuedCmds = 0
         if type == "menu" { snackName = d["snack"] as? String ?? ""; snackDue = (d["due"] as? Bool) ?? false; snackNext = d["next"] as? String ?? ""; return }
         guard type == "plan" else { return }

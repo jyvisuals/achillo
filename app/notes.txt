@@ -1,1 +1,1 @@
-Phone cue sounds (the plucks, breaths and 3-2-1) are about three times louder at every volume setting. The voice is unchanged.
+Watch: a session started on the phone now shows on the watch even if the watch app was opened later or woke from a wrist-down. The phone keeps the running session and the Quick one menu side by side, so one no longer overwrites the other.

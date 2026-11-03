@@ -49,6 +49,6 @@ struct AchilloWatchApp: App {
         WindowGroup {
             ContentView().environmentObject(model)
         }
-        .onChange(of: phase) { _, p in if p == .active { model.ensureRuntime() } }
+        .onChange(of: phase) { _, p in if p == .active { model.refreshFromPhone() } }
     }
 }
