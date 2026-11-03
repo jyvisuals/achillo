@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.94",
+          "buildVersion": "94",
+          "date": "2026-11-03T01:42:54Z",
+          "localizedDescription": "Watch: a session started on the phone now shows on the watch even if the watch app was opened later or woke from a wrist-down. The phone keeps the running session and the Quick one menu side by side, so one no longer overwrites the other.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.94.ipa",
+          "size": 1277281,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.93",
           "buildVersion": "93",
           "date": "2026-11-02T13:07:47Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.92.ipa",
           "size": 1271575,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.91",
-          "buildVersion": "91",
-          "date": "2026-11-02T12:44:21Z",
-          "localizedDescription": "Watch cues redesigned: one big hit on the push, a faint heartbeat through the hold, a thud-and-fall on the release, and a 3-2-1 at the end of holds. The screen flashes white on push and release. Taps uses Apple's strongest patterns on Strong and Max.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.91.ipa",
-          "size": 1264776,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.93",
-      "versionDate": "2026-11-02T13:07:47Z",
-      "versionDescription": "Phone cue sounds (the plucks, breaths and 3-2-1) are about three times louder at every volume setting. The voice is unchanged.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.93.ipa",
-      "size": 1271682
+      "version": "1.1.94",
+      "versionDate": "2026-11-03T01:42:54Z",
+      "versionDescription": "Watch: a session started on the phone now shows on the watch even if the watch app was opened later or woke from a wrist-down. The phone keeps the running session and the Quick one menu side by side, so one no longer overwrites the other.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.94.ipa",
+      "size": 1277281
     }
   ],
   "news": []
