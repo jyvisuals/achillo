@@ -1113,7 +1113,7 @@ function bfrPlanned(){const v=verdictKind(TODAY);return bfrDay(today)&&(!v||v===
 const isHome=k=>{const d=ANK_DEF.find(x=>x[0]===k);return d&&!d[7]&&k!=='bootback';};
 const isGym=k=>false; // Boot-on PT retired Oct 30
 // Quick ones: Chris's "pick a drill every hour or so" — one boot-on exercise, all its sets, rotating least-recent first.
-const SNACK_POOL=['toeyoga2','doming','invev','bandsup','pfwall'];
+const SNACK_POOL=['toeyoga2','doming','invev','bandsup','pfwall','wshift','march'];
 function snackLast(){const d=day();const a=d.snacks||[];return a.length?a[a.length-1].t:0;}
 function snackCad(){return Math.max(30,Number(prefs.cadence)||60);}
 function snackDue(){return Date.now()-snackLast()>=(snackCad()-5)*60000;}
@@ -1146,9 +1146,10 @@ window.__dbg=function(m){try{const d=new Date();const pad=n=>String(n).padStart(
 const dbg=(...a)=>window.__dbg(a.map(x=>typeof x==='object'?JSON.stringify(x):String(x)).join(' '));
 window.addEventListener('error',e=>dbg('js error:',e.message,(e.filename||'').split('/').pop()+':'+e.lineno));
 window.addEventListener('unhandledrejection',e=>dbg('promise rejected:',(e.reason&&(e.reason.message||e.reason))||''));
-const PREF_DEF={rate:1.02,voice:'',haptics:0.8,remind:1,morning:'7:55',cadence:60,lastHour:21,evening:'20:00',imageryAt:'21:00',pool:['toeyoga2','doming','invev','bandsup']};
+const PREF_DEF={rate:1.02,voice:'',haptics:0.8,remind:1,morning:'7:55',cadence:60,lastHour:21,evening:'20:00',imageryAt:'21:00',pool:['toeyoga2','doming','invev','bandsup','wshift','march']};
 let prefs=Object.assign({},PREF_DEF,local.get('prefs')||{});
 {const pl=(prefs.pool||[]).filter(k=>SNACK_POOL.includes(k));prefs.pool=pl.length?pl:PREF_DEF.pool.slice();}
+if(!prefs.v3pool){prefs.pool=[...new Set([...(prefs.pool||[]),'wshift','march'])];prefs.v3pool=1;try{local.set('prefs',prefs);}catch(e){}}
 if(!prefs.v2times){if(prefs.evening==='16:00')prefs.evening='20:00';if(prefs.imageryAt==='20:25')prefs.imageryAt='21:00';prefs.v2times=1;try{local.set('prefs',prefs);}catch(e){}}
 let audRefresh=null,volRefresh=null;
 function fmtHM(v){const [h,m]=String(v||'20:00').split(':').map(Number);return ((h%12)||12)+(m?':'+String(m).padStart(2,'0'):'')+(h<12?' AM':' PM');}

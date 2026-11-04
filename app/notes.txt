@@ -1,1 +1,1 @@
-Weight shifts and marching in place now remind you to put a heel lift in the sneaker.
+Weight shifts and marching in place are now in the quick-one rotation too. Turn either off under Settings, Quick ones, if you want.
