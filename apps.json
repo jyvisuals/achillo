@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.98",
+          "buildVersion": "98",
+          "date": "2026-11-04T12:19:40Z",
+          "localizedDescription": "Weight shifts and marching in place are now in the quick-one rotation too. Turn either off under Settings, Quick ones, if you want.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.98.ipa",
+          "size": 1274963,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.97",
           "buildVersion": "97",
           "date": "2026-11-04T11:54:08Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.95.ipa",
           "size": 1274695,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.94",
-          "buildVersion": "94",
-          "date": "2026-11-03T01:42:54Z",
-          "localizedDescription": "Watch: a session started on the phone now shows on the watch even if the watch app was opened later or woke from a wrist-down. The phone keeps the running session and the Quick one menu side by side, so one no longer overwrites the other.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.94.ipa",
-          "size": 1277281,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.97",
-      "versionDate": "2026-11-04T11:54:08Z",
-      "versionDescription": "Weight shifts and marching in place now remind you to put a heel lift in the sneaker.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.97.ipa",
-      "size": 1274926
+      "version": "1.1.98",
+      "versionDate": "2026-11-04T12:19:40Z",
+      "versionDescription": "Weight shifts and marching in place are now in the quick-one rotation too. Turn either off under Settings, Quick ones, if you want.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.98.ipa",
+      "size": 1274963
     }
   ],
   "news": []
