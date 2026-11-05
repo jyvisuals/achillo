@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.100",
+          "buildVersion": "100",
+          "date": "2026-11-05T11:21:17Z",
+          "localizedDescription": "BFR mornings: the band superset is two rounds instead of three, with 10-second rests between rounds (evenings keep three). About 40 minutes now.\nFixed: last night's calf-raise fix could stop a BFR morning from counting as a finished round.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.100.ipa",
+          "size": 1275370,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.99",
           "buildVersion": "99",
           "date": "2026-11-05T02:53:38Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.98.ipa",
           "size": 1274963,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.97",
-          "buildVersion": "97",
-          "date": "2026-11-04T11:54:08Z",
-          "localizedDescription": "Weight shifts and marching in place now remind you to put a heel lift in the sneaker.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.97.ipa",
-          "size": 1274926,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.99",
-      "versionDate": "2026-11-05T02:53:38Z",
-      "versionDescription": "Fixed: if the morning BFR got cut short after the calf raises, the evening round dropped the seated calf raise with nothing in its place. It now stays in.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.99.ipa",
-      "size": 1275044
+      "version": "1.1.100",
+      "versionDate": "2026-11-05T11:21:17Z",
+      "versionDescription": "BFR mornings: the band superset is two rounds instead of three, with 10-second rests between rounds (evenings keep three). About 40 minutes now.\nFixed: last night's calf-raise fix could stop a BFR morning from counting as a finished round.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.100.ipa",
+      "size": 1275370
     }
   ],
   "news": []
