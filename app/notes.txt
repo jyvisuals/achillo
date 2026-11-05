@@ -1,1 +1,1 @@
-Weight shifts and marching in place are now in the quick-one rotation too. Turn either off under Settings, Quick ones, if you want.
+Fixed: if the morning BFR got cut short after the calf raises, the evening round dropped the seated calf raise with nothing in its place. It now stays in.
