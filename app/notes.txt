@@ -1,1 +1,2 @@
-Fixed: if the morning BFR got cut short after the calf raises, the evening round dropped the seated calf raise with nothing in its place. It now stays in.
+BFR mornings: the band superset is two rounds instead of three, with 10-second rests between rounds (evenings keep three). About 40 minutes now.
+Fixed: last night's calf-raise fix could stop a BFR morning from counting as a finished round.

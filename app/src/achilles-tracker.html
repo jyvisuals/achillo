@@ -1035,7 +1035,12 @@ ANK_DEF.forEach(([k,sets,name,reps,setup,setupCue,phases,inBoot])=>{ANK_KEYS[k]=
     EX['bev_'+r]=Object.assign({},base,{name:'Band eversion · round '+r+' of 3',setup:r===1?8:0,setupCue:'Boot off, band around the forefoot, anchored to the inside so you pull outward. Foot pointed a little. Small, slow arcs; the ankle never comes up toward you.',phases:ph('Out','Turn the sole out against the band.')});
     EX['binv_'+r]=Object.assign({},base,{name:'Band inversion · round '+r+' of 3',setup:6,setupCue:'Switch the band anchor to the outside so you pull inward.',phases:ph('In','Turn the sole in against the band.')});
     EX['bpf_'+r]=Object.assign({},base,{name:'Band plantarflexion · round '+r+' of 3',setup:6,setupCue:'Band around the ball of the foot, ends in your hands. Point the foot down against it; on the way back the foot never comes up past {HINGE}.',phases:[['up','Point',2,'Point the foot down against the band.'],['down','Back',2,'Back slowly, only to {HINGE}.']]});}
-  ANK_KEYS.bandsup=['bev_1','binv_1','bpf_1','arest','bev_2','binv_2','bpf_2','arest','bev_3','binv_3','bpf_3'];})();
+  EX.brest={name:'Rest between rounds',reps:1,setup:0,phases:[['rest','Rest',10,'Ten seconds.']],rest:0};
+  const B3=['bev_1','binv_1','bpf_1','brest','bev_2','binv_2','bpf_2','brest','bev_3','binv_3','bpf_3'],B2=B3.slice(0,7);
+  const bfrRound=()=>{try{const d=day();return bfrPending()||(d.bfr>0&&(d.homeN||0)===0&&(d.ankle||0)===0);}catch(e){return false;}};
+  // BFR mornings: two rounds (the cuff work already loads the calf); otherwise Chris's three.
+  Object.defineProperty(ANK_KEYS,'bandsup',{get(){const two=bfrRound();for(let r=1;r<=3;r++)['bev_','binv_','bpf_'].forEach(k=>{const e=EX[k+r];if(e)e.name=e.name.replace(/round \d of \d/,'round '+r+' of '+(two?2:3));});return two?B2:B3;},enumerable:true,configurable:true});
+  Object.defineProperty(ANK_FULL,'bandsup',{get(){for(let r=1;r<=3;r++)['bev_','binv_','bpf_'].forEach(k=>{const e=EX[k+r];if(e)e.name=e.name.replace(/round \d of \d/,'round '+r+' of 3');});return B3;},enumerable:true,configurable:true});})();
 // David's long isometric holds: two minutes between holds, ankle circles filling the first two rests.
 (function(){const c=(dir,cue)=>({name:'Ankle circles · '+dir,reps:20,setup:6,setupCue:cue,phases:[['up','Circle',3,'Small, slow circle.']],rest:0,base:'pfwall',inBoot:false});
   EX.circ_cw=c('clockwise','Rest. Slide the foot off the ball, towel roll just above the ankle. Twenty small, lazy circles one way. Keep the top of each circle below {HINGE}.');
@@ -1087,7 +1092,7 @@ const HIPS_LAST=HIPS[HIPS.length-1];
 const ankLast=k=>ANK_KEYS[k][ANK_KEYS[k].length-1];
 function ankBases(){const d=day();const sameRound=d.bfr>0&&(d.homeN||0)===0&&(d.ankle||0)===0;
   // BFR calf raises stand in for the manual calf raise, and BFR presses for the wall isometric, only if they're actually in this round.
-  const calfCovered=sameRound||(bfrPending()&&!d.bfrA), pressCovered=sameRound||bfrPending();
+  const calfCovered=sameRound||(bfrPending()&&(!d.bfrA||(d.homeN||0)===0)), pressCovered=sameRound||bfrPending();   // BFR calf raises done in this same round still count
   return ANK_DEF.map(x=>x[0]).filter(k=>!((calfCovered&&k==='calfman')||(pressCovered&&k==='pfwall')));}
 function ankLeft(d){const done=(d.ankleDone||[]);return ankBases().filter(k=>!done.includes(k)&&k!=='bootback');}
 function ankList(only){let bases=only?[only]:ankBases().filter(k=>!((day().ankleDone||[]).includes(k)));
@@ -1515,8 +1520,9 @@ function recordDone(key,how){try{nativeEvt('done',{key});if(sess&&sess.mode&&ses
   const base=EX[key]&&EX[key].base;
   if(base&&key===ankLast(base)&&!(d.ankleDone||[]).includes(base)){d.ankleDone=(d.ankleDone||[]).concat(base);changed=true;
     if(how==='skipped'&&!(sess&&sess.doneEx.some(k=>EX[k]&&EX[k].base===base))){d.ankleSkip=(d.ankleSkip||[]).filter(x=>x!==base).concat(base);}else d.ankleSkip=(d.ankleSkip||[]).filter(x=>x!==base);sess.ankNew=(sess.ankNew||0)+1;if(isHome(base))d.homeAt=Date.now();if(isGym(base))d.gymAt=Date.now();
-    if(isHome(base)&&!homeLeft(d).length)d.homeN=Math.min((d.homeN||0)+1,2); if(isGym(base)&&!gymLeft(d).length)d.gymN=Math.min((d.gymN||0)+1,2);
-    if(!ankLeft(d).length){d.ankle=Math.min((d.ankle||0)+1,2);d.ankleDone=[];d.foot=1;sess.ankRound=true;}}
+    const homeEmpty=!homeLeft(d).length, allEmpty=!ankLeft(d).length;   // decide both before the round counter moves
+    if(isHome(base)&&homeEmpty)d.homeN=Math.min((d.homeN||0)+1,2); if(isGym(base)&&!gymLeft(d).length)d.gymN=Math.min((d.gymN||0)+1,2);
+    if(allEmpty){d.ankle=Math.min((d.ankle||0)+1,2);d.ankleDone=[];d.foot=1;sess.ankRound=true;}}
   if(key==='bcr15c'&&!d.bfrA){d.bfrA=1;changed=true;}
   if(key==='bpi4'&&!sess.bfrCounted){d.bfr=Math.min((d.bfr||0)+1,2);sess.bfrCounted=true;changed=true;}
   if(changed){persist();queueSave(TODAY);renderTasks();renderAnkle();renderLog();}}catch(e){}}
@@ -1704,7 +1710,7 @@ $('tPause').onclick=e=>{if(!sess)return; if(!paused){const p0=posSeconds();tick(
     const st=sess&&sess.steps[sess.i];if(st&&EX[st.ex]&&EX[st.ex].speakCue){sess.stepEnd=Date.now()+st.secs*1000;sayStep();}}
   setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused; persist(); lockInfo(); if(trackOn)syncTrack(); else if(!paused&&sound&&sess)startTrack(); watchSync();};
 // ---- skip / jump: skipping forward past an exercise counts it as done.
-const REST_KEY=/^(arest|srest|pfrest2?|cuffdown|cuffoff|deflatex?|bootback)$/;
+const REST_KEY=/^(arest|brest|srest|pfrest2?|cuffdown|cuffoff|deflatex?|bootback)$/;
 const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(k)?'bfrB':k;
 const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);if(d)return d[2];if(HIP_NAMES[g])return HIP_NAMES[g];if(g==='bfrA')return 'BFR seated calf raise';if(g==='bfrB')return 'BFR ball press';if(/^map_/.test(g)){const m=MAP_M.find(x=>'map_'+x.m===g);if(m)return 'Calf map · '+m.name;}return EX[g]?EX[g].name:g;};
 function jumpTo(idx){if(!sess)return;hush();$('jumpList').hidden=true;dbg('jump: to step',idx,sess.steps[idx]&&sess.steps[idx].ex);
