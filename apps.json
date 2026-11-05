@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.1.99",
+          "buildVersion": "99",
+          "date": "2026-11-05T02:53:38Z",
+          "localizedDescription": "Fixed: if the morning BFR got cut short after the calf raises, the evening round dropped the seated calf raise with nothing in its place. It now stays in.",
+          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.99.ipa",
+          "size": 1275044,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "1.1.98",
           "buildVersion": "98",
           "date": "2026-11-04T12:19:40Z",
@@ -35,26 +44,17 @@
           "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.97.ipa",
           "size": 1274926,
           "minOSVersion": "15.0"
-        },
-        {
-          "version": "1.1.95",
-          "buildVersion": "95",
-          "date": "2026-11-03T11:16:51Z",
-          "localizedDescription": "No more screen flash on the watch.",
-          "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.95.ipa",
-          "size": 1274695,
-          "minOSVersion": "15.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.1.98",
-      "versionDate": "2026-11-04T12:19:40Z",
-      "versionDescription": "Weight shifts and marching in place are now in the quick-one rotation too. Turn either off under Settings, Quick ones, if you want.",
-      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.98.ipa",
-      "size": 1274963
+      "version": "1.1.99",
+      "versionDate": "2026-11-05T02:53:38Z",
+      "versionDescription": "Fixed: if the morning BFR got cut short after the calf raises, the evening round dropped the seated calf raise with nothing in its place. It now stays in.",
+      "downloadURL": "https://raw.githubusercontent.com/jyvisuals/achillo/main/ipa/Achillo-1.1.99.ipa",
+      "size": 1275044
     }
   ],
   "news": []
