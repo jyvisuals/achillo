@@ -2240,7 +2240,7 @@ const LIB=[[
 ['Today’s poem','The Slowdown','5–8 min','https://pocketcasts.com/podcast/the-slowdown-poetry-reflection-daily/3cc0b5c0-a87b-0136-7b93-27f978dac4db'],
 ['Ode to Buttoning and Unbuttoning My Shirt','Poetry Unbound · Ross Gay','9 min',PU],
 ['Mindful Body Scan','Tara Brach','10 min',PCB],
-['Saying Yes to Our Life','Tara Brach','12 min',PCB],
+['Saying Yes to Our Life','Tara Brach','11 min',PCB],
 ['Relaxed and Awake','Tara Brach','17 min',PCB],
 ['Inciting Joy','Ross Gay','an essay a day','https://audible.com/series/Essays-Series-Audiobooks/B0BWJKP489'],
 ['Uses of the Erotic','Audre Lorde','23 min','https://www.ourbodiesourselves.org/health-info/audre-lorde-reads-uses-of-the-erotic/']
@@ -2260,7 +2260,7 @@ const LIB=[[
 ['Beloved: the Clearing','Toni Morrison','5 min','https://www.audible.com/pd/Beloved-Audiobook/B002V8KIZQ'],
 ['song at midnight','Poetry Unbound · Lucille Clifton','13 min',PU],
 ['Catalog of Unabashed Gratitude','Ross Gay','15 min','https://writingincompany.substack.com/p/ross-gays-catalog-of-unabashed-gratitude'],
-['Breath by Breath','Tara Brach','17 min',PCB],
+['Breath by Breath','Tara Brach','19 min',PCB],
 ['Coming Home with the Breath','Tara Brach','18 min',PCB],
 ['The Garden We Share','Poetry Off the Shelf','episode','https://pocketcasts.com/podcasts/9aae68c0-2a5f-012e-0845-00163e1b201c'],
 ['Tending Joy and Practicing Delight','On Being · Ross Gay','51 min','https://onbeing.org/programs/ross-gay-tending-joy-and-practicing-delight/'],
@@ -2314,6 +2314,13 @@ function pastHTML(){if(!ui.past)return '<div style="flex:1"></div><button class=
   const p=pastDays();return '<button class="be-more" id="beClosePast" aria-label="Hide past days">'+SVG.down+'</button>'+(p.length?p.map(d=>'<div class="be-day"><b>'+esc(d.lab)+'</b>'+d.ent.map(e=>(e.q?'<div class="q">'+esc(e.q)+'</div>':'')+e.lines.map(t=>'<div class="t">'+esc(t)+'</div>').join('')).join('')+'</div>').join(''):'<div class="be-faint" style="text-align:center">Nothing earlier yet.</div>');}
 // Direct audio files: these play inside the card, audio only. Everything else opens its own app.
 const AU={
+"0-16": "https://traffic.libsyn.com/tarabrach/2026_06_17_Meditation_Mindful_Body_Scan.mp3",
+"0-17": "https://traffic.libsyn.com/tarabrach/2024-12-25-Reflection-Saying-Yes-to-Our-Life-TaraBrach-2018-07-18.mp3",
+"0-18": "https://traffic.libsyn.com/tarabrach/2025_01_01_Meditation_Relaxed_and_Awake.mp3",
+"1-15": "https://traffic.libsyn.com/secure/tarabrach/2019-06-05-Meditation-Breath-by-Breath-redux-TaraBrach.mp3",
+"1-16": "https://traffic.libsyn.com/secure/tarabrach/2021-04-14-Meditation-Coming-Home-with-the-Breath-TaraBrach.mp3",
+"2-6": "https://www.uclahealth.org/marc/mpeg/04_Loving_Kindness.mp3",
+"2-9": "https://traffic.libsyn.com/preview/secure/mindfulorg/12MM_-_A_Meditation_to_Connect_With_Loving-Kindness_Even_When_Its_Hard_with_Sharon_Salzberg_January_30_2026_EDITED.mp3",
 "0-11": "https://cdn.simplecast.com/audio/38080bd8-b694-4f1a-b3c7-0b80b874d16b/episodes/e0934895-113c-4618-a833-c5c1849a0dd4/audio/c80ed1a3-aadd-45ed-b41c-ccba12edbc77/default_tc.mp3",
 "0-15": "https://cdn.simplecast.com/audio/49fe14/49fe14cf-8aef-4a4f-83ca-a3ac86a522d8/d1d2945c-5e05-4f70-bb93-5a8e7b976731/a-poem-to-notice-openings-and-closings_tc.mp3",
 "1-19": "https://cdn.simplecast.com/audio/85760130-020c-4d30-8e15-26c5c451394f/episodes/04833d7c-8b6f-4e97-b1b2-5d04c2501b55/audio/adcbcf1e-c69b-4389-9024-be7bc5bc6c57/default_tc.mp3",
