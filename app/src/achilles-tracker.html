@@ -2401,13 +2401,13 @@ function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+
     a.onclick=e=>{if(sw||ui.open===id){e.preventDefault();e.stopImmediatePropagation();if(!sw){ui.open=null;render();}sw=false;}};
     row.querySelectorAll('.be-act button').forEach(btn=>btn.onclick=()=>{const k=btn.dataset.a==='love'?'loved':'hidden';prefs[k][id]=!prefs[k][id];if(!prefs[k][id])delete prefs[k][id];savePrefs();ui.open=null;render();});});
   wirePlay();syncPlay();}
-function open(){ui.view='card';ui.mode=modeNow();ui.past=false;sheet.hidden=false;back.hidden=false;render();}
+function open(){sheet.style.animation='';ui.view='card';ui.mode=modeNow();ui.past=false;sheet.hidden=false;back.hidden=false;render();}
 function close(){sheet.hidden=true;back.hidden=true;sheet.innerHTML='';}
 fab.onclick=open;back.onclick=close;
 // Touch: drag the sheet down to dismiss (from the handle, or anywhere once its content is scrolled to the top).
 // When past days are showing, a downward swipe tucks them away instead; an upward swipe reveals them.
 {let y0=null,x0=0,ok=false,dy=0;const scroller=()=>sheet.querySelector('.be-body,.be-list');
- sheet.addEventListener('touchstart',e=>{if(e.target.closest('.be-front,.be-act,.be-pill'))return;const t=e.touches[0];y0=t.clientY;x0=t.clientX;dy=0;const sc=scroller();ok=!!e.target.closest('.be-grab,.be-tabs')||!sc||sc.scrollTop<=0;},{passive:true});
+ sheet.addEventListener('touchstart',e=>{if(e.target.closest('.be-front,.be-act,.be-pill'))return;const t=e.touches[0];y0=t.clientY;x0=t.clientX;dy=0;const sc=scroller();ok=!!e.target.closest('.be-grab,.be-tabs')||!sc||sc.scrollTop<=0;sheet.style.animation='none';},{passive:true});
  sheet.addEventListener('touchmove',e=>{if(y0==null)return;const t=e.touches[0];dy=t.clientY-y0;if(Math.abs(t.clientX-x0)>Math.abs(dy)){y0=null;sheet.style.transform='';return;}
    if(ok&&dy>0&&!(ui.view==='card'&&ui.past)){sheet.style.transition='none';sheet.style.transform='translateY('+dy+'px)';}},{passive:true});
  sheet.addEventListener('touchend',()=>{if(y0==null)return;y0=null;sheet.style.transition='transform .2s ease';
