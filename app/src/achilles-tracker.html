@@ -2181,9 +2181,10 @@ resumeSession();
 #beSheet .be-faint{font-size:14px;color:var(--muted);line-height:1.5}
 #beSheet h2.be-h{font-family:var(--display);font-weight:500;font-size:28px;margin:0}
 #beSheet .be-lines{display:flex;flex-direction:column;gap:2px}
-#beSheet .be-line{display:flex;align-items:center;gap:12px}
-#beSheet .be-line::before{content:"";width:5px;height:5px;border-radius:3px;background:var(--accent);flex-shrink:0;opacity:.7}
-#beSheet .be-line input,#beSheet .be-add input{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;font-size:16px;padding:10px 0;outline:none;min-width:0}
+#beSheet .be-line{display:flex;align-items:flex-start;gap:12px}
+#beSheet .be-line::before{content:"";width:5px;height:5px;margin-top:20px;border-radius:3px;background:var(--accent);flex-shrink:0;opacity:.7}
+#beSheet .be-line textarea{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;font-size:16px;line-height:1.4;padding:10px 0;outline:none;min-width:0;resize:none;overflow:hidden}
+#beSheet .be-add input{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;font-size:16px;padding:10px 0;outline:none;min-width:0}
 #beSheet .be-add{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);margin-top:4px}
 #beSheet .be-add input::placeholder{color:var(--muted)}
 #beSheet .be-ico{width:44px;height:44px;border-radius:22px;border:0;background:transparent;color:var(--accent);display:grid;place-items:center;padding:0;flex-shrink:0}
@@ -2307,7 +2308,7 @@ const pick=t=>{const L=LIB[t].map((r,k)=>({r,id:t+'-'+k})).filter(x=>!prefs.hidd
 function pastDays(){const all=H.allDays(),out=[];Object.keys(all).filter(k=>k<H.today&&all[k]&&all[k].be).sort().reverse().slice(0,14).forEach(k=>{const b=all[k].be;const dt=new Date(k+'T12:00');const lab=dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
   if(ui.mode==='m'){const ent=Object.keys(b.m||{}).filter(i=>(b.m[i]||[]).length).map(i=>({q:PROMPTS[i]||'',lines:b.m[i]}));if(ent.length)out.push({lab,ent});}
   else{const first=Object.keys(b.m||{}).map(i=>(b.m[i]||[])[0]).find(Boolean);if((b.d||[]).length)out.push({lab,ent:[{q:first?'Morning: '+first:'',lines:b.d}]});}});return out;}
-function linesHTML(list,kind){return '<div class="be-lines">'+list.map((t,k)=>'<div class="be-line"><input data-k="'+k+'" data-kind="'+kind+'" value="'+esc(t)+'" aria-label="Edit line '+(k+1)+'" enterkeyhint="done"></div>').join('')+
+function linesHTML(list,kind){return '<div class="be-lines">'+list.map((t,k)=>'<div class="be-line"><textarea rows="1" data-k="'+k+'" data-kind="'+kind+'" aria-label="Edit line '+(k+1)+'" enterkeyhint="done">'+esc(t)+'</textarea></div>').join('')+
   '<div class="be-add"><input id="beNew" placeholder="…" aria-label="Add a line" enterkeyhint="done"><button class="be-ico" id="beMic" aria-label="Add">'+SVG.mic+'</button></div></div>';}
 function pastHTML(){if(!ui.past)return '<div style="flex:1"></div><button class="be-more" id="beOpenPast" aria-label="Show past days">'+SVG.up+'</button>';
   const p=pastDays();return '<button class="be-more" id="beClosePast" aria-label="Hide past days">'+SVG.down+'</button>'+(p.length?p.map(d=>'<div class="be-day"><b>'+esc(d.lab)+'</b>'+d.ent.map(e=>(e.q?'<div class="q">'+esc(e.q)+'</div>':'')+e.lines.map(t=>'<div class="t">'+esc(t)+'</div>').join('')).join('')+'</div>').join(''):'<div class="be-faint" style="text-align:center">Nothing earlier yet.</div>');}
@@ -2352,7 +2353,7 @@ player.addEventListener('play',()=>{window.__beAudioOn=true;syncFab();if(!('medi
 const release=()=>{window.__beAudioOn=false;syncFab();try{H.sessMedia();}catch(e){}};
 player.addEventListener('pause',release);player.addEventListener('ended',release);
 player.addEventListener('ended',()=>{player.currentTime=0;});
-const wirePlay=()=>sheet.querySelectorAll('[data-play]').forEach(b=>{b.addEventListener('click',e=>{e.preventDefault();playId(b.dataset.play);});});
+const wirePlay=()=>sheet.querySelectorAll('[data-play]').forEach(b=>{b.addEventListener('click',e=>{e.preventDefault();playId(b.dataset.play);if(ui.view==='lib'){ui.view='card';ui.open=null;render();}});});
 function listenHTML(t){const x=curItem()||pick(t);const au=x&&AU[x.id];
   const btn=!x?'':au?'<button class="be-play" data-play="'+x.id+'" aria-label="Play or pause '+esc(x.r[0])+'">'+(isOn(x.id)?SVG.pause:SVG.play)+'</button>':'<a class="be-play" href="'+esc(x.r[3])+'" target="_blank" rel="noopener" aria-label="Open '+esc(x.r[0])+'">'+SVG.out+'</a>';
   return (au?'<div class="be-prog" aria-hidden="true"><i></i></div>':'')+'<div class="be-listen">'+btn+'<div class="nm">'+(x?esc(x.r[0]):'')+'</div><button class="be-link" id="beAll">All</button></div>';}
@@ -2368,8 +2369,9 @@ function wireCard(){
   $('beClose').onclick=close;$('beAll').onclick=()=>{ui.view='lib';ui.tab=ui.mode==='m'?0:1;ui.open=null;render();};
   // Re-resolve on every mutation: save() and the snapshot listener can swap the day record out from under us.
   const listOf=kind=>{const b=store();return kind==='m'?(b.m[ui.pi]=b.m[ui.pi]||[]):b.d;};
-  sheet.querySelectorAll('.be-line input').forEach(inp=>{const kd=inp.dataset.kind,k=+inp.dataset.k;
-    inp.oninput=()=>{listOf(kd)[k]=inp.value;touch();};
+  const fit=t=>{t.style.height='auto';t.style.height=t.scrollHeight+'px';};
+  sheet.querySelectorAll('.be-line textarea').forEach(inp=>{const kd=inp.dataset.kind,k=+inp.dataset.k;requestAnimationFrame(()=>fit(inp));
+    inp.oninput=()=>{listOf(kd)[k]=inp.value.replace(/\n/g,' ');touch();fit(inp);};
     inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}};
     inp.onblur=()=>{if(!inp.value.trim()){listOf(kd).splice(k,1);touch();render();}};});
   const nw=$('beNew'),mic=$('beMic'),kind=ui.mode==='m'?'m':'d';
@@ -2381,7 +2383,7 @@ function wireCard(){
     pill.onpointerdown=e=>{sx=e.clientX;sw=false;};pill.onpointerup=e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)>40){sw=true;go(dx<0?1:-1);}};
     pill.onclick=()=>{if(sw){sw=false;return;}go(1);};}
   const op=$('beOpenPast'),cp=$('beClosePast');if(op)op.onclick=()=>{ui.past=true;render();};if(cp)cp.onclick=()=>{ui.past=false;render();};
-  const body=$('beBody');let sy=null;body.onpointerdown=e=>{sy=e.clientY;};body.onpointerup=e=>{if(sy==null)return;const dy=e.clientY-sy;sy=null;
+  const body=$('beBody');let sy=null;body.onpointerdown=e=>{sy=e.pointerType==='touch'?null:e.clientY;};body.onpointerup=e=>{if(sy==null)return;const dy=e.clientY-sy;sy=null;
     if(dy<-60&&!ui.past&&body.scrollHeight<=body.clientHeight+4){ui.past=true;render();}else if(dy>60&&ui.past&&body.scrollTop<=0){ui.past=false;render();}};}
 function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+k}));const nh=rows.filter(x=>prefs.hidden[x.id]).length;
   const vis=rows.filter(x=>ui.showHid||!prefs.hidden[x.id]).sort((a,b)=>((prefs.loved[b.id]?1:0)-(prefs.loved[a.id]?1:0))||a.k-b.k);
@@ -2401,7 +2403,18 @@ function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+
   wirePlay();syncPlay();}
 function open(){ui.view='card';ui.mode=modeNow();ui.past=false;sheet.hidden=false;back.hidden=false;render();}
 function close(){sheet.hidden=true;back.hidden=true;sheet.innerHTML='';}
-fab.onclick=open;back.onclick=close;const sRun=$('sRun');
+fab.onclick=open;back.onclick=close;
+// Touch: drag the sheet down to dismiss (from the handle, or anywhere once its content is scrolled to the top).
+// When past days are showing, a downward swipe tucks them away instead; an upward swipe reveals them.
+{let y0=null,x0=0,ok=false,dy=0;const scroller=()=>sheet.querySelector('.be-body,.be-list');
+ sheet.addEventListener('touchstart',e=>{if(e.target.closest('.be-front,.be-act,.be-pill'))return;const t=e.touches[0];y0=t.clientY;x0=t.clientX;dy=0;const sc=scroller();ok=!!e.target.closest('.be-grab,.be-tabs')||!sc||sc.scrollTop<=0;},{passive:true});
+ sheet.addEventListener('touchmove',e=>{if(y0==null)return;const t=e.touches[0];dy=t.clientY-y0;if(Math.abs(t.clientX-x0)>Math.abs(dy)){y0=null;sheet.style.transform='';return;}
+   if(ok&&dy>0&&!(ui.view==='card'&&ui.past)){sheet.style.transition='none';sheet.style.transform='translateY('+dy+'px)';}},{passive:true});
+ sheet.addEventListener('touchend',()=>{if(y0==null)return;y0=null;sheet.style.transition='transform .2s ease';
+   if(ok&&dy>0&&ui.view==='card'&&ui.past){sheet.style.transform='';if(dy>60){ui.past=false;render();}return;}
+   if(ok&&dy>90){sheet.style.transform='translateY(100%)';setTimeout(()=>{sheet.style.transform='';sheet.style.transition='';close();},180);return;}
+   sheet.style.transform='';
+   const sc=scroller();if(ui.view==='card'&&!ui.past&&dy<-60&&sc&&sc.scrollHeight<=sc.clientHeight+4){ui.past=true;render();}});}const sRun=$('sRun');
 // Always available; the observer just notes whether a session is running.
 function syncFab(){fab.hidden=false;const live=!!(sRun&&!sRun.hidden);fab.classList.toggle('sess',live);
   const tb=document.getElementById('tabbar');const h=tb&&getComputedStyle(tb).display!=='none'?tb.getBoundingClientRect().height:0;fab.style.setProperty('--beDock',h+'px');}
