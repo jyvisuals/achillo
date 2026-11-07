@@ -1317,6 +1317,7 @@ function renderMapTrend(){const el=$('trendMap');if(!el)return;if(!mapLog.length
     return '<div class="mb"><span>'+x.name+'</span><div class="bar"><i style="width:'+(avg==null?0:Math.round(avg/3*100))+'%"></i></div><span class="v">'+(avg==null?'—':avg.toFixed(1))+'</span></div>';}).join('');
   el.innerHTML='<div class="eyebrow">Calf map · left leg, last 3 sessions (0–3)</div><div class="mapbars">'+rows+'</div>';}
 renderMapTrend();
+window.__be={day:()=>day(),allDays:()=>allDays(),save:()=>queueSave(TODAY),get today(){return TODAY;}};
 window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k],recordDone:k=>recordDone(k),finish:c=>finish(c),renderNow:()=>renderNow(),allDays:()=>allDays(),mergeDay:(a,b)=>mergeDay(a,b),get today(){return TODAY;},queue:()=>queueSave(TODAY)};
 (function loop(){try{if(sess&&document.visibilityState==='visible')drawSegs();}catch(e){}requestAnimationFrame(loop);})();
 function setRing(frac,snap){if(snap){arc.classList.add('snap');}arc.style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,frac))));if(snap){void arc.offsetWidth;arc.classList.remove('snap');}}
@@ -2158,5 +2159,199 @@ resumeSession();
     e=>setStatus('Live sync stopped. Reload to reconnect.'));
   db.doc('settings/profile').onSnapshot(s=>{if(s.exists){settings=Object.assign({},s.data());renderWB();}},()=>{});
 })();
+})();
+</script>
+<!-- ===== PT bookends: a quiet card to pull up during PT (morning prompts, evening delights, listening library) ===== -->
+<style>
+#beFab{position:fixed;right:20px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:44;width:48px;height:48px;border-radius:24px;border:1px solid var(--line);background:var(--surface);color:var(--accent);display:grid;place-items:center;box-shadow:var(--shadow);padding:0}
+#beFab[hidden],#beSheet[hidden],#beBack[hidden]{display:none}
+#beBack{position:fixed;inset:0;z-index:58;background:rgba(0,0,0,.45);animation:fadeIn .2s ease both}
+#beSheet{position:fixed;left:0;right:0;bottom:0;z-index:60;height:82vh;display:flex;flex-direction:column;background:var(--surface);color:var(--ink);border-radius:28px 28px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.35);animation:sheetUp .32s cubic-bezier(.2,.9,.25,1) both;font-family:var(--body)}
+#beSheet .be-grab{align-self:center;width:120px;height:32px;border:0;background:transparent;display:grid;place-items:center;flex-shrink:0;padding:0}
+#beSheet .be-grab::before{content:"";width:40px;height:4px;border-radius:2px;background:var(--line)}
+#beSheet .be-body{flex:1;min-height:0;overflow-y:auto;padding:28px 28px 12px;display:flex;flex-direction:column;gap:24px;overscroll-behavior:contain}
+#beSheet .be-pill{touch-action:pan-y;user-select:none;-webkit-user-select:none;min-height:160px;border-radius:30px;border:0;background:var(--tint);color:var(--ink);padding:26px;text-align:left;font-family:var(--display);font-weight:500;font-size:25px;line-height:1.3;letter-spacing:-.01em;width:100%}
+#beSheet .be-dots{display:flex;justify-content:center;gap:8px;margin-top:-8px}
+#beSheet .be-dots i{width:4px;height:4px;border-radius:2px;background:var(--line)}
+#beSheet .be-dots i.a{background:color-mix(in srgb,var(--accent) 55%,var(--line))}
+#beSheet .be-dots i.on{width:16px;background:var(--accent)}
+#beSheet .be-faint{font-size:14px;color:var(--muted);line-height:1.5}
+#beSheet h2.be-h{font-family:var(--display);font-weight:500;font-size:28px;margin:0}
+#beSheet .be-lines{display:flex;flex-direction:column;gap:2px}
+#beSheet .be-line{display:flex;align-items:center;gap:12px}
+#beSheet .be-line::before{content:"";width:5px;height:5px;border-radius:3px;background:var(--accent);flex-shrink:0;opacity:.7}
+#beSheet .be-line input,#beSheet .be-add input{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;font-size:16px;padding:10px 0;outline:none;min-width:0}
+#beSheet .be-add{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);margin-top:4px}
+#beSheet .be-add input::placeholder{color:var(--muted)}
+#beSheet .be-ico{width:44px;height:44px;border-radius:22px;border:0;background:transparent;color:var(--accent);display:grid;place-items:center;padding:0;flex-shrink:0}
+#beSheet .be-more{align-self:center;width:64px;height:44px;border:0;background:transparent;color:var(--line);display:grid;place-items:center;padding:0}
+#beSheet .be-day{display:flex;flex-direction:column;gap:6px;padding-bottom:10px}
+#beSheet .be-day b{font-weight:500;font-size:13px;color:var(--muted);letter-spacing:.04em}
+#beSheet .be-day .q{font-size:14px;color:var(--muted);margin-top:4px}
+#beSheet .be-day .t{font-size:15px;color:var(--ink);opacity:.8;padding-left:17px}
+#beSheet .be-listen{display:flex;align-items:center;gap:14px;padding:12px 28px calc(20px + env(safe-area-inset-bottom));flex-shrink:0}
+#beSheet .be-play{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);color:var(--accent);display:grid;place-items:center;flex-shrink:0;text-decoration:none}
+#beSheet .be-listen .nm{flex:1;font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#beSheet .be-link{border:0;background:transparent;color:var(--accent);font:inherit;font-size:14px;padding:12px 0}
+#beSheet .be-tabs{display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0}
+#beSheet .be-tabs div{display:flex;gap:24px}
+#beSheet .be-tabs button.t{height:44px;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font:inherit;font-size:15px;font-weight:500;padding:0}
+#beSheet button:focus:not(:focus-visible),#beSheet a:focus:not(:focus-visible){outline:none}
+#beSheet .be-tabs button.t.on{color:var(--ink);border-bottom-color:var(--accent)}
+#beSheet .be-list{flex:1;min-height:0;overflow-y:auto;padding:8px 16px 24px;display:flex;flex-direction:column;gap:2px}
+#beSheet .be-row{position:relative;overflow:hidden;border-radius:16px;flex-shrink:0}
+#beSheet .be-act{position:absolute;top:0;right:0;bottom:0;display:flex}
+#beSheet .be-act button{width:60px;border:0;display:grid;place-items:center;padding:0;background:var(--sunk);color:var(--ink)}
+#beSheet .be-act button.lv{background:var(--tint);color:var(--accent)}
+#beSheet .be-front{position:relative;display:flex;align-items:center;gap:10px;padding:14px 12px;background:var(--surface);color:var(--ink);text-decoration:none;transition:transform .18s ease;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#beSheet .be-row.open .be-front{transform:translateX(-120px);background:var(--sunk)}
+#beSheet .be-front span.tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+#beSheet .be-front span.tt b{font-weight:400;font-size:16px;line-height:1.35}
+#beSheet .be-front span.tt small{font-size:13px;color:var(--muted)}
+#beSheet .be-row.hid .be-front{opacity:.45}
+</style>
+<button id="beFab" hidden aria-label="Open the bookends card"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></button>
+<div id="beBack" hidden></div>
+<div id="beSheet" hidden role="dialog" aria-modal="true" aria-label="Bookends"></div>
+<script>
+(function(){
+const PCB='https://pocketcasts.com/podcasts/d85b6740-2c4f-012e-0993-00163e1b201c',NEFF='https://self-compassion.org/guided-self-compassion-meditations-mp3-2/',UCSD='https://cih.ucsd.edu/mindfulness/guided-audio-video',TH='https://www.tarabrach.com/?p=6571',PU='https://pocketcasts.com/podcast/poetry-unbound/fe4aba40-0b1f-0138-9f6c-0acc26574db2';
+const LIB=[[
+['Wild Geese','Mary Oliver','1.5 min','https://www.themarginalian.org/2014/09/24/mary-oliver-reads-wild-geese/'],
+['The Summer Day','Mary Oliver','1.5 min','https://maryoliver.beacon.org/2011/06/mary-oliver-reads-the-summer-day'],
+['Otherwise','Jane Kenyon','1 min','https://www.poetryfoundation.org/audio/77032/otherwise'],
+['homage to my hips','Lucille Clifton','1 min','https://poets.org/poem/homage-my-hips-audio-only'],
+['won’t you celebrate with me','Lucille Clifton','1 min','https://www.themarginalian.org/2015/09/01/lucille-clifton-reads-wont-you-celebrate-with-me/'],
+['Blackberry Eating','Galway Kinnell','1 min','https://poetryarchive.org/?p=5561'],
+['Eagle Poem','Joy Harjo','1.5 min','https://poetryarchive.org/poem/eagle-poem'],
+['Instructions on Not Giving Up','Ada Limón','1.5 min','https://improvisedlife.com/2019/03/22/ada-limons-breathtaking-reading-instructions-not-giving/'],
+['The Guest House','Rumi, read by Amanda Holmes','1.5 min','https://theamericanscholar.org/the-guest-house-by-rumi/'],
+['Mornings at Blackwater','Mary Oliver','1.5 min','https://maryoliver.beacon.org/aboutmary/media/'],
+['Everything Is Waiting for You','David Whyte','2 min','https://www.youtube.com/watch?v=QmA4s8r630s'],
+['Kindness','Naomi Shihab Nye','2 min','https://voxpopulisphere.com/2022/02/06/video-kindness-by-naomi-shihab-nye'],
+['Singularity','Marie Howe','3 min','https://www.themarginalian.org/2020/04/23/singularity-marie-howe-animated/'],
+['A Brief for the Defense','Jack Gilbert','3 min','https://mars.gmu.edu/handle/1920/531'],
+['Today’s poem','The Slowdown','5–8 min','https://pocketcasts.com/podcast/the-slowdown-poetry-reflection-daily/3cc0b5c0-a87b-0136-7b93-27f978dac4db'],
+['Ode to Buttoning and Unbuttoning My Shirt','Poetry Unbound · Ross Gay','9 min',PU],
+['Mindful Body Scan','Tara Brach','10 min',PCB],
+['Saying Yes to Our Life','Tara Brach','12 min',PCB],
+['Relaxed and Awake','Tara Brach','17 min',PCB],
+['Inciting Joy','Ross Gay','an essay a day','https://audible.com/series/Essays-Series-Audiobooks/B0BWJKP489'],
+['Uses of the Erotic','Audre Lorde','23 min','https://www.ourbodiesourselves.org/health-info/audre-lorde-reads-uses-of-the-erotic/']
+],[
+['Thank You','Ross Gay','2 min','https://theworld.org/stories/2013/08/14/earth-poetry'],
+['Let Evening Come','Jane Kenyon','1 min','https://poets.org/poem/let-evening-come'],
+['blessing the boats','Lucille Clifton, read by Elizabeth Acevedo','1 min','https://www.poetryfoundation.org/video/156997/elizabeth-acevedo-reads-blessing-the-boats-by-lucille-clifton'],
+['Saint Francis and the Sow','Galway Kinnell','1.5 min','https://voca.arizona.edu/reading/galway-kinnell-april-8-1992'],
+['Perhaps the World Ends Here','Joy Harjo','2 min','https://www.pbs.org/newshour/show/poet-joy-harjo-reads-a-thanksgiving-poem'],
+['The Peace of Wild Things','Wendell Berry','2 min','https://www.themarginalian.org/2021/03/12/wendell-berry-the-peace-of-wild-things-animated/'],
+['To the Mulberry Tree','Ross Gay','3 min','https://voca.arizona.edu/reading/ross-gay-january-19-2017'],
+['To the Fig Tree on 9th and Christian','Ross Gay','4 min','https://indianapublicmedia.org/eartheats/ross-gays-to-the-fig-tree-on-9th-and-christian.php'],
+['Small Kindnesses','The Slowdown','5 min','https://www.slowdownshow.org/episode/2019/08/29/199-small-kindnesses'],
+['At Blackwater Pond','Mary Oliver, a poem a night','1.5 min each','https://penguinrandomhouse.com/books/isbn/9780807007006'],
+['The Book of Delights','Ross Gay','1–4 min each','https://www.audible.com/pd/The-Book-of-Delights-Audiobook/B07LHJXBJG'],
+['The Book of (More) Delights','Ross Gay','1–4 min each','https://www.audible.com/pd/The-Book-of-More-Delights-Audiobook/B0BWFTVQYL'],
+['Beloved: the Clearing','Toni Morrison','5 min','https://www.audible.com/pd/Beloved-Audiobook/B002V8KIZQ'],
+['song at midnight','Poetry Unbound · Lucille Clifton','13 min',PU],
+['Catalog of Unabashed Gratitude','Ross Gay','15 min','https://writingincompany.substack.com/p/ross-gays-catalog-of-unabashed-gratitude'],
+['Breath by Breath','Tara Brach','17 min',PCB],
+['Coming Home with the Breath','Tara Brach','18 min',PCB],
+['The Garden We Share','Poetry Off the Shelf','episode','https://pocketcasts.com/podcasts/9aae68c0-2a5f-012e-0845-00163e1b201c'],
+['Tending Joy and Practicing Delight','On Being · Ross Gay','51 min','https://onbeing.org/programs/ross-gay-tending-joy-and-practicing-delight/'],
+['Before You Know Kindness','On Being · Naomi Shihab Nye','51 min','https://podknife.com/episodes/naomi-shihab-nye-before-you-know-kindness-as-the-deepest-thing-inside'],
+['Catalog of Unabashed Gratitude (book)','Ross Gay, a poem a night','a few min each','https://www.audible.com/author/Ross-Gay/B001JOVOJM']
+],[
+['Self-Compassion Break','Kristin Neff','5 min','https://self-compassion.org/blog/take-a-self-compassion-break/'],
+['Loving-Kindness and Compassion','Livia Walsh · UC San Diego','6 min',UCSD],
+['Be Your Own Best Friend','Kristin Neff · Happiness Break','8 min','https://greatergood.berkeley.edu/podcasts/item/happiness_break_how_to_be_your_own_best_friend_encore'],
+['8-Minute Lovingkindness','Sharon Salzberg','8 min','https://eomega.org/audio/8-minute-lovingkindness-meditation'],
+['Suffering and Compassion','Tara Brach','8 min',TH],
+['Loving Kindness','Diana Winston · UCLA','9 min','https://www.uclahealth.org/uclamindful/guided-meditations'],
+['Loving Kindness for Health','Diana Winston · UCLA','11 min','https://www.uclahealth.org/marc/patients'],
+['Blessings of Love','Tara Brach','11 min',TH],
+['Lovingkindness','Jack Kornfield · Omega','12 min','https://eomega.org/audio/a-12-minute-mindfulness-meditation'],
+['Loving-Kindness (Even When It’s Hard)','Sharon Salzberg','12 min','https://pocketcasts.com/podcast/12-minute-meditation/d4201140-869e-0133-2d8b-6dc413d6d41d/a-meditation-to-connect-with-loving-kindness-even-when-its-hard/9de93eb2-90dd-40ed-bd15-a5466d2d74cf'],
+['Metta','Tara Brach','12 min','https://www.tarabrach.com/guided-meditation-metta-lovingkindness/'],
+['Loving Kindness for a Loved One','Noriko Morita Harth · UC San Diego','15 min',UCSD],
+['Embodied Metta','Tara Brach','20 min','https://www.tarabrach.com/?p=50567'],
+['Loving-Kindness Meditation','Kristin Neff','20 min',NEFF],
+['Compassionate Body Scan','Kristin Neff','24 min',NEFF],
+['Loving Kindness Guided Meditation','Jack Kornfield · Heart Wisdom','33 min','https://beherenownetwork.com/heart-wisdom-with-jack-kornfield-ep-224-loving-kindness-guided-meditation/']
+]];
+const PROMPTS=['How do I want to show up today?','What would actually satisfy me?','What could I do today with all of me in it?','Where am I settling for sensation over feeling?','What’s alive in my body right now?','What do I want to say yes to today?'];
+const TABS=['Morning','Evening','Kindness'];
+const SVG={mic:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+ ok:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+ up:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>',
+ down:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+ play:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg>',
+ heart:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8.4 3.2 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5 18.8 5 21 8.4 19.5 11.8 17.5 16.4 12 21 12 21z"/></svg>',
+ x:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
+const $=id=>document.getElementById(id), sheet=$('beSheet'), fab=$('beFab'), back=$('beBack');
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let prefs={loved:{},hidden:{}};try{prefs=Object.assign(prefs,JSON.parse(localStorage.getItem('ach:beLib')||'{}'));}catch(e){}
+const savePrefs=()=>{try{localStorage.setItem('ach:beLib',JSON.stringify(prefs));}catch(e){}};
+const H=window.__be;
+const store=()=>{const d=H.day();d.be=d.be||{};d.be.m=d.be.m||{};d.be.d=d.be.d||[];return d.be;};
+const touch=()=>{try{H.save();}catch(e){}};
+let ui={view:'card',mode:'m',pi:0,past:false,tab:0,open:null,showHid:false};
+const modeNow=()=>new Date().getHours()<15?'m':'e';
+const pick=t=>{const L=LIB[t].map((r,k)=>({r,id:t+'-'+k})).filter(x=>!prefs.hidden[x.id]);if(!L.length)return null;const lv=L.filter(x=>prefs.loved[x.id]);const pool=lv.length?lv:L;const dn=Math.floor(Date.now()/864e5);return pool[dn%pool.length];};
+function pastDays(){const all=H.allDays(),out=[];Object.keys(all).filter(k=>k<H.today&&all[k]&&all[k].be).sort().reverse().slice(0,14).forEach(k=>{const b=all[k].be;const dt=new Date(k+'T12:00');const lab=dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  if(ui.mode==='m'){const ent=Object.keys(b.m||{}).filter(i=>(b.m[i]||[]).length).map(i=>({q:PROMPTS[i]||'',lines:b.m[i]}));if(ent.length)out.push({lab,ent});}
+  else{const first=Object.keys(b.m||{}).map(i=>(b.m[i]||[])[0]).find(Boolean);if((b.d||[]).length)out.push({lab,ent:[{q:first?'Morning: '+first:'',lines:b.d}]});}});return out;}
+function linesHTML(list,kind){return '<div class="be-lines">'+list.map((t,k)=>'<div class="be-line"><input data-k="'+k+'" data-kind="'+kind+'" value="'+esc(t)+'" aria-label="Edit line '+(k+1)+'" enterkeyhint="done"></div>').join('')+
+  '<div class="be-add"><input id="beNew" placeholder="…" aria-label="Add a line" enterkeyhint="done"><button class="be-ico" id="beMic" aria-label="Add">'+SVG.mic+'</button></div></div>';}
+function pastHTML(){if(!ui.past)return '<div style="flex:1"></div><button class="be-more" id="beOpenPast" aria-label="Show past days">'+SVG.up+'</button>';
+  const p=pastDays();return '<button class="be-more" id="beClosePast" aria-label="Hide past days">'+SVG.down+'</button>'+(p.length?p.map(d=>'<div class="be-day"><b>'+esc(d.lab)+'</b>'+d.ent.map(e=>(e.q?'<div class="q">'+esc(e.q)+'</div>':'')+e.lines.map(t=>'<div class="t">'+esc(t)+'</div>').join('')).join('')+'</div>').join(''):'<div class="be-faint" style="text-align:center">Nothing earlier yet.</div>');}
+function listenHTML(t){const x=pick(t);return '<div class="be-listen">'+(x?'<a class="be-play" href="'+esc(x.r[3])+'" target="_blank" rel="noopener" aria-label="Play '+esc(x.r[0])+'">'+SVG.play+'</a><div class="nm">'+esc(x.r[0])+'</div>':'<div class="nm"></div>')+'<button class="be-link" id="beAll">All</button></div>';}
+function render(){const b=store();
+  if(ui.view==='lib')return renderLib();
+  let h='<button class="be-grab" id="beClose" aria-label="Close"></button><div class="be-body" id="beBody">';
+  if(ui.mode==='m'){const list=b.m[ui.pi]||[];
+    h+='<button class="be-pill" id="bePill" aria-label="'+esc(PROMPTS[ui.pi])+' Swipe or tap for another.">'+esc(PROMPTS[ui.pi])+'</button><div class="be-dots" aria-hidden="true">'+PROMPTS.map((p,k)=>'<i class="'+(k===ui.pi?'on':(b.m[k]||[]).length?'a':'')+'"></i>').join('')+'</div>'+linesHTML(list,'m');}
+  else{const first=Object.keys(b.m).map(i=>(b.m[i]||[])[0]).find(Boolean);
+    h+=(first?'<div class="be-faint">This morning: '+esc(first)+'</div>':'')+'<h2 class="be-h">Delights:</h2>'+linesHTML(b.d,'d');}
+  h+=pastHTML()+'</div>'+listenHTML(ui.mode==='m'?0:1);sheet.innerHTML=h;wireCard();}
+function wireCard(){const b=store();
+  $('beClose').onclick=close;$('beAll').onclick=()=>{ui.view='lib';ui.tab=ui.mode==='m'?0:1;ui.open=null;render();};
+  const listOf=kind=>kind==='m'?(b.m[ui.pi]=b.m[ui.pi]||[]):b.d;
+  sheet.querySelectorAll('.be-line input').forEach(inp=>{const L=listOf(inp.dataset.kind),k=+inp.dataset.k;
+    inp.oninput=()=>{L[k]=inp.value;touch();};
+    inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}};
+    inp.onblur=()=>{if(!inp.value.trim()){L.splice(k,1);touch();render();}};});
+  const nw=$('beNew'),mic=$('beMic'),kind=ui.mode==='m'?'m':'d';
+  const add=()=>{const t=nw.value.trim();if(!t)return;listOf(kind).push(t);touch();render();setTimeout(()=>{const n=$('beNew');if(n)n.focus();},30);};
+  const sync=()=>{const has=!!nw.value.trim();mic.innerHTML=has?SVG.ok:SVG.mic;mic.setAttribute('aria-label',has?'Add':'Dictate with the keyboard mic');};
+  nw.oninput=sync;nw.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();add();}};
+  mic.onclick=()=>{if(nw.value.trim())add();else nw.focus();};
+  const pill=$('bePill');if(pill){let sx=null,sw=false;const go=d=>{ui.pi=(ui.pi+d+PROMPTS.length)%PROMPTS.length;render();};
+    pill.onpointerdown=e=>{sx=e.clientX;sw=false;};pill.onpointerup=e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)>40){sw=true;go(dx<0?1:-1);}};
+    pill.onclick=()=>{if(sw){sw=false;return;}go(1);};}
+  const op=$('beOpenPast'),cp=$('beClosePast');if(op)op.onclick=()=>{ui.past=true;render();};if(cp)cp.onclick=()=>{ui.past=false;render();};
+  const body=$('beBody');let sy=null;body.onpointerdown=e=>{sy=e.clientY;};body.onpointerup=e=>{if(sy==null)return;const dy=e.clientY-sy;sy=null;
+    if(dy<-60&&!ui.past&&body.scrollHeight<=body.clientHeight+4){ui.past=true;render();}else if(dy>60&&ui.past&&body.scrollTop<=0){ui.past=false;render();}};}
+function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+k}));const nh=rows.filter(x=>prefs.hidden[x.id]).length;
+  const vis=rows.filter(x=>ui.showHid||!prefs.hidden[x.id]).sort((a,b)=>((prefs.loved[b.id]?1:0)-(prefs.loved[a.id]?1:0))||a.k-b.k);
+  let h='<button class="be-grab" id="beClose" aria-label="Close"></button><div class="be-tabs"><div>'+TABS.map((n,k)=>'<button class="t'+(k===t?' on':'')+'" data-t="'+k+'" aria-pressed="'+(k===t)+'">'+n+'</button>').join('')+'</div><button class="be-link" id="beDone">Done</button></div><div class="be-list">';
+  h+=vis.map(x=>{const lv=!!prefs.loved[x.id],hd=!!prefs.hidden[x.id];return '<div class="be-row'+(ui.open===x.id?' open':'')+(hd?' hid':'')+'" data-id="'+x.id+'"><div class="be-act"><button class="lv" data-a="love" aria-label="'+(lv?'Unlove ':'Love ')+esc(x.r[0])+'">'+SVG.heart+'</button><button data-a="hide" aria-label="'+(hd?'Unhide ':'Hide ')+esc(x.r[0])+'">'+SVG.x+'</button></div>'+
+   '<a class="be-front" href="'+esc(x.r[3])+'" target="_blank" rel="noopener" draggable="false"><span class="tt"><b>'+esc(x.r[0])+'</b><small>'+esc(x.r[1])+' · '+esc(x.r[2])+'</small></span>'+(lv?'<span style="color:var(--accent);display:grid">'+SVG.heart.replace('width="20" height="20"','width="14" height="14"')+'</span>':'')+'</a></div>';}).join('');
+  if(nh)h+='<button class="be-link" id="beHid" style="align-self:center;color:var(--muted);font-size:13px;margin-top:12px">'+(ui.showHid?'Hide hidden':'Show hidden ('+nh+')')+'</button>';
+  sheet.innerHTML=h+'</div>';
+  $('beClose').onclick=close;$('beDone').onclick=()=>{ui.view='card';render();};
+  sheet.querySelectorAll('.be-tabs button.t').forEach(b=>b.onclick=()=>{ui.tab=+b.dataset.t;ui.open=null;render();});
+  const hb=$('beHid');if(hb)hb.onclick=()=>{ui.showHid=!ui.showHid;render();};
+  sheet.querySelectorAll('.be-row').forEach(row=>{const id=row.dataset.id,a=row.querySelector('.be-front');let sx=null,sw=false;
+    a.onpointerdown=e=>{sx=e.clientX;sw=false;};
+    a.onpointerup=e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(dx<-40){sw=true;ui.open=id;render();}else if(dx>40){sw=true;ui.open=null;render();}};
+    a.onclick=e=>{if(sw||ui.open===id){e.preventDefault();if(!sw){ui.open=null;render();}sw=false;}};
+    row.querySelectorAll('.be-act button').forEach(btn=>btn.onclick=()=>{const k=btn.dataset.a==='love'?'loved':'hidden';prefs[k][id]=!prefs[k][id];if(!prefs[k][id])delete prefs[k][id];savePrefs();ui.open=null;render();});});}
+function open(){ui.view='card';ui.mode=modeNow();ui.past=false;sheet.hidden=false;back.hidden=false;render();}
+function close(){sheet.hidden=true;back.hidden=true;sheet.innerHTML='';}
+fab.onclick=open;back.onclick=close;
+// Show the button only while a session is running.
+const sRun=$('sRun');const syncFab=()=>{fab.hidden=!sRun||sRun.hidden;if(fab.hidden&&!sheet.hidden)close();};
+if(sRun){new MutationObserver(syncFab).observe(sRun,{attributes:true,attributeFilter:['hidden']});syncFab();}
+window.__beOpen=open;
 })();
 </script>
