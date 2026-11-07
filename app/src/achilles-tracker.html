@@ -2313,13 +2313,14 @@ function render(){const b=store();
   else{const first=Object.keys(b.m).map(i=>(b.m[i]||[])[0]).find(Boolean);
     h+=(first?'<div class="be-faint">This morning: '+esc(first)+'</div>':'')+'<h2 class="be-h">Delights:</h2>'+linesHTML(b.d,'d');}
   h+=pastHTML()+'</div>'+listenHTML(ui.mode==='m'?0:1);sheet.innerHTML=h;wireCard();}
-function wireCard(){const b=store();
+function wireCard(){
   $('beClose').onclick=close;$('beAll').onclick=()=>{ui.view='lib';ui.tab=ui.mode==='m'?0:1;ui.open=null;render();};
-  const listOf=kind=>kind==='m'?(b.m[ui.pi]=b.m[ui.pi]||[]):b.d;
-  sheet.querySelectorAll('.be-line input').forEach(inp=>{const L=listOf(inp.dataset.kind),k=+inp.dataset.k;
-    inp.oninput=()=>{L[k]=inp.value;touch();};
+  // Re-resolve on every mutation: save() and the snapshot listener can swap the day record out from under us.
+  const listOf=kind=>{const b=store();return kind==='m'?(b.m[ui.pi]=b.m[ui.pi]||[]):b.d;};
+  sheet.querySelectorAll('.be-line input').forEach(inp=>{const kd=inp.dataset.kind,k=+inp.dataset.k;
+    inp.oninput=()=>{listOf(kd)[k]=inp.value;touch();};
     inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}};
-    inp.onblur=()=>{if(!inp.value.trim()){L.splice(k,1);touch();render();}};});
+    inp.onblur=()=>{if(!inp.value.trim()){listOf(kd).splice(k,1);touch();render();}};});
   const nw=$('beNew'),mic=$('beMic'),kind=ui.mode==='m'?'m':'d';
   const add=()=>{const t=nw.value.trim();if(!t)return;listOf(kind).push(t);touch();render();setTimeout(()=>{const n=$('beNew');if(n)n.focus();},30);};
   const sync=()=>{const has=!!nw.value.trim();mic.innerHTML=has?SVG.ok:SVG.mic;mic.setAttribute('aria-label',has?'Add':'Dictate with the keyboard mic');};
