@@ -2403,6 +2403,8 @@ fab.onclick=open;back.onclick=close;const sRun=$('sRun');
 function syncFab(){fab.hidden=false;const live=!!(sRun&&!sRun.hidden);fab.classList.toggle('sess',live);
   const tb=document.getElementById('tabbar');const h=tb&&getComputedStyle(tb).display!=='none'?tb.getBoundingClientRect().height:0;fab.style.setProperty('--beDock',h+'px');}
 window.addEventListener('resize',syncFab);
+// Mode switches (focus, done screen, report) show and hide the tab bar without touching sRun.
+{const w=document.querySelector('.wrap'),tb=document.getElementById('tabbar');const mo=new MutationObserver(syncFab);if(w)mo.observe(w,{attributes:true,attributeFilter:['class']});if(tb)mo.observe(tb,{attributes:true,attributeFilter:['class','style','hidden']});}
 {let sy=null;fab.addEventListener('pointerdown',e=>{sy=e.clientY;try{fab.setPointerCapture(e.pointerId);}catch(_){}});fab.addEventListener('pointerup',e=>{if(sy!=null&&sy-e.clientY>20)open();sy=null;});}
 if(sRun){new MutationObserver(syncFab).observe(sRun,{attributes:true,attributeFilter:['hidden']});syncFab();}
 window.__beOpen=open;
