@@ -176,8 +176,8 @@ html.tabs .hero{padding-bottom:6px}
 #sPickNote{display:none}
 html.tabs .wrap:not(.focus) #audRow{display:none}
 /* full-screen session */
-.wrap.focus{padding-top:calc(10px + env(safe-area-inset-top))}
-.wrap.focus #sessionCard{min-height:calc(100vh - 60px);border:0;background:transparent;box-shadow:none;justify-content:flex-start;gap:14px}
+.wrap.focus{padding-top:calc(2px + env(safe-area-inset-top))}
+.wrap.focus #sessionCard{min-height:calc(100vh - 60px);padding-top:0;border:0;background:transparent;box-shadow:none;justify-content:flex-start;gap:14px}
 .wrap.focus #sName{font-size:34px!important;line-height:1.08;text-align:center;letter-spacing:-.02em}
 .wrap.focus #sStep{text-align:center}
 .wrap.focus .ring,.wrap.focus .ring>svg{width:280px;height:280px}
@@ -458,7 +458,7 @@ pre.rtext{display:none}
 .wrap>*:nth-child(1){animation-delay:0ms}.wrap>*:nth-child(2){animation-delay:60ms}.wrap>*:nth-child(3){animation-delay:120ms}.wrap>*:nth-child(4){animation-delay:180ms}.wrap>*:nth-child(5){animation-delay:240ms}.wrap>*:nth-child(6){animation-delay:300ms}.wrap>*:nth-child(7){animation-delay:360ms}.wrap>*:nth-child(n+8){animation-delay:420ms}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .wrap.focus>*{animation:none}
-.wrap.focus #sessionCard{padding:18px}
+.wrap.focus #sessionCard{padding:0 18px 18px}
 .wrap.focus #sessionCard{animation:focusIn .45s cubic-bezier(.2,1,.3,1) both}
 @keyframes focusIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
 /* ring: color follows force. amber builds in over the ramp, drains over the ease-off */
@@ -1317,7 +1317,7 @@ function renderMapTrend(){const el=$('trendMap');if(!el)return;if(!mapLog.length
     return '<div class="mb"><span>'+x.name+'</span><div class="bar"><i style="width:'+(avg==null?0:Math.round(avg/3*100))+'%"></i></div><span class="v">'+(avg==null?'—':avg.toFixed(1))+'</span></div>';}).join('');
   el.innerHTML='<div class="eyebrow">Calf map · left leg, last 3 sessions (0–3)</div><div class="mapbars">'+rows+'</div>';}
 renderMapTrend();
-window.__be={day:()=>day(),allDays:()=>allDays(),save:()=>queueSave(TODAY),get today(){return TODAY;}};
+window.__be={sessMedia:()=>{if(sess&&sound)sessMedia();},day:()=>day(),allDays:()=>allDays(),save:()=>queueSave(TODAY),get today(){return TODAY;}};
 window.__t={day:()=>day(),gymBases:()=>ankBases().filter(isGym),start:(...a)=>startSession(...a),jump:i=>jumpTo(i),get sess(){return sess;},ex:k=>EX[k],recordDone:k=>recordDone(k),finish:c=>finish(c),renderNow:()=>renderNow(),allDays:()=>allDays(),mergeDay:(a,b)=>mergeDay(a,b),get today(){return TODAY;},queue:()=>queueSave(TODAY)};
 (function loop(){try{if(sess&&document.visibilityState==='visible')drawSegs();}catch(e){}requestAnimationFrame(loop);})();
 function setRing(frac,snap){if(snap){arc.classList.add('snap');}arc.style.strokeDashoffset=String(C*(1-Math.max(0,Math.min(1,frac))));if(snap){void arc.offsetWidth;arc.classList.remove('snap');}}
@@ -1493,6 +1493,9 @@ async function startTrack_(){
     if(track.__verify)ok=await track.__verify();else{await new Promise(r=>setTimeout(r,1200));ok=!track.paused&&track.currentTime>t1;}
     $('audWarn').hidden=!!ok;dbg('audio: self-test',ok?'ok':'FAILED',track.__lastError||window.__nativeAudioMissing||'');if(!ok)$('audWarnT').textContent='Audio didn\'t start.'+((track.__lastError||window.__nativeAudioMissing)?' ('+(track.__lastError||window.__nativeAudioMissing)+')':'');},2200);
   // Lock-screen controls: keeps iOS treating this like a podcast, so cues keep playing with the screen off or in another app.
+  sessMedia();
+}
+function sessMedia(){if(window.__beAudioOn)return;
   try{if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:$('isoh').textContent||'Session',artist:'Achilles rehab · sound cues'});
     navigator.mediaSession.setActionHandler('pause',()=>{const t0=Date.now();setTimeout(()=>{ // iOS sends a media pause as you leave the app: ignore it then
       if(document.visibilityState==='hidden'||(window.__hiddenAt||0)>=t0-1500){dbg('pause: media pause while leaving the app, ignored');return;}
@@ -1510,7 +1513,7 @@ function enter(idx,fromEnd,quiet){ // move to step idx, ending fromEnd + its len
   breathFor(st); lockInfo(); nativeEvt('step',{kind:st.kind,ex:st.ex,rep:st.rep,reps:(EX[st.ex]||{}).reps||1,secs:st.secs,quiet:!!quiet,rest:REST_KEY.test(st.ex)||!!st.long||st.kind==='rest'&&st.secs>=10,first:!!(EX[st.ex]&&EX[st.ex].phases&&EX[st.ex].phases[0]&&EX[st.ex].phases[0][0]===st.kind&&EX[st.ex].phases[0][1]===st.label)});
 }
 // Lock screen: exercise and set as the title, phase and rep as the subtitle.
-function lockInfo(){try{if(!sess)return;if(!('mediaSession' in navigator)&&!window.__nativeNowPlaying)return;const st=sess.steps[sess.i];const e=EX[st.ex]||{};
+function lockInfo(){try{if(!sess||window.__beAudioOn)return;if(!('mediaSession' in navigator)&&!window.__nativeNowPlaying)return;const st=sess.steps[sess.i];const e=EX[st.ex]||{};
   const title=(e.name||'Session').replace(/\(\d of \d\)/,'').trim();
   const sub=st.kind==='setup'?'Get set':st.kind==='mark'?'Done':e.speakCue?'Imagery':(st.label||'')+((e.reps||1)>1&&!/^(arest|srest|cuffdown|cuffoff|deflate|bootback)$/.test(st.ex)?' · rep '+(st.rep+1)+' of '+e.reps:'');
   if(window.__nativeNowPlaying)window.__nativeNowPlaying(title,(paused?'Paused · ':'')+sub);
@@ -2163,7 +2166,7 @@ resumeSession();
 </script>
 <!-- ===== PT bookends: a quiet card to pull up during PT (morning prompts, evening delights, listening library) ===== -->
 <style>
-#beFab{position:fixed;right:20px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:44;width:48px;height:48px;border-radius:24px;border:1px solid var(--line);background:var(--surface);color:var(--accent);display:grid;place-items:center;box-shadow:var(--shadow);padding:0}
+#beFab{position:fixed;left:50%;transform:translateX(-50%);bottom:var(--beDock,0px);z-index:44;width:132px;height:calc(30px + var(--beSafe,0px));padding:7px 0 var(--beSafe,0px);border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;background:var(--surface);color:var(--accent);display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 -2px 12px rgba(0,0,0,.06);touch-action:none}#beFab::before{content:'';width:28px;height:3px;border-radius:2px;background:var(--line)}#beFab.sess{--beSafe:env(safe-area-inset-bottom)}
 #beFab[hidden],#beSheet[hidden],#beBack[hidden]{display:none}
 #beBack{position:fixed;inset:0;z-index:58;background:rgba(0,0,0,.45);animation:fadeIn .2s ease both}
 #beSheet{position:fixed;left:0;right:0;bottom:0;z-index:60;height:82vh;display:flex;flex-direction:column;background:var(--surface);color:var(--ink);border-radius:28px 28px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.35);animation:sheetUp .32s cubic-bezier(.2,.9,.25,1) both;font-family:var(--body)}
@@ -2334,10 +2337,17 @@ const isOn=id=>cur===id&&!player.paused;
 const curItem=()=>{if(!cur)return null;const [t,k]=cur.split('-').map(Number);return {r:LIB[t][k],id:cur};};
 function playId(id){if(cur===id){player.paused?player.play().catch(()=>{}):player.pause();return;}
   cur=id;player.src=AU[id];player.play().catch(()=>{});
-  try{const x=curItem();if('mediaSession' in navigator&&window.MediaMetadata)navigator.mediaSession.metadata=new MediaMetadata({title:x.r[0],artist:x.r[1]});}catch(e){}}
+}
 function syncPlay(){sheet.querySelectorAll('[data-play]').forEach(b=>{const on=isOn(b.dataset.play);const ic=b.classList.contains('be-play')?b:b.querySelector('.ic');if(ic){ic.innerHTML=on?SVG.pause:SVG.play;ic.classList.toggle('on',on);}b.setAttribute('aria-pressed',on);});
   const pr=sheet.querySelector('.be-prog i');if(pr)pr.style.width=(cur&&player.duration?Math.min(100,player.currentTime/player.duration*100):0)+'%';}
 ['play','pause','ended','timeupdate','loadedmetadata'].forEach(ev=>player.addEventListener(ev,syncPlay));
+// While a recording plays, lock-screen controls drive it; when it stops, they go back to the session.
+const ms=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f);}catch(e){}};
+player.addEventListener('play',()=>{window.__beAudioOn=true;syncFab();if(!('mediaSession' in navigator))return;
+  ms('play',()=>player.play().catch(()=>{}));ms('pause',()=>player.pause());ms('nexttrack',null);ms('previoustrack',null);
+  try{const x=curItem();navigator.mediaSession.metadata=new MediaMetadata({title:x.r[0],artist:x.r[1]});navigator.mediaSession.playbackState='playing';}catch(e){}});
+const release=()=>{window.__beAudioOn=false;syncFab();try{H.sessMedia();}catch(e){}};
+player.addEventListener('pause',release);player.addEventListener('ended',release);
 player.addEventListener('ended',()=>{player.currentTime=0;});
 const wirePlay=()=>sheet.querySelectorAll('[data-play]').forEach(b=>{b.addEventListener('click',e=>{e.preventDefault();playId(b.dataset.play);});});
 function listenHTML(t){const x=curItem()||pick(t);const au=x&&AU[x.id];
@@ -2388,9 +2398,12 @@ function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+
   wirePlay();syncPlay();}
 function open(){ui.view='card';ui.mode=modeNow();ui.past=false;sheet.hidden=false;back.hidden=false;render();}
 function close(){sheet.hidden=true;back.hidden=true;sheet.innerHTML='';}
-fab.onclick=open;back.onclick=close;
-// Show the button only while a session is running.
-const sRun=$('sRun');const syncFab=()=>{fab.hidden=!sRun||sRun.hidden;if(fab.hidden&&!sheet.hidden)close();};
+fab.onclick=open;back.onclick=close;const sRun=$('sRun');
+// Always available; the observer just notes whether a session is running.
+function syncFab(){fab.hidden=false;const live=!!(sRun&&!sRun.hidden);fab.classList.toggle('sess',live);
+  const tb=document.getElementById('tabbar');const h=tb&&getComputedStyle(tb).display!=='none'?tb.getBoundingClientRect().height:0;fab.style.setProperty('--beDock',h+'px');}
+window.addEventListener('resize',syncFab);
+{let sy=null;fab.addEventListener('pointerdown',e=>{sy=e.clientY;try{fab.setPointerCapture(e.pointerId);}catch(_){}});fab.addEventListener('pointerup',e=>{if(sy!=null&&sy-e.clientY>20)open();sy=null;});}
 if(sRun){new MutationObserver(syncFab).observe(sRun,{attributes:true,attributeFilter:['hidden']});syncFab();}
 window.__beOpen=open;
 })();
