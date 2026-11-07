@@ -1,3 +1,4 @@
+PT bookends: library pieces with an audio file now play right in the card (audio only, keeps going with the screen locked). Others open their own app.
 New: a small sun button during any session opens a quiet card. Mornings: swipe through prompts and add answers one at a time. Evenings: Delights. Swipe up for past days. "All" opens a listening library (swipe a row left to love or hide it).
 BFR mornings: the band superset is two rounds instead of three, with 10-second rests between rounds (evenings keep three). About 40 minutes now.
 Fixed: last night's calf-raise fix could stop a BFR morning from counting as a finished round.

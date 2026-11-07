@@ -2191,6 +2191,8 @@ resumeSession();
 #beSheet .be-day .t{font-size:15px;color:var(--ink);opacity:.8;padding-left:17px}
 #beSheet .be-listen{display:flex;align-items:center;gap:14px;padding:12px 28px calc(20px + env(safe-area-inset-bottom));flex-shrink:0}
 #beSheet .be-play{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);color:var(--accent);display:grid;place-items:center;flex-shrink:0;text-decoration:none}
+#beSheet .be-prog{height:2px;background:var(--line);margin:0 28px;border-radius:1px;overflow:hidden;flex-shrink:0}#beSheet .be-prog i{display:block;height:100%;width:0;background:var(--accent)}
+#beSheet .be-front .ic{color:var(--muted);display:grid;opacity:.7}#beSheet .be-front .ic.on{color:var(--accent);opacity:1}
 #beSheet .be-listen .nm{flex:1;font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #beSheet .be-link{border:0;background:transparent;color:var(--accent);font:inherit;font-size:14px;padding:12px 0}
 #beSheet .be-tabs{display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0}
@@ -2285,6 +2287,8 @@ const SVG={mic:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stro
  up:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>',
  down:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
  play:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg>',
+ pause:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>',
+ out:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
  heart:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8.4 3.2 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5 18.8 5 21 8.4 19.5 11.8 17.5 16.4 12 21 12 21z"/></svg>',
  x:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
 const $=id=>document.getElementById(id), sheet=$('beSheet'), fab=$('beFab'), back=$('beBack');
@@ -2304,7 +2308,41 @@ function linesHTML(list,kind){return '<div class="be-lines">'+list.map((t,k)=>'<
   '<div class="be-add"><input id="beNew" placeholder="…" aria-label="Add a line" enterkeyhint="done"><button class="be-ico" id="beMic" aria-label="Add">'+SVG.mic+'</button></div></div>';}
 function pastHTML(){if(!ui.past)return '<div style="flex:1"></div><button class="be-more" id="beOpenPast" aria-label="Show past days">'+SVG.up+'</button>';
   const p=pastDays();return '<button class="be-more" id="beClosePast" aria-label="Hide past days">'+SVG.down+'</button>'+(p.length?p.map(d=>'<div class="be-day"><b>'+esc(d.lab)+'</b>'+d.ent.map(e=>(e.q?'<div class="q">'+esc(e.q)+'</div>':'')+e.lines.map(t=>'<div class="t">'+esc(t)+'</div>').join('')).join('')+'</div>').join(''):'<div class="be-faint" style="text-align:center">Nothing earlier yet.</div>');}
-function listenHTML(t){const x=pick(t);return '<div class="be-listen">'+(x?'<a class="be-play" href="'+esc(x.r[3])+'" target="_blank" rel="noopener" aria-label="Play '+esc(x.r[0])+'">'+SVG.play+'</a><div class="nm">'+esc(x.r[0])+'</div>':'<div class="nm"></div>')+'<button class="be-link" id="beAll">All</button></div>';}
+// Direct audio files: these play inside the card, audio only. Everything else opens its own app.
+const AU={
+"1-3": "https://voca.arizona.edu/system/files/media/Kinnell-Galway_04-08-1992_2.mp3",
+"1-6": "https://voca.arizona.edu/system/files/media/GAY-ROSS_01-19-2017_04.m4v",
+"1-7": "https://voca.arizona.edu/system/files/media/GAY-ROSS_01-19-2017_07.m4v",
+"1-14": "https://voca.arizona.edu/system/files/media/GAY-ROSS_01-19-2017_08.m4v",
+"1-18": "https://cdn.simplecast.com/audio/85760130-020c-4d30-8e15-26c5c451394f/episodes/1d45cda3-a9e5-45b7-8f57-464a6f8047ba/audio/5e97094a-ef6c-449a-a359-44f6c0c351ef/default_tc.mp3",
+"2-0": "https://self-compassion.org/wp-content/uploads/2024/07/General-Self-Compassion-Break-March2024.mp3",
+"2-1": "https://cih.ucsd.edu/sites/default/files/2026-09/6-min-loving-kindness-and-compassion-meditation-livia-walsh.m4a",
+"2-2": "https://dts.podtrac.com/redirect.mp3/pdrl.fm/0f808e/tracking.swap.fm/track/sblTq32fyWAjsHzze2LG/mgln.ai/e/48/dovetail.prxu.org/_/192/91faa56e-e604-4a6b-a854-e5aeedf71e8c/SoH_HB_Kristin_Neff_Self_Compassion__aka_HB_E3__mix_4.mp3",
+"2-3": "https://traffic.megaphone.fm/MBSLLC6414231315.mp3",
+"2-4": "https://traffic.libsyn.com/secure/tarabrach/2020-10-28-Meditation-Suffering-and-Compassion-TaraBrach-2020-05-30.mp3",
+"2-5": "https://d1cy5zxxhbcbkk.cloudfront.net/guided-meditations/05_Loving_Kindness_Meditation.mp3",
+"2-7": "https://traffic.libsyn.com/secure/tarabrach/2017-09-27-Meditation-Blessings-of-Love-TaraBrach-2016-02-24.mp3",
+"2-8": "https://traffic.megaphone.fm/MBSLLC7402388578.mp3",
+"2-10": "https://traffic.libsyn.com/secure/tarabrach/2014-02-05-Metta-Meditation-Lovingkindness-TaraBrach.mp3",
+"2-11": "https://cih.ucsd.edu/sites/default/files/2026-09/15-min-loving-kindness-for-a-loved-one-noriko-morita-harth.m4a",
+"2-12": "https://traffic.libsyn.com/secure/tarabrach/2025_02_05_Meditation_Embodied_Metta.mp3",
+"2-13": "https://self-compassion.org/wp-content/uploads/2024/07/Loving-Kindness-Meditation-April2024.mp3",
+"2-14": "https://self-compassion.org/wp-content/uploads/2024/07/Compassionate-Body-Scan-April2024.mp3"
+};
+const player=new Audio();player.preload='none';let cur=null;
+const isOn=id=>cur===id&&!player.paused;
+const curItem=()=>{if(!cur)return null;const [t,k]=cur.split('-').map(Number);return {r:LIB[t][k],id:cur};};
+function playId(id){if(cur===id){player.paused?player.play().catch(()=>{}):player.pause();return;}
+  cur=id;player.src=AU[id];player.play().catch(()=>{});
+  try{const x=curItem();if('mediaSession' in navigator&&window.MediaMetadata)navigator.mediaSession.metadata=new MediaMetadata({title:x.r[0],artist:x.r[1]});}catch(e){}}
+function syncPlay(){sheet.querySelectorAll('[data-play]').forEach(b=>{const on=isOn(b.dataset.play);const ic=b.classList.contains('be-play')?b:b.querySelector('.ic');if(ic){ic.innerHTML=on?SVG.pause:SVG.play;ic.classList.toggle('on',on);}b.setAttribute('aria-pressed',on);});
+  const pr=sheet.querySelector('.be-prog i');if(pr)pr.style.width=(cur&&player.duration?Math.min(100,player.currentTime/player.duration*100):0)+'%';}
+['play','pause','ended','timeupdate','loadedmetadata'].forEach(ev=>player.addEventListener(ev,syncPlay));
+player.addEventListener('ended',()=>{player.currentTime=0;});
+const wirePlay=()=>sheet.querySelectorAll('[data-play]').forEach(b=>{b.addEventListener('click',e=>{e.preventDefault();playId(b.dataset.play);});});
+function listenHTML(t){const x=curItem()||pick(t);const au=x&&AU[x.id];
+  const btn=!x?'':au?'<button class="be-play" data-play="'+x.id+'" aria-label="Play or pause '+esc(x.r[0])+'">'+(isOn(x.id)?SVG.pause:SVG.play)+'</button>':'<a class="be-play" href="'+esc(x.r[3])+'" target="_blank" rel="noopener" aria-label="Open '+esc(x.r[0])+'">'+SVG.out+'</a>';
+  return (au?'<div class="be-prog" aria-hidden="true"><i></i></div>':'')+'<div class="be-listen">'+btn+'<div class="nm">'+(x?esc(x.r[0]):'')+'</div><button class="be-link" id="beAll">All</button></div>';}
 function render(){const b=store();
   if(ui.view==='lib')return renderLib();
   let h='<button class="be-grab" id="beClose" aria-label="Close"></button><div class="be-body" id="beBody">';
@@ -2312,7 +2350,7 @@ function render(){const b=store();
     h+='<button class="be-pill" id="bePill" aria-label="'+esc(PROMPTS[ui.pi])+' Swipe or tap for another.">'+esc(PROMPTS[ui.pi])+'</button><div class="be-dots" aria-hidden="true">'+PROMPTS.map((p,k)=>'<i class="'+(k===ui.pi?'on':(b.m[k]||[]).length?'a':'')+'"></i>').join('')+'</div>'+linesHTML(list,'m');}
   else{const first=Object.keys(b.m).map(i=>(b.m[i]||[])[0]).find(Boolean);
     h+=(first?'<div class="be-faint">This morning: '+esc(first)+'</div>':'')+'<h2 class="be-h">Delights:</h2>'+linesHTML(b.d,'d');}
-  h+=pastHTML()+'</div>'+listenHTML(ui.mode==='m'?0:1);sheet.innerHTML=h;wireCard();}
+  h+=pastHTML()+'</div>'+listenHTML(ui.mode==='m'?0:1);sheet.innerHTML=h;wireCard();wirePlay();syncPlay();}
 function wireCard(){
   $('beClose').onclick=close;$('beAll').onclick=()=>{ui.view='lib';ui.tab=ui.mode==='m'?0:1;ui.open=null;render();};
   // Re-resolve on every mutation: save() and the snapshot listener can swap the day record out from under us.
@@ -2336,7 +2374,7 @@ function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+
   const vis=rows.filter(x=>ui.showHid||!prefs.hidden[x.id]).sort((a,b)=>((prefs.loved[b.id]?1:0)-(prefs.loved[a.id]?1:0))||a.k-b.k);
   let h='<button class="be-grab" id="beClose" aria-label="Close"></button><div class="be-tabs"><div>'+TABS.map((n,k)=>'<button class="t'+(k===t?' on':'')+'" data-t="'+k+'" aria-pressed="'+(k===t)+'">'+n+'</button>').join('')+'</div><button class="be-link" id="beDone">Done</button></div><div class="be-list">';
   h+=vis.map(x=>{const lv=!!prefs.loved[x.id],hd=!!prefs.hidden[x.id];return '<div class="be-row'+(ui.open===x.id?' open':'')+(hd?' hid':'')+'" data-id="'+x.id+'"><div class="be-act"><button class="lv" data-a="love" aria-label="'+(lv?'Unlove ':'Love ')+esc(x.r[0])+'">'+SVG.heart+'</button><button data-a="hide" aria-label="'+(hd?'Unhide ':'Hide ')+esc(x.r[0])+'">'+SVG.x+'</button></div>'+
-   '<a class="be-front" href="'+esc(x.r[3])+'" target="_blank" rel="noopener" draggable="false"><span class="tt"><b>'+esc(x.r[0])+'</b><small>'+esc(x.r[1])+' · '+esc(x.r[2])+'</small></span>'+(lv?'<span style="color:var(--accent);display:grid">'+SVG.heart.replace('width="20" height="20"','width="14" height="14"')+'</span>':'')+'</a></div>';}).join('');
+   '<a class="be-front" href="'+esc(x.r[3])+'"'+(AU[x.id]?' data-play="'+x.id+'"':' target="_blank" rel="noopener"')+' draggable="false"><span class="tt"><b>'+esc(x.r[0])+'</b><small>'+esc(x.r[1])+' · '+esc(x.r[2])+'</small></span>'+(lv?'<span style="color:var(--accent);display:grid">'+SVG.heart.replace('width="20" height="20"','width="14" height="14"')+'</span>':'')+'<span class="ic">'+(AU[x.id]?(isOn(x.id)?SVG.pause:SVG.play):SVG.out)+'</span></a></div>';}).join('');
   if(nh)h+='<button class="be-link" id="beHid" style="align-self:center;color:var(--muted);font-size:13px;margin-top:12px">'+(ui.showHid?'Hide hidden':'Show hidden ('+nh+')')+'</button>';
   sheet.innerHTML=h+'</div>';
   $('beClose').onclick=close;$('beDone').onclick=()=>{ui.view='card';render();};
@@ -2345,8 +2383,9 @@ function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+
   sheet.querySelectorAll('.be-row').forEach(row=>{const id=row.dataset.id,a=row.querySelector('.be-front');let sx=null,sw=false;
     a.onpointerdown=e=>{sx=e.clientX;sw=false;};
     a.onpointerup=e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(dx<-40){sw=true;ui.open=id;render();}else if(dx>40){sw=true;ui.open=null;render();}};
-    a.onclick=e=>{if(sw||ui.open===id){e.preventDefault();if(!sw){ui.open=null;render();}sw=false;}};
-    row.querySelectorAll('.be-act button').forEach(btn=>btn.onclick=()=>{const k=btn.dataset.a==='love'?'loved':'hidden';prefs[k][id]=!prefs[k][id];if(!prefs[k][id])delete prefs[k][id];savePrefs();ui.open=null;render();});});}
+    a.onclick=e=>{if(sw||ui.open===id){e.preventDefault();e.stopImmediatePropagation();if(!sw){ui.open=null;render();}sw=false;}};
+    row.querySelectorAll('.be-act button').forEach(btn=>btn.onclick=()=>{const k=btn.dataset.a==='love'?'loved':'hidden';prefs[k][id]=!prefs[k][id];if(!prefs[k][id])delete prefs[k][id];savePrefs();ui.open=null;render();});});
+  wirePlay();syncPlay();}
 function open(){ui.view='card';ui.mode=modeNow();ui.past=false;sheet.hidden=false;back.hidden=false;render();}
 function close(){sheet.hidden=true;back.hidden=true;sheet.innerHTML='';}
 fab.onclick=open;back.onclick=close;
