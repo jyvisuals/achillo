@@ -2233,7 +2233,7 @@ const LIB=[[
 ['The Guest House','Rumi, read by Amanda Holmes','1.5 min','https://theamericanscholar.org/the-guest-house-by-rumi/'],
 ['Mornings at Blackwater','Mary Oliver','1.5 min','https://maryoliver.beacon.org/aboutmary/media/'],
 ['Everything Is Waiting for You','David Whyte','2 min','https://www.youtube.com/watch?v=QmA4s8r630s'],
-['Kindness','Naomi Shihab Nye','2 min','https://voxpopulisphere.com/2022/02/06/video-kindness-by-naomi-shihab-nye'],
+['Kindness','Naomi Shihab Nye · On Being','short excerpt','https://onbeing.org/programs/hope-is-a-muscle-i-before-you-know-kindness-as-the-deepest-thing-inside'],
 ['Singularity','Marie Howe','3 min','https://www.themarginalian.org/2020/04/23/singularity-marie-howe-animated/'],
 ['A Brief for the Defense','Jack Gilbert','3 min','https://mars.gmu.edu/handle/1920/531'],
 ['Today’s poem','The Slowdown','5–8 min','https://pocketcasts.com/podcast/the-slowdown-poetry-reflection-daily/3cc0b5c0-a87b-0136-7b93-27f978dac4db'],
@@ -2313,6 +2313,9 @@ function pastHTML(){if(!ui.past)return '<div style="flex:1"></div><button class=
   const p=pastDays();return '<button class="be-more" id="beClosePast" aria-label="Hide past days">'+SVG.down+'</button>'+(p.length?p.map(d=>'<div class="be-day"><b>'+esc(d.lab)+'</b>'+d.ent.map(e=>(e.q?'<div class="q">'+esc(e.q)+'</div>':'')+e.lines.map(t=>'<div class="t">'+esc(t)+'</div>').join('')).join('')+'</div>').join(''):'<div class="be-faint" style="text-align:center">Nothing earlier yet.</div>');}
 // Direct audio files: these play inside the card, audio only. Everything else opens its own app.
 const AU={
+"0-11": "https://cdn.simplecast.com/audio/38080bd8-b694-4f1a-b3c7-0b80b874d16b/episodes/e0934895-113c-4618-a833-c5c1849a0dd4/audio/c80ed1a3-aadd-45ed-b41c-ccba12edbc77/default_tc.mp3",
+"0-15": "https://cdn.simplecast.com/audio/49fe14/49fe14cf-8aef-4a4f-83ca-a3ac86a522d8/d1d2945c-5e05-4f70-bb93-5a8e7b976731/a-poem-to-notice-openings-and-closings_tc.mp3",
+"1-19": "https://cdn.simplecast.com/audio/85760130-020c-4d30-8e15-26c5c451394f/episodes/04833d7c-8b6f-4e97-b1b2-5d04c2501b55/audio/adcbcf1e-c69b-4389-9024-be7bc5bc6c57/default_tc.mp3",
 "1-3": "https://voca.arizona.edu/system/files/media/Kinnell-Galway_04-08-1992_2.mp3",
 "1-6": "https://voca.arizona.edu/system/files/media/GAY-ROSS_01-19-2017_04.m4v",
 "1-7": "https://voca.arizona.edu/system/files/media/GAY-ROSS_01-19-2017_07.m4v",
