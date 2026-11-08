@@ -1,5 +1,6 @@
 // Run after node build.js. Requires Playwright; set CHROMIUM_PATH if Chromium is not on its default path.
 // Add --live-audio for the additions, or --all-audio for every stream (no media files are saved).
+// BOOKENDS_AUDIO_IDS=0-12,0-17 limits live checks when rechecking individual sources.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -9,7 +10,7 @@ const vm=require('node:vm');
 const src=fs.readFileSync(path.join(__dirname,'../src/achilles-tracker.html'),'utf8');
 const {LIB,AU,START}=vm.runInNewContext(src.slice(src.indexOf("const PCB="),src.indexOf('const PROMPTS='))+
   src.slice(src.indexOf('const AU={'),src.indexOf('const player=new Audio();'))+';({LIB,AU,START})');
-const additions=['0-0','0-1','0-2','0-3','0-4','0-5','0-6','0-7','0-8','0-9','0-10','0-13','0-14','0-20','1-0','1-1','1-2','1-4','1-5','1-8','1-13','1-17','2-15'];
+const additions=['0-0','0-1','0-2','0-3','0-4','0-5','0-6','0-7','0-8','0-9','0-10','0-12','0-13','0-14','0-20','1-0','1-1','1-2','1-4','1-5','1-8','1-13','1-17','2-15'];
 const protectedIds=['0-19','1-9','1-10','1-11','1-12','1-20'];
 const prefs={loved:{'0-7':true,'0-19':true,'0-20':true},hidden:{'0-1':true}};
 const row=id=>`.be-row[data-id="${id}"]`;
@@ -46,7 +47,7 @@ const row=id=>`.be-row[data-id="${id}"]`;
     };
     await page.click('#beFab');await library(0);
     assert.deepEqual((await ids()).slice(0,4),['0-7','0-20','0-19','0-0']);
-    assert.equal((await ids()).at(-1),'0-12');
+    assert.equal((await ids()).at(-1),'0-18');
     assert.equal(await page.locator(row('0-1')).count(),0);
     // Swiping preserves the DOM, animates the snap, and does not activate the recording.
     await page.locator(row('0-0')+' .be-front').evaluate(el=>{
@@ -109,7 +110,7 @@ const row=id=>`.be-row[data-id="${id}"]`;
         assert.equal(await page.locator(row(id)+' .be-front').getAttribute('target'),'_blank');
       }
     }
-    assert.equal(total,58);assert.equal(playable,51);
+    assert.equal(total,58);assert.equal(playable,52);
     assert.deepEqual(Array.from(LIB,tab=>tab.length),[21,21,16]);
     assert.ok(Object.values(AU).every(url=>url.startsWith('https://')));
     // A deterministic audio fixture checks intro seeking, resume, manual rewind, and replay.
@@ -152,12 +153,16 @@ const row=id=>`.be-row[data-id="${id}"]`;
     await fixture.close();
     console.log('Intro seek/resume/replay OK');
     if(process.argv.includes('--live-audio')||process.argv.includes('--all-audio')){
-      for(const id of process.argv.includes('--all-audio')?Object.keys(AU):[...additions,'0-11']){
+      const audioIds=process.env.BOOKENDS_AUDIO_IDS?.split(',')||(process.argv.includes('--all-audio')?Object.keys(AU):[...additions,'0-11']);
+      assert.ok(audioIds.every(id=>AU[id]),'Every requested recording must exist');
+      for(const id of audioIds){
         await page.click(`.be-tabs button[data-t="${id.split('-')[0]}"]`);
         const front=page.locator(row(id)+' .be-front');
         assert.equal(await front.locator('.ic svg path').getAttribute('d'),'M7 4l13 8-13 8z');
         await front.click();
-        await page.waitForFunction(({url,start})=>window.__audio.some(a=>a.src===url&&!a.paused&&a.currentTime>start+.1),{url:AU[id],start:START[id]||0},{timeout:45000});
+        await page.waitForFunction(({url,start})=>window.__audio.some(a=>a.src===url&&!a.paused&&a.currentTime>start+.1),{url:AU[id],start:START[id]||0},{timeout:45000}).catch(async e=>{
+          console.error('Live recording failed',id,await page.evaluate(()=>window.__audio.map(a=>({src:a.src,time:a.currentTime,duration:a.duration,paused:a.paused,error:a.error?.message,ready:a.readyState}))));throw e;
+        });
         assert.equal(await page.locator('.be-play').getAttribute('data-play'),id);
         assert.equal(await page.locator('.be-play').getAttribute('aria-pressed'),'true');
         await page.waitForFunction(()=>Number(document.querySelector('#beSeek').value)>0);
@@ -175,12 +180,19 @@ const row=id=>`.be-row[data-id="${id}"]`;
           await page.locator('#beSeek').focus();await page.keyboard.press('ArrowRight');
           await page.waitForFunction(()=>Number(document.querySelector('#beSeek').value)>0);
         }
+        const duration=await page.evaluate(url=>window.__audio.find(a=>a.src===url).duration,AU[id]);
+        assert.ok(Number.isFinite(duration)&&duration>(START[id]||0),id+' has a valid duration');
+        await page.locator('#beSeek').fill(String(Math.round((duration-.5)*10)/10));
+        await page.click('.be-play');
+        await page.waitForFunction(({url,start})=>window.__audio.some(a=>a.src===url&&a.paused&&Math.abs(a.currentTime-start)<.2),
+          {url:AU[id],start:START[id]||0},{timeout:30000});
+        assert.equal(await page.locator('.be-play').getAttribute('aria-pressed'),'false');
         assert.equal(context.pages().length,1);
-        console.log('Played and paused',id,LIB[+id.split('-')[0]][+id.split('-')[1]][0]);
+        console.log('Played, paused, and reached the end',id,LIB[+id.split('-')[0]][+id.split('-')[1]][0]);
         await library(+id.split('-')[0]);
       }
     }
     assert.deepEqual(errors,[]);
-    console.log('Bookends OK: 58 rows, 51 playable; ordering, saved preferences, animated mouse/touch swipes, no accidental playback or page errors.');
+    console.log('Bookends OK: 58 rows, 52 playable; ordering, saved preferences, animated mouse/touch swipes, no accidental playback or page errors.');
   }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(e=>{console.error(e);process.exitCode=1;});

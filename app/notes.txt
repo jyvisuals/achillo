@@ -1,3 +1,4 @@
+Bookends: Singularity now plays in the card, starting at the reading.
 Bookends: 23 more library pieces play in the card.
 Bookends: skip recording introductions, seek with the playback bar, and hear the standalone reading of Kindness.
 Bookends: hearted pieces come first in each library tab, with playable recordings first within each group. Swipe smoothly to reveal labeled Heart and Hide buttons.
