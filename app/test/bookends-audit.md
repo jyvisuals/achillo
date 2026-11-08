@@ -1,5 +1,7 @@
 # Bookends recording audit — 2026-11-08
 
+Historical start-cue audit. See [the subsequent boundary audit](bookends-boundaries.md) for all 54 current streams, reviewed endings and the replacement for the dynamically advertised Happiness Break source.
+
 The library contains 58 pieces. With this change, 52 have an in-card stream; the six protected audiobook entries retain their existing full-book links.
 
 ## Verification
