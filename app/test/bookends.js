@@ -45,6 +45,23 @@ const row=id=>`.be-row[data-id="${id}"]`;
       const box=await front.boundingBox(),x=box.x+box.width*.7,y=box.y+box.height/2;
       await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+dx,y,{steps:8});await page.mouse.up();
     };
+    const fabBox=await page.locator('#beFab').boundingBox();
+    assert.equal(fabBox.width,44);assert.equal(fabBox.height,44);assert.equal(Math.round(fabBox.x+fabBox.width),378);
+    const cdp=await context.newCDPSession(page);
+    const dragHandle=async(dy,cancel=false)=>{
+      await page.locator('#beClose').scrollIntoViewIfNeeded();
+      const box=await page.locator('#beClose').boundingBox(),x=box.x+50,y=box.y+box.height/2;
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+      for(let i=1;i<=6;i++)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y+dy*i/6}]});
+      await page.waitForFunction(dy=>document.querySelector('#beSheet').style.transform===`translateY(${dy}px)`,dy);
+      await cdp.send('Input.dispatchTouchEvent',{type:cancel?'touchCancel':'touchEnd',touchPoints:[]});
+    };
+    await page.click('#beFab');
+    await dragHandle(30);assert.equal(await page.locator('#beSheet').isVisible(),true);
+    await page.waitForFunction(()=>getComputedStyle(document.querySelector('#beSheet')).transform==='none'||getComputedStyle(document.querySelector('#beSheet')).transform==='matrix(1, 0, 0, 1, 0, 0)');
+    await dragHandle(120,true);assert.equal(await page.locator('#beSheet').isVisible(),true);
+    await page.waitForFunction(()=>getComputedStyle(document.querySelector('#beSheet')).transform==='none'||getComputedStyle(document.querySelector('#beSheet')).transform==='matrix(1, 0, 0, 1, 0, 0)');
+    await dragHandle(120);await page.locator('#beSheet').waitFor({state:'hidden'});
     await page.click('#beFab');await library(0);
     assert.deepEqual((await ids()).slice(0,4),['0-7','0-20','0-19','0-0']);
     assert.equal((await ids()).at(-1),'0-18');
@@ -72,7 +89,6 @@ const row=id=>`.be-row[data-id="${id}"]`;
     await swipe('0-0',-70);await page.locator(row('0-0')+' [data-a="hide"]').click();
     assert.equal(await page.locator(row('0-0')+'.hid').count(),0);
     // Touch uses the same animated interaction, including a right swipe to close.
-    const cdp=await context.newCDPSession(page);
     const touchSwipe=async dx=>{
       const box=await page.locator(row('0-0')+' .be-front').boundingBox();
       const x=box.x+box.width*.7,y=box.y+box.height/2;
@@ -92,6 +108,15 @@ const row=id=>`.be-row[data-id="${id}"]`;
     }
     await touchSwipe(75);assert.equal(await page.locator('.be-row.open').count(),0);
     assert.ok(await page.evaluate(()=>window.__audio.every(a=>a.paused&&!a.currentSrc)));
+    // Vertical touches on recording rows still scroll the library rather than play or swipe a row.
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:180,y:650}]});
+    for(let y=620;y>=350;y-=30)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:180,y}]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await page.waitForFunction(()=>document.querySelector('.be-list').scrollTop>80);
+    assert.equal(await page.locator('.be-row.open').count(),0);
+    assert.ok(await page.evaluate(()=>window.__audio.every(a=>a.paused&&!a.currentSrc)));
+    await dragHandle(120);await page.locator('#beSheet').waitFor({state:'hidden'});
+    await page.click('#beFab');await library(0);
     await page.locator(row('0-0')+' .be-front').focus();await page.keyboard.press('ArrowLeft');
     assert.ok(await page.locator(row('0-0')+' [data-a="love"]').evaluate(el=>el===document.activeElement));
     await page.keyboard.press('Escape');assert.equal(await page.locator('.be-row.open').count(),0);
@@ -150,8 +175,43 @@ const row=id=>`.be-row[data-id="${id}"]`;
     await fixture.waitForFunction(start=>window.__audio.some(a=>a.paused&&Math.abs(a.currentTime-start)<.2),start);
     await fixture.click('.be-play');
     await fixture.waitForFunction(start=>window.__audio.some(a=>!a.paused&&a.currentTime>start&&a.currentTime<start+3),start);
+    // A finger can drift vertically while scrubbing. It must not drag the sheet or lose the seek.
+    const seekTouch=await context.newCDPSession(fixture);
+    await fixture.click('.be-play');
+    await fixture.locator('#beSeek').fill('0');
+    const seekBox=await fixture.locator('#beSeek').boundingBox();
+    const seekX=seekBox.x+7,seekY=seekBox.y+seekBox.height/2;
+    await seekTouch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:seekX,y:seekY}]});
+    await seekTouch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:seekX+2,y:seekY+20}]});
+    await seekTouch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:seekBox.x+seekBox.width*.75,y:seekY+20}]});
+    assert.equal(await fixture.locator('#beSheet').evaluate(el=>el.style.transform),'');
+    await seekTouch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await fixture.waitForFunction(()=>window.__audio.some(a=>a.currentTime>85&&a.currentTime<95&&a.paused)).catch(async e=>{
+      console.error('Touch seek state',await fixture.evaluate(()=>({value:document.querySelector('#beSeek').value,audio:window.__audio.map(a=>({time:a.currentTime,paused:a.paused}))})));throw e;
+    });
+    assert.equal(await fixture.locator('#beSheet').isVisible(),true);
+    await fixture.click('.be-play');
+    await seekTouch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:seekBox.x+seekBox.width*.75,y:seekY}]});
+    await seekTouch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:seekBox.x+seekBox.width*.25,y:seekY-20}]});
+    const preview=Number(await fixture.locator('#beSeek').inputValue());
+    assert.ok(preview>25&&preview<35);
+    // Playback updates arriving during a held drag must not reset the preview or seek repeatedly.
+    await fixture.evaluate(()=>window.__audio.forEach(a=>a.dispatchEvent(new Event('timeupdate'))));
+    assert.equal(Number(await fixture.locator('#beSeek').inputValue()),preview);
+    assert.ok(await fixture.evaluate(()=>window.__audio.some(a=>a.currentTime>85&&!a.paused)));
+    await seekTouch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await fixture.waitForFunction(()=>window.__audio.some(a=>a.currentTime>25&&a.currentTime<35&&!a.paused));
+    await fixture.click('.be-play');
+    await fixture.mouse.click(seekBox.x+seekBox.width/2,seekY);
+    await fixture.waitForFunction(()=>window.__audio.some(a=>Math.abs(a.currentTime-60)<.2&&a.paused));
+    await fixture.locator('#beSeek').focus();await fixture.keyboard.press('ArrowRight');
+    await fixture.waitForFunction(()=>window.__audio.some(a=>a.currentTime>60&&a.currentTime<61&&a.paused));
+    const beforeCancel=Number(await fixture.locator('#beSeek').inputValue());
+    await seekTouch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:seekBox.x+seekBox.width*.9,y:seekY}]});
+    await seekTouch.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+    assert.equal(Number(await fixture.locator('#beSeek').inputValue()),beforeCancel);
     await fixture.close();
-    console.log('Intro seek/resume/replay OK');
+    console.log('Intro seek/resume/replay, touch scrubbing, canceled drag, mouse and keyboard seeking OK');
     if(process.argv.includes('--live-audio')||process.argv.includes('--all-audio')){
       const audioIds=process.env.BOOKENDS_AUDIO_IDS?.split(',')||(process.argv.includes('--all-audio')?Object.keys(AU):[...additions,'0-11']);
       assert.ok(audioIds.every(id=>AU[id]),'Every requested recording must exist');
