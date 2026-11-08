@@ -2195,7 +2195,14 @@ resumeSession();
 #beSheet .be-day .t{font-size:15px;color:var(--ink);opacity:.8;padding-left:17px}
 #beSheet .be-listen{display:flex;align-items:center;gap:14px;padding:12px 28px calc(20px + env(safe-area-inset-bottom));flex-shrink:0}
 #beSheet .be-play{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);color:var(--accent);display:grid;place-items:center;flex-shrink:0;text-decoration:none}
-#beSheet .be-prog{height:2px;background:var(--line);margin:0 28px;border-radius:1px;overflow:hidden;flex-shrink:0}#beSheet .be-prog i{display:block;height:100%;width:0;background:var(--accent)}
+#beSheet .be-prog{height:28px;margin:0 28px;display:flex;align-items:center;flex-shrink:0}
+#beSheet .be-prog input{appearance:none;-webkit-appearance:none;width:100%;height:28px;margin:0;padding:0;border:0;background:transparent;cursor:pointer;touch-action:pan-y;--played:0%}
+#beSheet .be-prog input::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(to right,var(--accent) var(--played),var(--line) var(--played))}
+#beSheet .be-prog input::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:14px;height:14px;margin-top:-5.5px;border:0;border-radius:50%;background:var(--accent)}
+#beSheet .be-prog input::-moz-range-track{height:3px;border-radius:2px;background:var(--line)}
+#beSheet .be-prog input::-moz-range-progress{height:3px;background:var(--accent)}
+#beSheet .be-prog input::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:var(--accent)}
+#beSheet .be-prog input:disabled{opacity:.4;cursor:default}
 #beSheet .be-front .ic{color:var(--muted);display:grid;opacity:.7}#beSheet .be-front .ic.on{color:var(--accent);opacity:1}
 #beSheet .be-listen .nm{flex:1;font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #beSheet .be-link{border:0;background:transparent;color:var(--accent);font:inherit;font-size:14px;padding:12px 0}
@@ -2206,12 +2213,18 @@ resumeSession();
 #beSheet .be-tabs button.t.on{color:var(--ink);border-bottom-color:var(--accent)}
 #beSheet .be-list{flex:1;min-height:0;overflow-y:auto;padding:8px 16px 24px;display:flex;flex-direction:column;gap:2px}
 #beSheet .be-row{position:relative;overflow:hidden;border-radius:16px;flex-shrink:0}
-#beSheet .be-act{position:absolute;top:0;right:0;bottom:0;display:flex}
-#beSheet .be-act button{width:60px;border:0;display:grid;place-items:center;padding:0;background:var(--sunk);color:var(--ink)}
+#beSheet .be-act{position:absolute;top:0;right:0;bottom:0;width:144px;display:flex;gap:4px;padding:4px;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .2s ease,visibility 0s .24s}
+#beSheet .be-row.open .be-act,#beSheet .be-row.dragging .be-act{visibility:visible;opacity:1;pointer-events:auto;transition-delay:0s}
+#beSheet .be-act button{flex:1;min-width:0;min-height:44px;border:0;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px 2px;background:var(--sunk);color:var(--muted);font:600 11px var(--body)}
 #beSheet .be-act button.lv{background:var(--tint);color:var(--accent)}
-#beSheet .be-front{position:relative;display:flex;align-items:center;gap:10px;padding:14px 12px;background:var(--surface);color:var(--ink);text-decoration:none;transition:transform .18s ease;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-#beSheet .be-row.open .be-front{transform:translateX(-120px);background:var(--sunk)}
-#beSheet .be-front span.tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+#beSheet .be-act button.lv[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+#beSheet .be-act button:active{filter:brightness(.92)}
+#beSheet .be-front{--beOffset:0px;position:relative;display:flex;align-items:center;gap:10px;padding:14px 12px;border-radius:16px;background:var(--surface);color:var(--ink);text-decoration:none;transform:translateX(calc(-1 * var(--beOffset)));transition:transform .24s cubic-bezier(.2,.8,.2,1);touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#beSheet .be-row.open .be-front{--beOffset:144px;background:var(--sunk)}
+#beSheet .be-front span.tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;transform:translateX(var(--beOffset));margin-right:var(--beOffset);transition:transform .24s cubic-bezier(.2,.8,.2,1),margin-right .24s cubic-bezier(.2,.8,.2,1)}
+#beSheet .be-row.dragging .be-front,#beSheet .be-row.dragging .tt{transition:none}
+@media(prefers-reduced-motion:reduce){#beSheet .be-front,#beSheet .be-front .tt,#beSheet .be-act{transition:none}}
+#beSheet .be-front .tt b,#beSheet .be-front .tt small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #beSheet .be-front span.tt b{font-weight:400;font-size:16px;line-height:1.35}
 #beSheet .be-front span.tt small{font-size:13px;color:var(--muted)}
 #beSheet .be-row.hid .be-front{opacity:.45}
@@ -2223,66 +2236,66 @@ resumeSession();
 (function(){
 const PCB='https://pocketcasts.com/podcasts/d85b6740-2c4f-012e-0993-00163e1b201c',NEFF='https://self-compassion.org/guided-self-compassion-meditations-mp3-2/',UCSD='https://cih.ucsd.edu/mindfulness/guided-audio-video',TH='https://www.tarabrach.com/?p=6571',PU='https://pocketcasts.com/podcast/poetry-unbound/fe4aba40-0b1f-0138-9f6c-0acc26574db2';
 const LIB=[[
-['Wild Geese','Mary Oliver','1.5 min','https://www.themarginalian.org/2014/09/24/mary-oliver-reads-wild-geese/'],
-['The Summer Day','Mary Oliver','1.5 min','https://maryoliver.beacon.org/2011/06/mary-oliver-reads-the-summer-day'],
+['Wild Geese','Mary Oliver','1.5 min','https://onbeing.org/poetry/wild-geese/'],
+['I Happened to Be Standing','Mary Oliver','1.5 min','https://onbeing.org/poetry/i-happened-to-be-standing/'],
 ['Otherwise','Jane Kenyon','1 min','https://www.poetryfoundation.org/audio/77032/otherwise'],
-['homage to my hips','Lucille Clifton','1 min','https://poets.org/poem/homage-my-hips-audio-only'],
-['won’t you celebrate with me','Lucille Clifton','1 min','https://www.themarginalian.org/2015/09/01/lucille-clifton-reads-wont-you-celebrate-with-me/'],
-['Blackberry Eating','Galway Kinnell','1 min','https://poetryarchive.org/?p=5561'],
-['Eagle Poem','Joy Harjo','1.5 min','https://poetryarchive.org/poem/eagle-poem'],
-['Instructions on Not Giving Up','Ada Limón','1.5 min','https://improvisedlife.com/2019/03/22/ada-limons-breathtaking-reading-instructions-not-giving/'],
-['The Guest House','Rumi, read by Amanda Holmes','1.5 min','https://theamericanscholar.org/the-guest-house-by-rumi/'],
-['Mornings at Blackwater','Mary Oliver','1.5 min','https://maryoliver.beacon.org/aboutmary/media/'],
-['Everything Is Waiting for You','David Whyte','2 min','https://www.youtube.com/watch?v=QmA4s8r630s'],
-['Kindness','Naomi Shihab Nye · On Being','short excerpt','https://onbeing.org/programs/hope-is-a-muscle-i-before-you-know-kindness-as-the-deepest-thing-inside'],
+['homage to my hips','Lucille Clifton','1 min','https://voca.arizona.edu/reading/lucille-clifton-october-12-1983'],
+['won’t you celebrate with me','Poetry Unbound · Lucille Clifton','11.5 min','https://onbeing.org/programs/lucille-clifton-song-at-midnight/'],
+['Oatmeal','Galway Kinnell','4.5 min','https://voca.arizona.edu/reading/galway-kinnell-april-8-1992'],
+['Eagle Poem','Joy Harjo','1.5 min','https://poetryarchive.org/poem/eagle-poem/'],
+['Dead Stars','Ada Limón','2 min','https://onbeing.org/poetry/dead-stars/'],
+['The Guest House','Rumi, read by Amanda Holmes','1.5 min','https://shows.acast.com/readmeapoem/episodes/-theguesthouse-byrumi'],
+['The Fourth Sign of the Zodiac','Mary Oliver','3 min','https://onbeing.org/poetry/the-fourth-sign-of-the-zodiac/'],
+['Everything Is Waiting for You','David Whyte','2 min','https://onbeing.org/poetry/everything-is-waiting-for-you/'],
+['Kindness','Naomi Shihab Nye','2 min','https://onbeing.org/poetry/kindness/'],
 ['Singularity','Marie Howe','3 min','https://www.themarginalian.org/2020/04/23/singularity-marie-howe-animated/'],
-['A Brief for the Defense','Jack Gilbert','3 min','https://mars.gmu.edu/handle/1920/531'],
-['Today’s poem','The Slowdown','5–8 min','https://pocketcasts.com/podcast/the-slowdown-poetry-reflection-daily/3cc0b5c0-a87b-0136-7b93-27f978dac4db'],
-['Ode to Buttoning and Unbuttoning My Shirt','Poetry Unbound · Ross Gay','9 min',PU],
-['Mindful Body Scan','Tara Brach','10 min',PCB],
+['Failing and Flying','Jack Gilbert, read by Amanda Holmes','2 min','https://shows.acast.com/readmeapoem/episodes/failing-and-flying-by-jack-gilbert'],
+['Someday','The Slowdown · Mary Oliver','2.5 min','https://www.slowdownshow.org/episode/2026/07/29/1569-someday-by-mary-oliver'],
+['Ode to Buttoning and Unbuttoning My Shirt','Poetry Unbound · Ross Gay','8 min',PU],
+['Mindful Body Scan','Tara Brach','9 min',PCB],
 ['Saying Yes to Our Life','Tara Brach','11 min',PCB],
-['Relaxed and Awake','Tara Brach','17 min',PCB],
+['Relaxed and Awake','Tara Brach','16.5 min',PCB],
 ['Inciting Joy','Ross Gay','an essay a day','https://audible.com/series/Essays-Series-Audiobooks/B0BWJKP489'],
-['Uses of the Erotic','Audre Lorde','23 min','https://www.ourbodiesourselves.org/health-info/audre-lorde-reads-uses-of-the-erotic/']
+['A Litany of Survival','Audre Lorde, read by Amanda Holmes','2.5 min','https://shows.acast.com/readmeapoem/episodes/a-litany-of-survival-by-audre-lorde']
 ],[
-['Thank You','Ross Gay','2 min','https://theworld.org/stories/2013/08/14/earth-poetry'],
-['Let Evening Come','Jane Kenyon','1 min','https://poets.org/poem/let-evening-come'],
-['blessing the boats','Lucille Clifton, read by Elizabeth Acevedo','1 min','https://www.poetryfoundation.org/video/156997/elizabeth-acevedo-reads-blessing-the-boats-by-lucille-clifton'],
+['Thank You','Ross Gay','1.5 min','https://theworld.org/stories/2013/08/14/earth-poetry'],
+['Twilight: After Haying','Jane Kenyon, read by Amanda Holmes','1.5 min','https://shows.acast.com/readmeapoem/episodes/twilight-after-haying-by-jane-kenyon'],
+['New Bones','Lucille Clifton, read by Amanda Holmes','1 min','https://shows.acast.com/readmeapoem/episodes/new-bones-by-lucille-clifton'],
 ['Saint Francis and the Sow','Galway Kinnell','1.5 min','https://voca.arizona.edu/reading/galway-kinnell-april-8-1992'],
-['Perhaps the World Ends Here','Joy Harjo','2 min','https://www.pbs.org/newshour/show/poet-joy-harjo-reads-a-thanksgiving-poem'],
-['The Peace of Wild Things','Wendell Berry','2 min','https://www.themarginalian.org/2021/03/12/wendell-berry-the-peace-of-wild-things-animated/'],
-['To the Mulberry Tree','Ross Gay','3 min','https://voca.arizona.edu/reading/ross-gay-january-19-2017'],
-['To the Fig Tree on 9th and Christian','Ross Gay','4 min','https://indianapublicmedia.org/eartheats/ross-gays-to-the-fig-tree-on-9th-and-christian.php'],
-['Small Kindnesses','The Slowdown','5 min','https://www.slowdownshow.org/episode/2019/08/29/199-small-kindnesses'],
+['Praise the Rain','Poetry Unbound · Joy Harjo','6.5 min','https://onbeing.org/programs/joy-harjo-praise-the-rain/'],
+['The Peace of Wild Things','Wendell Berry, read by Amanda Holmes','1.5 min','https://shows.acast.com/readmeapoem/episodes/the-peace-of-wild-things-by-wendell-berry'],
+['To the Mulberry Tree','Ross Gay','3.5 min','https://voca.arizona.edu/reading/ross-gay-january-19-2017'],
+['To the Fig Tree on 9th and Christian','Ross Gay','3 min','https://indianapublicmedia.org/eartheats/ross-gays-to-the-fig-tree-on-9th-and-christian.php'],
+['Small Kindnesses','The Slowdown','1.5 min','https://www.slowdownshow.org/episode/2019/08/29/199-small-kindnesses'],
 ['At Blackwater Pond','Mary Oliver, a poem a night','1.5 min each','https://penguinrandomhouse.com/books/isbn/9780807007006'],
 ['The Book of Delights','Ross Gay','1–4 min each','https://www.audible.com/pd/The-Book-of-Delights-Audiobook/B07LHJXBJG'],
 ['The Book of (More) Delights','Ross Gay','1–4 min each','https://www.audible.com/pd/The-Book-of-More-Delights-Audiobook/B0BWFTVQYL'],
 ['Beloved: the Clearing','Toni Morrison','5 min','https://www.audible.com/pd/Beloved-Audiobook/B002V8KIZQ'],
-['song at midnight','Poetry Unbound · Lucille Clifton','13 min',PU],
-['Catalog of Unabashed Gratitude','Ross Gay','15 min','https://writingincompany.substack.com/p/ross-gays-catalog-of-unabashed-gratitude'],
-['Breath by Breath','Tara Brach','19 min',PCB],
-['Coming Home with the Breath','Tara Brach','18 min',PCB],
-['The Garden We Share','Poetry Off the Shelf','episode','https://pocketcasts.com/podcasts/9aae68c0-2a5f-012e-0845-00163e1b201c'],
-['Tending Joy and Practicing Delight','On Being · Ross Gay','51 min','https://onbeing.org/programs/ross-gay-tending-joy-and-practicing-delight/'],
-['Before You Know Kindness','On Being · Naomi Shihab Nye','51 min','https://podknife.com/episodes/naomi-shihab-nye-before-you-know-kindness-as-the-deepest-thing-inside'],
+['song at midnight','Poetry Unbound · Lucille Clifton','12 min','https://onbeing.org/programs/lucille-clifton-song-at-midnight/'],
+['Catalog of Unabashed Gratitude','Ross Gay','13.5 min','https://writingincompany.substack.com/p/ross-gays-catalog-of-unabashed-gratitude'],
+['Breath by Breath','Tara Brach','18 min',PCB],
+['Coming Home with the Breath','Tara Brach','17 min',PCB],
+['The Garden We Share','Poetry Off the Shelf','26.5 min','https://www.poetryfoundation.org/podcasts/151306/the-garden-we-share'],
+['Tending Joy and Practicing Delight','On Being · Ross Gay','57 min','https://onbeing.org/programs/ross-gay-tending-joy-and-practicing-delight/'],
+['Before You Know Kindness','On Being · Naomi Shihab Nye','48 min','https://podknife.com/episodes/naomi-shihab-nye-before-you-know-kindness-as-the-deepest-thing-inside'],
 ['Catalog of Unabashed Gratitude (book)','Ross Gay, a poem a night','a few min each','https://www.audible.com/author/Ross-Gay/B001JOVOJM']
 ],[
 ['Self-Compassion Break','Kristin Neff','5 min','https://self-compassion.org/blog/take-a-self-compassion-break/'],
-['Loving-Kindness and Compassion','Livia Walsh · UC San Diego','6 min',UCSD],
-['Be Your Own Best Friend','Kristin Neff · Happiness Break','8 min','https://greatergood.berkeley.edu/podcasts/item/happiness_break_how_to_be_your_own_best_friend_encore'],
-['8-Minute Lovingkindness','Sharon Salzberg','8 min','https://eomega.org/audio/8-minute-lovingkindness-meditation'],
-['Suffering and Compassion','Tara Brach','8 min',TH],
-['Loving Kindness','Diana Winston · UCLA','9 min','https://www.uclahealth.org/uclamindful/guided-meditations'],
+['Loving-Kindness and Compassion','Livia Walsh · UC San Diego','3 min',UCSD],
+['Be Your Own Best Friend','Kristin Neff · Happiness Break','5 min','https://greatergood.berkeley.edu/podcasts/item/happiness_break_how_to_be_your_own_best_friend_encore'],
+['8-Minute Lovingkindness','Sharon Salzberg','9 min','https://eomega.org/audio/8-minute-lovingkindness-meditation'],
+['Suffering and Compassion','Tara Brach','7.5 min',TH],
+['Loving Kindness','Diana Winston · UCLA','9.5 min','https://www.uclahealth.org/uclamindful/guided-meditations'],
 ['Loving Kindness for Health','Diana Winston · UCLA','11 min','https://www.uclahealth.org/marc/patients'],
-['Blessings of Love','Tara Brach','11 min',TH],
-['Lovingkindness','Jack Kornfield · Omega','12 min','https://eomega.org/audio/a-12-minute-mindfulness-meditation'],
-['Loving-Kindness (Even When It’s Hard)','Sharon Salzberg','12 min','https://pocketcasts.com/podcast/12-minute-meditation/d4201140-869e-0133-2d8b-6dc413d6d41d/a-meditation-to-connect-with-loving-kindness-even-when-its-hard/9de93eb2-90dd-40ed-bd15-a5466d2d74cf'],
+['Blessings of Love','Tara Brach','10.5 min',TH],
+['Lovingkindness','Jack Kornfield · Omega','11.5 min','https://eomega.org/audio/a-12-minute-mindfulness-meditation'],
+['Loving-Kindness (Even When It’s Hard)','Sharon Salzberg','10.5 min','https://pocketcasts.com/podcast/12-minute-meditation/d4201140-869e-0133-2d8b-6dc413d6d41d/a-meditation-to-connect-with-loving-kindness-even-when-its-hard/9de93eb2-90dd-40ed-bd15-a5466d2d74cf'],
 ['Metta','Tara Brach','12 min','https://www.tarabrach.com/guided-meditation-metta-lovingkindness/'],
-['Loving Kindness for a Loved One','Noriko Morita Harth · UC San Diego','15 min',UCSD],
-['Embodied Metta','Tara Brach','20 min','https://www.tarabrach.com/?p=50567'],
+['Loving Kindness for a Loved One','Noriko Morita Harth · UC San Diego','12.5 min',UCSD],
+['Embodied Metta','Tara Brach','18.5 min','https://www.tarabrach.com/?p=50567'],
 ['Loving-Kindness Meditation','Kristin Neff','20 min',NEFF],
-['Compassionate Body Scan','Kristin Neff','24 min',NEFF],
-['Loving Kindness Guided Meditation','Jack Kornfield · Heart Wisdom','33 min','https://beherenownetwork.com/heart-wisdom-with-jack-kornfield-ep-224-loving-kindness-guided-meditation/']
+['Compassionate Body Scan','Kristin Neff','22.5 min',NEFF],
+['Loving Kindness Guided Meditation','Jack Kornfield · Heart Wisdom','26.5 min','https://beherenownetwork.com/heart-wisdom-with-jack-kornfield-ep-224-loving-kindness-guided-meditation/']
 ]];
 const PROMPTS=['How do I want to show up today?','What would actually satisfy me?','What could I do today with all of me in it?','Where am I settling for sensation over feeling?','What’s alive in my body right now?','What do I want to say yes to today?'];
 const TABS=['Morning','Evening','Kindness'];
@@ -2321,7 +2334,7 @@ const AU={
 "1-16": "https://traffic.libsyn.com/secure/tarabrach/2021-04-14-Meditation-Coming-Home-with-the-Breath-TaraBrach.mp3",
 "2-6": "https://www.uclahealth.org/marc/mpeg/04_Loving_Kindness.mp3",
 "2-9": "https://traffic.libsyn.com/preview/secure/mindfulorg/12MM_-_A_Meditation_to_Connect_With_Loving-Kindness_Even_When_Its_Hard_with_Sharon_Salzberg_January_30_2026_EDITED.mp3",
-"0-11": "https://cdn.simplecast.com/audio/38080bd8-b694-4f1a-b3c7-0b80b874d16b/episodes/e0934895-113c-4618-a833-c5c1849a0dd4/audio/c80ed1a3-aadd-45ed-b41c-ccba12edbc77/default_tc.mp3",
+"0-11": "https://cdn.simplecast.com/audio/38080b/38080bd8-b694-4f1a-b3c7-0b80b874d16b/5e9d2f11-55c9-4dd5-add2-1f1482a70414/nye-kindness_tc.mp3",
 "0-15": "https://cdn.simplecast.com/audio/49fe14/49fe14cf-8aef-4a4f-83ca-a3ac86a522d8/d1d2945c-5e05-4f70-bb93-5a8e7b976731/a-poem-to-notice-openings-and-closings_tc.mp3",
 "1-19": "https://cdn.simplecast.com/audio/85760130-020c-4d30-8e15-26c5c451394f/episodes/04833d7c-8b6f-4e97-b1b2-5d04c2501b55/audio/adcbcf1e-c69b-4389-9024-be7bc5bc6c57/default_tc.mp3",
 "1-3": "https://voca.arizona.edu/system/files/media/Kinnell-Galway_04-08-1992_2.mp3",
@@ -2341,17 +2354,93 @@ const AU={
 "2-11": "https://cih.ucsd.edu/sites/default/files/2026-09/15-min-loving-kindness-for-a-loved-one-noriko-morita-harth.m4a",
 "2-12": "https://traffic.libsyn.com/secure/tarabrach/2025_02_05_Meditation_Embodied_Metta.mp3",
 "2-13": "https://self-compassion.org/wp-content/uploads/2024/07/Loving-Kindness-Meditation-April2024.mp3",
-"2-14": "https://self-compassion.org/wp-content/uploads/2024/07/Compassionate-Body-Scan-April2024.mp3"
+"2-14": "https://self-compassion.org/wp-content/uploads/2024/07/Compassionate-Body-Scan-April2024.mp3",
+"0-0": "https://cdn.simplecast.com/audio/38080b/38080bd8-b694-4f1a-b3c7-0b80b874d16b/75e89d0a-703e-4104-8d26-4f01c73d4b2f/oliver-wild-geese_tc.mp3",
+"0-1": "https://cdn.simplecast.com/audio/38080b/38080bd8-b694-4f1a-b3c7-0b80b874d16b/572db8fd-e17d-4f9f-a538-f510cd4a1e20/oliver-i-happened-to-be-standing_tc.mp3",
+"0-2": "https://cdn.simplecast.com/audio/1bf11c/1bf11c14-f329-4a38-b3a4-d5a91aaa46a6/308d00c2-47b0-469a-8b52-d74898e37632/ce4f591f57fe10caae51e3d82bdee5d3e017ce71_tc.mp3",
+"0-3": "https://voca.arizona.edu/system/files/media/clifton-lucille_10-12-1983_2.mp3",
+"0-4": "https://cdn.simplecast.com/audio/49fe14cf-8aef-4a4f-83ca-a3ac86a522d8/episodes/d2ca6fd7-0ff8-4d73-aab0-a4eb1f8365bc/audio/5651edef-a0b1-4c46-bbe9-5e0ae695add5/default_tc.mp3",
+"0-5": "https://voca.arizona.edu/system/files/media/Kinnell-Galway_04-08-1992_5.mp3",
+"0-6": "https://poetryarchive.org/wp-content/uploads/poems/full/JOY_HARJO-Eagle_Poem-POETRY_PLEASE-28-02-1993-Prod-Julian_Wilkinson.mp3",
+"0-7": "https://cdn.simplecast.com/audio/38080bd8-b694-4f1a-b3c7-0b80b874d16b/episodes/40395e9c-3940-414d-92b9-003c605074d8/audio/ee548cf0-49f7-496e-998e-c5d1b8894d7a/default_tc.mp3",
+"0-8": "https://sphinx.acast.com/readmeapoem/-theguesthouse-byrumi/media.mp3",
+"0-9": "https://cdn.simplecast.com/audio/38080b/38080bd8-b694-4f1a-b3c7-0b80b874d16b/28bb282d-03fa-4736-9ca6-f644e267d72f/oliver-the-fourth-sign-of-the-zodiac_tc.mp3",
+"0-10": "https://cdn.simplecast.com/audio/38080b/38080bd8-b694-4f1a-b3c7-0b80b874d16b/4f6ddfd1-1ce2-4d1f-95ed-3d6925d01dc0/whyte-everything-is-waiting-for-you_tc.mp3",
+"0-13": "https://sphinx.acast.com/p/acast/s/readmeapoem/e/619bb9bcd688290019e38b36/media.mp3",
+"0-14": "https://play.publicradio.org/unreplaced_ua/o/americanpublicmedia/podcasts/theslowdown/2026/07/theslowdown_20260729_20260729_128.mp3",
+"0-20": "https://sphinx.acast.com/p/acast/s/readmeapoem/e/61e625ded9341b0012330daf/media.mp3",
+"1-0": "https://www.loe.org/audio/100423/100423POEM.mp3",
+"1-1": "https://sphinx.acast.com/p/acast/s/readmeapoem/e/69e656fdd2febdbec99889c3/media.mp3",
+"1-2": "https://sphinx.acast.com/p/acast/s/readmeapoem/e/68f2847db5743a0a56668f19/media.mp3",
+"1-4": "https://cdn.simplecast.com/audio/49fe14/49fe14cf-8aef-4a4f-83ca-a3ac86a522d8/502f68e4-0b22-4db7-ad5e-7b0b20c6a204/a-poem-for-all-life-brings_tc.mp3",
+"1-5": "https://sphinx.acast.com/p/acast/s/readmeapoem/e/66675ec50e8c9a00128f5909/media.mp3",
+"1-8": "https://play.publicradio.org/unreplaced_ua/o/americanpublicmedia/podcasts/theslowdown/2019/08/20190829_theslowdown_20190829_128.mp3",
+"1-13": "https://cdn.simplecast.com/audio/49fe14cf-8aef-4a4f-83ca-a3ac86a522d8/episodes/d2ca6fd7-0ff8-4d73-aab0-a4eb1f8365bc/audio/5651edef-a0b1-4c46-bbe9-5e0ae695add5/default_tc.mp3",
+"1-17": "https://cdn.simplecast.com/audio/a807ce/a807ce62-71b3-4522-84db-7b464c9f5740/1cc50781-8fd9-448e-a05e-b97d1ec55adc/341bfbfcd32401094ff879d2f3872f1ba22b6aa3_tc.mp3",
+"2-15": "https://pscrb.fm/rss/p/rss.art19.com/episodes/5e44dadb-a0bb-4d76-94ca-4f52d3df9516.mp3"
 };
-const player=new Audio();player.preload='none';let cur=null;
+// Verified beginning of each reading or guided practice, in seconds. Streams remain unmodified.
+const START={
+"0-0": 9.2,
+"0-1": 12.7,
+"0-2": 4.6,
+"0-3": 65,
+"0-4": 75.8,
+"0-5": 95,
+"0-7": 14.9,
+"0-8": 35,
+"0-9": 24,
+"0-10": 14,
+"0-11": 12.4,
+"0-13": 47.5,
+"0-14": 237,
+"0-15": 47,
+"0-16": 69.5,
+"0-17": 41,
+"0-18": 40.5,
+"0-20": 68.5,
+"1-0": 46.8,
+"1-1": 72.7,
+"1-2": 44.5,
+"1-3": 31.6,
+"1-4": 39.5,
+"1-5": 57.4,
+"1-6": 51.8,
+"1-7": 9.5,
+"1-8": 210,
+"1-13": 44.8,
+"1-14": 100.4,
+"1-15": 41,
+"1-16": 41.8,
+"1-17": 88.5,
+"1-18": 126.5,
+"1-19": 149.1,
+"2-1": 33.5,
+"2-2": 267,
+"2-3": 60.3,
+"2-4": 41.4,
+"2-6": 10,
+"2-7": 43.5,
+"2-8": 117.2,
+"2-9": 91.4,
+"2-11": 11,
+"2-12": 51.5,
+"2-15": 393.8
+};
+const player=new Audio();player.preload='none';let cur=null,pendingStart=null;
+const seekStart=()=>{if(pendingStart==null||!Number.isFinite(player.duration)||player.duration<=0)return;
+  try{player.currentTime=Math.min(pendingStart,Math.max(0,player.duration-1));pendingStart=null;}catch(_){}};
+player.addEventListener('loadedmetadata',seekStart);player.addEventListener('canplay',seekStart);
 const isOn=id=>cur===id&&!player.paused;
 const curItem=()=>{if(!cur)return null;const [t,k]=cur.split('-').map(Number);return {r:LIB[t][k],id:cur};};
 function playId(id){if(cur===id){player.paused?player.play().catch(()=>{}):player.pause();return;}
-  cur=id;player.src=AU[id];player.play().catch(()=>{});
+  cur=id;pendingStart=START[id]||0;player.src=AU[id];player.play().catch(()=>{});
 }
 function syncPlay(){sheet.querySelectorAll('[data-play]').forEach(b=>{const on=isOn(b.dataset.play);const ic=b.classList.contains('be-play')?b:b.querySelector('.ic');if(ic){ic.innerHTML=on?SVG.pause:SVG.play;ic.classList.toggle('on',on);}b.setAttribute('aria-pressed',on);});
-  const pr=sheet.querySelector('.be-prog i');if(pr)pr.style.width=(cur&&player.duration?Math.min(100,player.currentTime/player.duration*100):0)+'%';}
-['play','pause','ended','timeupdate','loadedmetadata'].forEach(ev=>player.addEventListener(ev,syncPlay));
+  const pr=$('beSeek');if(pr){const ready=!!cur&&Number.isFinite(player.duration)&&player.duration>0;pr.disabled=!ready;pr.max=ready?player.duration:100;pr.value=ready?player.currentTime:0;
+    pr.style.setProperty('--played',(ready?Math.min(100,player.currentTime/player.duration*100):0)+'%');
+    const time=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');pr.setAttribute('aria-valuetext',ready?time(player.currentTime)+' of '+time(player.duration):'Not playing');}}
+['play','pause','ended','timeupdate','loadedmetadata','seeked','durationchange'].forEach(ev=>player.addEventListener(ev,syncPlay));
 // While a recording plays, lock-screen controls drive it; when it stops, they go back to the session.
 const ms=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f);}catch(e){}};
 player.addEventListener('play',()=>{window.__beAudioOn=true;syncFab();if(!('mediaSession' in navigator))return;
@@ -2359,11 +2448,12 @@ player.addEventListener('play',()=>{window.__beAudioOn=true;syncFab();if(!('medi
   try{const x=curItem();navigator.mediaSession.metadata=new MediaMetadata({title:x.r[0],artist:x.r[1]});navigator.mediaSession.playbackState='playing';}catch(e){}});
 const release=()=>{window.__beAudioOn=false;syncFab();try{H.sessMedia();}catch(e){}};
 player.addEventListener('pause',release);player.addEventListener('ended',release);
-player.addEventListener('ended',()=>{player.currentTime=0;});
-const wirePlay=()=>sheet.querySelectorAll('[data-play]').forEach(b=>{b.addEventListener('click',e=>{e.preventDefault();playId(b.dataset.play);if(ui.view==='lib'){ui.view='card';ui.open=null;render();}});});
+player.addEventListener('ended',()=>{pendingStart=START[cur]||0;seekStart();syncPlay();});
+const wirePlay=()=>{sheet.querySelectorAll('[data-play]').forEach(b=>{b.addEventListener('click',e=>{e.preventDefault();playId(b.dataset.play);if(ui.view==='lib'){ui.view='card';ui.open=null;render();}});});
+  const seek=$('beSeek');if(seek)seek.oninput=()=>{if(!cur||!Number.isFinite(player.duration))return;pendingStart=null;player.currentTime=Math.max(0,Math.min(player.duration,Number(seek.value)));syncPlay();};};
 function listenHTML(t){const x=curItem()||pick(t);const au=x&&AU[x.id];
   const btn=!x?'':au?'<button class="be-play" data-play="'+x.id+'" aria-label="Play or pause '+esc(x.r[0])+'">'+(isOn(x.id)?SVG.pause:SVG.play)+'</button>':'<a class="be-play" href="'+esc(x.r[3])+'" target="_blank" rel="noopener" aria-label="Open '+esc(x.r[0])+'">'+SVG.out+'</a>';
-  return (au?'<div class="be-prog" aria-hidden="true"><i></i></div>':'')+'<div class="be-listen">'+btn+'<div class="nm">'+(x?esc(x.r[0]):'')+'</div><button class="be-link" id="beAll">All</button></div>';}
+  return (au?'<div class="be-prog"><input id="beSeek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Recording position" disabled></div>':'')+'<div class="be-listen">'+btn+'<div class="nm">'+(x?esc(x.r[0]):'')+'</div><button class="be-link" id="beAll">All</button></div>';}
 function render(){const b=store();
   if(ui.view==='lib')return renderLib();
   let h='<button class="be-grab" id="beClose" aria-label="Close"></button><div class="be-body" id="beBody">';
@@ -2393,19 +2483,28 @@ function wireCard(){
   const body=$('beBody');let sy=null;body.onpointerdown=e=>{sy=e.pointerType==='touch'?null:e.clientY;};body.onpointerup=e=>{if(sy==null)return;const dy=e.clientY-sy;sy=null;
     if(dy<-60&&!ui.past&&body.scrollHeight<=body.clientHeight+4){ui.past=true;render();}else if(dy>60&&ui.past&&body.scrollTop<=0){ui.past=false;render();}};}
 function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+k}));const nh=rows.filter(x=>prefs.hidden[x.id]).length;
-  const vis=rows.filter(x=>ui.showHid||!prefs.hidden[x.id]).sort((a,b)=>((prefs.loved[b.id]?1:0)-(prefs.loved[a.id]?1:0))||a.k-b.k);
+  const vis=rows.filter(x=>ui.showHid||!prefs.hidden[x.id]).sort((a,b)=>((prefs.loved[b.id]?1:0)-(prefs.loved[a.id]?1:0))||((AU[b.id]?1:0)-(AU[a.id]?1:0))||a.k-b.k);
   let h='<button class="be-grab" id="beClose" aria-label="Close"></button><div class="be-tabs"><div>'+TABS.map((n,k)=>'<button class="t'+(k===t?' on':'')+'" data-t="'+k+'" aria-pressed="'+(k===t)+'">'+n+'</button>').join('')+'</div><button class="be-link" id="beDone">Done</button></div><div class="be-list">';
-  h+=vis.map(x=>{const lv=!!prefs.loved[x.id],hd=!!prefs.hidden[x.id];return '<div class="be-row'+(ui.open===x.id?' open':'')+(hd?' hid':'')+'" data-id="'+x.id+'"><div class="be-act"><button class="lv" data-a="love" aria-label="'+(lv?'Unlove ':'Love ')+esc(x.r[0])+'">'+SVG.heart+'</button><button data-a="hide" aria-label="'+(hd?'Unhide ':'Hide ')+esc(x.r[0])+'">'+SVG.x+'</button></div>'+
+  h+=vis.map(x=>{const lv=!!prefs.loved[x.id],hd=!!prefs.hidden[x.id];return '<div class="be-row'+(ui.open===x.id?' open':'')+(hd?' hid':'')+'" data-id="'+x.id+'"><div class="be-act"><button class="lv" data-a="love" aria-pressed="'+lv+'" aria-label="'+(lv?'Unlove ':'Love ')+esc(x.r[0])+'">'+SVG.heart+'<span>'+(lv?'Hearted':'Heart')+'</span></button><button data-a="hide" aria-label="'+(hd?'Unhide ':'Hide ')+esc(x.r[0])+'">'+SVG.x+'<span>'+(hd?'Unhide':'Hide')+'</span></button></div>'+
    '<a class="be-front" href="'+esc(x.r[3])+'"'+(AU[x.id]?' data-play="'+x.id+'"':' target="_blank" rel="noopener"')+' draggable="false"><span class="tt"><b>'+esc(x.r[0])+'</b><small>'+esc(x.r[1])+' · '+esc(x.r[2])+'</small></span>'+(lv?'<span style="color:var(--accent);display:grid">'+SVG.heart.replace('width="20" height="20"','width="14" height="14"')+'</span>':'')+'<span class="ic">'+(AU[x.id]?(isOn(x.id)?SVG.pause:SVG.play):SVG.out)+'</span></a></div>';}).join('');
   if(nh)h+='<button class="be-link" id="beHid" style="align-self:center;color:var(--muted);font-size:13px;margin-top:12px">'+(ui.showHid?'Hide hidden':'Show hidden ('+nh+')')+'</button>';
   sheet.innerHTML=h+'</div>';
   $('beClose').onclick=close;$('beDone').onclick=()=>{ui.view='card';render();};
   sheet.querySelectorAll('.be-tabs button.t').forEach(b=>b.onclick=()=>{ui.tab=+b.dataset.t;ui.open=null;render();});
   const hb=$('beHid');if(hb)hb.onclick=()=>{ui.showHid=!ui.showHid;render();};
-  sheet.querySelectorAll('.be-row').forEach(row=>{const id=row.dataset.id,a=row.querySelector('.be-front');let sx=null,sw=false;
-    a.onpointerdown=e=>{sx=e.clientX;sw=false;};
-    a.onpointerup=e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(dx<-40){sw=true;ui.open=id;render();}else if(dx>40){sw=true;ui.open=null;render();}};
-    a.onclick=e=>{if(sw||ui.open===id){e.preventDefault();e.stopImmediatePropagation();if(!sw){ui.open=null;render();}sw=false;}};
+  // Keep the row elements in place so their slide transition runs and a swipe cannot become a play tap.
+  const openRow=id=>{ui.open=id;sheet.querySelectorAll('.be-row').forEach(row=>row.classList.toggle('open',row.dataset.id===id));};
+  sheet.querySelectorAll('.be-row').forEach(row=>{const id=row.dataset.id,a=row.querySelector('.be-front');let sx=null,sy=0,sw=false;
+    const settle=()=>{row.classList.remove('dragging');a.style.removeProperty('--beOffset');};
+    a.onpointerdown=e=>{sx=e.clientX;sy=e.clientY;sw=false;};
+    a.onpointermove=e=>{if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(!sw&&(Math.abs(dx)<8||Math.abs(dx)<=Math.abs(dy)))return;
+      sw=true;try{a.setPointerCapture(e.pointerId);}catch(_){}row.classList.add('dragging');a.style.setProperty('--beOffset',Math.max(0,Math.min(144,(ui.open===id?144:0)-dx))+'px');};
+    a.onpointercancel=()=>{sx=null;sw=true;settle();};
+    a.onpointerup=e=>{if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){sw=true;openRow(dx<0?id:null);}settle();};
+    a.onclick=e=>{if(sw||ui.open===id){e.preventDefault();e.stopImmediatePropagation();if(!sw)openRow(null);sw=false;}};
+    a.setAttribute('aria-keyshortcuts','ArrowLeft');
+    a.onkeydown=e=>{if(e.key==='ArrowLeft'){e.preventDefault();openRow(id);row.querySelector('[data-a="love"]').focus();}};
+    row.addEventListener('keydown',e=>{if((e.key==='Escape'||e.key==='ArrowRight')&&ui.open===id){e.preventDefault();openRow(null);a.focus();}});
     row.querySelectorAll('.be-act button').forEach(btn=>btn.onclick=()=>{const k=btn.dataset.a==='love'?'loved':'hidden';prefs[k][id]=!prefs[k][id];if(!prefs[k][id])delete prefs[k][id];savePrefs();ui.open=null;render();});});
   wirePlay();syncPlay();}
 function open(){sheet.style.animation='';ui.view='card';ui.mode=modeNow();ui.past=false;sheet.hidden=false;back.hidden=false;render();}
