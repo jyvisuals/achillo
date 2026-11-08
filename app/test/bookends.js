@@ -8,13 +8,27 @@ const path=require('node:path');
 const http=require('node:http');
 const vm=require('node:vm');
 const src=fs.readFileSync(path.join(__dirname,'../src/achilles-tracker.html'),'utf8');
-const {LIB,AU,START}=vm.runInNewContext(src.slice(src.indexOf("const PCB="),src.indexOf('const PROMPTS='))+
-  src.slice(src.indexOf('const AU={'),src.indexOf('const player=new Audio();'))+';({LIB,AU,START})');
+const {LIB,AU,START,END,SKIP,clipRanges,clipLength,clipPosition,sourcePosition}=vm.runInNewContext(src.slice(src.indexOf("const PCB="),src.indexOf('const PROMPTS='))+
+  src.slice(src.indexOf('const AU={'),src.indexOf('const player=new Audio();'))+';({LIB,AU,START,END,SKIP,clipRanges,clipLength,clipPosition,sourcePosition})');
 const additions=['0-0','0-1','0-2','0-3','0-4','0-5','0-6','0-7','0-8','0-9','0-10','0-12','0-13','0-14','0-20','0-22','1-0','1-1','1-2','1-4','1-5','1-8','1-13','1-17','1-21','2-15'];
 const protectedIds=['0-19','1-9','1-10','1-11','1-12','1-20'];
 const prefs={loved:{'0-7':true,'0-19':true,'0-20':true,'0-16':true},hidden:{'0-1':true}};
 const row=id=>`.be-row[data-id="${id}"]`;
 const tabFor=id=>id.startsWith('2-')||['0-16','0-17','0-18','1-15','1-16'].includes(id)?2:+id.split('-')[0];
+
+assert.deepEqual(Object.keys(END).sort(),Object.keys(AU).sort(),'Every stream has a reviewed end');
+for(const id of Object.keys(AU)){
+  const start=START[id]||0,end=END[id];
+  assert.ok(Number.isFinite(end)&&end>start,id+' has valid content bounds');
+  let previous=start;
+  for(const [from,to] of SKIP[id]||[]){
+    assert.ok(from>=previous&&to>from&&to<=end,id+' has ordered interior exclusions');previous=to;
+  }
+  const ranges=clipRanges(id,end+60),length=clipLength(ranges);
+  assert.ok(length>0,id+' retains content');
+  assert.equal(sourcePosition(0,ranges),start);
+  assert.ok(Math.abs(sourcePosition(length,ranges)-end)<1e-6);
+}
 
 (async()=>{
   const server=http.createServer((req,res)=>{
@@ -155,6 +169,13 @@ const tabFor=id=>id.startsWith('2-')||['0-16','0-17','0-18','1-15','1-16'].inclu
     wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(rate,24);wav.writeUInt32LE(rate*2,28);
     wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(dataBytes,40);
     const fixture=await context.newPage();
+    fixture.on('pageerror',e=>errors.push(e.message));
+    const fixtureEnd=100,fixtureLength=fixtureEnd-start-10;
+    // Use a longer source than the listening section, with a synthetic mid-roll excluded.
+    const fixtureHTML=fs.readFileSync(path.join(__dirname,'../www/index.html'),'utf8')
+      .replace(/const END=\{[\s\S]*?\};/,'const END='+JSON.stringify({[introId]:fixtureEnd})+';')
+      .replace(/const SKIP=\{[\s\S]*?\};/,'const SKIP='+JSON.stringify({[introId]:[[40,50]]})+';');
+    await fixture.route(page.url(),route=>route.fulfill({contentType:'text/html',body:fixtureHTML}));
     await fixture.addInitScript(()=>{
       const NativeAudio=window.Audio;window.__audio=[];
       window.Audio=function(...args){const a=new NativeAudio(...args);window.__audio.push(a);return a;};window.Audio.prototype=NativeAudio.prototype;
@@ -176,9 +197,13 @@ const tabFor=id=>id.startsWith('2-')||['0-16','0-17','0-18','1-15','1-16'].inclu
     await fixture.waitForFunction(()=>document.querySelector('.be-play').getAttribute('aria-pressed')==='false');
     await fixture.locator('#beSeek').fill('0');
     await fixture.waitForFunction(()=>Number(document.querySelector('#beSeek').value)===0);
+    assert.ok(Math.abs(Number(await fixture.locator('#beSeek').getAttribute('max'))-fixtureLength)<.001);
+    await fixture.waitForFunction(start=>window.__audio.some(a=>Math.abs(a.currentTime-start)<.2),start);
     await fixture.click('.be-play');
-    await fixture.waitForFunction(start=>window.__audio.some(a=>!a.paused&&a.currentTime>.1&&a.currentTime<start),start);
-    await fixture.locator('#beSeek').fill('119.9');
+    await fixture.waitForFunction(start=>window.__audio.some(a=>!a.paused&&a.currentTime>start+.1&&a.currentTime<start+3),start);
+    await fixture.locator('#beSeek').fill(String(Math.round((39.8-start)*10)/10));
+    await fixture.waitForFunction(()=>window.__audio.some(a=>!a.paused&&a.currentTime>=50&&a.currentTime<52));
+    await fixture.locator('#beSeek').fill(String(Math.round((fixtureLength-.1)*10)/10));
     await fixture.waitForFunction(start=>window.__audio.some(a=>a.paused&&Math.abs(a.currentTime-start)<.2),start);
     await fixture.click('.be-play');
     await fixture.waitForFunction(start=>window.__audio.some(a=>!a.paused&&a.currentTime>start&&a.currentTime<start+3),start);
@@ -193,7 +218,8 @@ const tabFor=id=>id.startsWith('2-')||['0-16','0-17','0-18','1-15','1-16'].inclu
     await seekTouch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:seekBox.x+seekBox.width*.75,y:seekY+20}]});
     assert.equal(await fixture.locator('#beSheet').evaluate(el=>el.style.transform),'');
     await seekTouch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-    await fixture.waitForFunction(()=>window.__audio.some(a=>a.currentTime>85&&a.currentTime<95&&a.paused)).catch(async e=>{
+    const touchTarget=start+10+fixtureLength*.75;
+    await fixture.waitForFunction(target=>window.__audio.some(a=>Math.abs(a.currentTime-target)<3&&a.paused),touchTarget).catch(async e=>{
       console.error('Touch seek state',await fixture.evaluate(()=>({value:document.querySelector('#beSeek').value,audio:window.__audio.map(a=>({time:a.currentTime,paused:a.paused}))})));throw e;
     });
     assert.equal(await fixture.locator('#beSheet').isVisible(),true);
@@ -201,22 +227,32 @@ const tabFor=id=>id.startsWith('2-')||['0-16','0-17','0-18','1-15','1-16'].inclu
     await seekTouch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:seekBox.x+seekBox.width*.75,y:seekY}]});
     await seekTouch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:seekBox.x+seekBox.width*.25,y:seekY-20}]});
     const preview=Number(await fixture.locator('#beSeek').inputValue());
-    assert.ok(preview>25&&preview<35);
+    assert.ok(Math.abs(preview-fixtureLength*.25)<3);
     // Playback updates arriving during a held drag must not reset the preview or seek repeatedly.
     await fixture.evaluate(()=>window.__audio.forEach(a=>a.dispatchEvent(new Event('timeupdate'))));
     assert.equal(Number(await fixture.locator('#beSeek').inputValue()),preview);
-    assert.ok(await fixture.evaluate(()=>window.__audio.some(a=>a.currentTime>85&&!a.paused)));
+    assert.ok(await fixture.evaluate(target=>window.__audio.some(a=>Math.abs(a.currentTime-target)<5&&!a.paused),touchTarget));
     await seekTouch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-    await fixture.waitForFunction(()=>window.__audio.some(a=>a.currentTime>25&&a.currentTime<35&&!a.paused));
+    await fixture.waitForFunction(target=>window.__audio.some(a=>Math.abs(a.currentTime-target)<3&&!a.paused),start+fixtureLength*.25);
     await fixture.click('.be-play');
     await fixture.mouse.click(seekBox.x+seekBox.width/2,seekY);
-    await fixture.waitForFunction(()=>window.__audio.some(a=>Math.abs(a.currentTime-60)<.2&&a.paused));
+    const midpoint=start+10+fixtureLength/2;
+    await fixture.waitForFunction(target=>window.__audio.some(a=>Math.abs(a.currentTime-target)<.2&&a.paused),midpoint);
     await fixture.locator('#beSeek').focus();await fixture.keyboard.press('ArrowRight');
-    await fixture.waitForFunction(()=>window.__audio.some(a=>a.currentTime>60&&a.currentTime<61&&a.paused));
+    await fixture.waitForFunction(target=>window.__audio.some(a=>a.currentTime>target&&a.currentTime<target+1&&a.paused),midpoint);
     const beforeCancel=Number(await fixture.locator('#beSeek').inputValue());
     await seekTouch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:seekBox.x+seekBox.width*.9,y:seekY}]});
     await seekTouch.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
     assert.equal(Number(await fixture.locator('#beSeek').inputValue()),beforeCancel);
+    // Native/lock-screen seeks also stay out of trimmed content, and the end timer handles rate changes.
+    await fixture.evaluate(()=>{window.__audio[0].currentTime=0;});
+    await fixture.waitForFunction(start=>window.__audio.some(a=>Math.abs(a.currentTime-start)<.2),start);
+    await fixture.evaluate(()=>{window.__audio[0].currentTime=45;});
+    await fixture.waitForFunction(()=>window.__audio.some(a=>Math.abs(a.currentTime-50)<.2));
+    await fixture.locator('#beSeek').fill(String(Math.round((fixtureLength-.6)*10)/10));
+    await fixture.evaluate(()=>{window.__audio[0].playbackRate=2;});
+    await fixture.click('.be-play');
+    await fixture.waitForFunction(start=>window.__audio.some(a=>a.paused&&Math.abs(a.currentTime-start)<.2),start);
     await fixture.close();
     console.log('Intro seek/resume/replay, touch scrubbing, canceled drag, mouse and keyboard seeking OK');
     if(process.argv.includes('--live-audio')||process.argv.includes('--all-audio')){
@@ -242,14 +278,23 @@ const tabFor=id=>id.startsWith('2-')||['0-16','0-17','0-18','1-15','1-16'].inclu
           await page.click('.be-play');
           await page.waitForFunction(()=>document.querySelector('.be-play').getAttribute('aria-pressed')==='false');
           await page.locator('#beSeek').fill('0');
-          await page.waitForFunction(()=>window.__audio.some(a=>a.currentSrc&&a.currentTime<.2));
+          await page.waitForFunction(start=>window.__audio.some(a=>a.currentSrc&&Math.abs(a.currentTime-start)<.2),START[id]||0);
           assert.equal(await page.locator('.be-play').getAttribute('aria-pressed'),'false');
           await page.locator('#beSeek').focus();await page.keyboard.press('ArrowRight');
           await page.waitForFunction(()=>Number(document.querySelector('#beSeek').value)>0);
         }
         const duration=await page.evaluate(url=>window.__audio.find(a=>a.src===url).duration,AU[id]);
         assert.ok(Number.isFinite(duration)&&duration>(START[id]||0),id+' has a valid duration');
-        await page.locator('#beSeek').fill(String(Math.round((duration-.5)*10)/10));
+        const length=clipLength(clipRanges(id,duration));
+        assert.ok(length>0,id+' has a valid listening section');
+        assert.ok(Math.abs(Number(await page.locator('#beSeek').getAttribute('max'))-length)<.1);
+        for(const [from,to] of SKIP[id]||[]){
+          await page.locator('#beSeek').fill(String(Math.round(clipPosition(from-.4,clipRanges(id,duration))*10)/10));
+          await page.click('.be-play');
+          await page.waitForFunction(({url,to})=>window.__audio.some(a=>a.src===url&&!a.paused&&a.currentTime>=to&&a.currentTime<to+5),{url:AU[id],to},{timeout:30000});
+          await page.click('.be-play');
+        }
+        await page.locator('#beSeek').fill(String(Math.round((length-.5)*10)/10));
         await page.click('.be-play');
         await page.waitForFunction(({url,start})=>window.__audio.some(a=>a.src===url&&a.paused&&Math.abs(a.currentTime-start)<.2),
           {url:AU[id],start:START[id]||0},{timeout:30000});

@@ -1,3 +1,4 @@
+Bookends: skip recording introductions and promotional endings; progress and seeking stay within the reading. Reviewed all 54 streams and replaced a changing pre-roll source with the author’s full recording.
 Bookends: readings lead the morning and evening library; guided practices now have their own Meditations tab. Added long Mary Oliver and Ross Gay readings and restored the full Audre Lorde reading link.
 Bookends: drag down from the wider top handle to close; compact button now sits at the bottom right.
 Bookends: drag the audio progress bar reliably without moving the card; larger touch area and smoother seeking.
