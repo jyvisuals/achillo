@@ -2166,11 +2166,11 @@ resumeSession();
 </script>
 <!-- ===== PT bookends: a quiet card to pull up during PT (morning prompts, evening delights, listening library) ===== -->
 <style>
-#beFab{position:fixed;left:50%;transform:translateX(-50%);bottom:var(--beDock,0px);z-index:44;width:132px;height:calc(30px + var(--beSafe,0px));padding:7px 0 var(--beSafe,0px);border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;background:var(--surface);color:var(--accent);display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 -2px 12px rgba(0,0,0,.06);touch-action:none}#beFab::before{content:'';width:28px;height:3px;border-radius:2px;background:var(--line)}#beFab.sess{--beSafe:env(safe-area-inset-bottom)}
+#beFab{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:calc(max(var(--beDock,0px),env(safe-area-inset-bottom)) + 12px);z-index:44;width:44px;height:44px;padding:0;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--accent);display:grid;place-items:center;box-shadow:0 2px 12px rgba(0,0,0,.1);touch-action:none}
 #beFab[hidden],#beSheet[hidden],#beBack[hidden]{display:none}
 #beBack{position:fixed;inset:0;z-index:58;background:rgba(0,0,0,.45);animation:fadeIn .2s ease both}
 #beSheet{position:fixed;left:0;right:0;bottom:0;z-index:60;height:82vh;display:flex;flex-direction:column;background:var(--surface);color:var(--ink);border-radius:28px 28px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.35);animation:sheetUp .32s cubic-bezier(.2,.9,.25,1) both;font-family:var(--body)}
-#beSheet .be-grab{align-self:center;width:120px;height:32px;border:0;background:transparent;display:grid;place-items:center;flex-shrink:0;padding:0}
+#beSheet .be-grab{align-self:center;width:100%;height:44px;border:0;background:transparent;display:grid;place-items:center;flex-shrink:0;padding:0;touch-action:none}
 #beSheet .be-grab::before{content:"";width:40px;height:4px;border-radius:2px;background:var(--line)}
 #beSheet .be-body{flex:1;min-height:0;overflow-y:auto;padding:28px 28px 12px;display:flex;flex-direction:column;gap:24px;overscroll-behavior:contain}
 #beSheet .be-pill{touch-action:pan-y;user-select:none;-webkit-user-select:none;min-height:160px;border-radius:30px;border:0;background:var(--tint);color:var(--ink);padding:26px;text-align:left;font-family:var(--display);font-weight:500;font-size:25px;line-height:1.3;letter-spacing:-.01em;width:100%}
@@ -2195,8 +2195,8 @@ resumeSession();
 #beSheet .be-day .t{font-size:15px;color:var(--ink);opacity:.8;padding-left:17px}
 #beSheet .be-listen{display:flex;align-items:center;gap:14px;padding:12px 28px calc(20px + env(safe-area-inset-bottom));flex-shrink:0}
 #beSheet .be-play{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);color:var(--accent);display:grid;place-items:center;flex-shrink:0;text-decoration:none}
-#beSheet .be-prog{height:28px;margin:0 28px;display:flex;align-items:center;flex-shrink:0}
-#beSheet .be-prog input{appearance:none;-webkit-appearance:none;width:100%;height:28px;margin:0;padding:0;border:0;background:transparent;cursor:pointer;touch-action:pan-y;--played:0%}
+#beSheet .be-prog{height:44px;margin:0 28px;display:flex;align-items:center;flex-shrink:0}
+#beSheet .be-prog input{appearance:none;-webkit-appearance:none;width:100%;height:44px;margin:0;padding:0;border:0;background:transparent;cursor:pointer;touch-action:none;--played:0%}
 #beSheet .be-prog input::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(to right,var(--accent) var(--played),var(--line) var(--played))}
 #beSheet .be-prog input::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:14px;height:14px;margin-top:-5.5px;border:0;border-radius:50%;background:var(--accent)}
 #beSheet .be-prog input::-moz-range-track{height:3px;border-radius:2px;background:var(--line)}
@@ -2309,6 +2309,7 @@ const SVG={mic:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stro
  heart:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8.4 3.2 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5 18.8 5 21 8.4 19.5 11.8 17.5 16.4 12 21 12 21z"/></svg>',
  x:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
 const $=id=>document.getElementById(id), sheet=$('beSheet'), fab=$('beFab'), back=$('beBack');
+let dismissTimer=null;
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let prefs={loved:{},hidden:{}};try{prefs=Object.assign(prefs,JSON.parse(localStorage.getItem('ach:beLib')||'{}'));}catch(e){}
 const savePrefs=()=>{try{localStorage.setItem('ach:beLib',JSON.stringify(prefs));}catch(e){}};
@@ -2429,7 +2430,7 @@ const START={
 "2-15": 393.8,
 "0-12": 733.2
 };
-const player=new Audio();player.preload='none';let cur=null,pendingStart=null;
+const player=new Audio();player.preload='none';let cur=null,pendingStart=null,scrubbing=null;
 const seekStart=()=>{if(pendingStart==null||!Number.isFinite(player.duration)||player.duration<=0)return;
   try{player.currentTime=Math.min(pendingStart,Math.max(0,player.duration-1));pendingStart=null;}catch(_){}};
 player.addEventListener('loadedmetadata',seekStart);player.addEventListener('canplay',seekStart);
@@ -2439,9 +2440,9 @@ function playId(id){if(cur===id){player.paused?player.play().catch(()=>{}):playe
   cur=id;pendingStart=START[id]||0;player.src=AU[id];player.play().catch(()=>{});
 }
 function syncPlay(){sheet.querySelectorAll('[data-play]').forEach(b=>{const on=isOn(b.dataset.play);const ic=b.classList.contains('be-play')?b:b.querySelector('.ic');if(ic){ic.innerHTML=on?SVG.pause:SVG.play;ic.classList.toggle('on',on);}b.setAttribute('aria-pressed',on);});
-  const pr=$('beSeek');if(pr){const ready=!!cur&&Number.isFinite(player.duration)&&player.duration>0;pr.disabled=!ready;pr.max=ready?player.duration:100;pr.value=ready?player.currentTime:0;
-    pr.style.setProperty('--played',(ready?Math.min(100,player.currentTime/player.duration*100):0)+'%');
-    const time=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');pr.setAttribute('aria-valuetext',ready?time(player.currentTime)+' of '+time(player.duration):'Not playing');}}
+  const pr=$('beSeek');if(pr){const ready=!!cur&&Number.isFinite(player.duration)&&player.duration>0;const pos=ready?(scrubbing===pr?Number(pr.value):player.currentTime):0;pr.disabled=!ready;pr.max=ready?player.duration:100;if(scrubbing!==pr)pr.value=pos;
+    pr.style.setProperty('--played',(ready?Math.min(100,pos/player.duration*100):0)+'%');
+    const time=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');pr.setAttribute('aria-valuetext',ready?time(pos)+' of '+time(player.duration):'Not playing');}}
 ['play','pause','ended','timeupdate','loadedmetadata','seeked','durationchange'].forEach(ev=>player.addEventListener(ev,syncPlay));
 // While a recording plays, lock-screen controls drive it; when it stops, they go back to the session.
 const ms=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f);}catch(e){}};
@@ -2452,11 +2453,24 @@ const release=()=>{window.__beAudioOn=false;syncFab();try{H.sessMedia();}catch(e
 player.addEventListener('pause',release);player.addEventListener('ended',release);
 player.addEventListener('ended',()=>{pendingStart=START[cur]||0;seekStart();syncPlay();});
 const wirePlay=()=>{sheet.querySelectorAll('[data-play]').forEach(b=>{b.addEventListener('click',e=>{e.preventDefault();playId(b.dataset.play);if(ui.view==='lib'){ui.view='card';ui.open=null;render();}});});
-  const seek=$('beSeek');if(seek)seek.oninput=()=>{if(!cur||!Number.isFinite(player.duration))return;pendingStart=null;player.currentTime=Math.max(0,Math.min(player.duration,Number(seek.value)));syncPlay();};};
+  const seek=$('beSeek');if(seek){
+    const commit=()=>{if(!cur||!Number.isFinite(player.duration))return;pendingStart=null;player.currentTime=Math.max(0,Math.min(player.duration,Number(seek.value)));};
+    // Own the drag so a vertical finger drift cannot turn into scrolling or cancel seeking.
+    // Keep the native range's keyboard/accessibility behavior, and seek once on release.
+    let pointer=null;
+    const preview=e=>{const box=seek.getBoundingClientRect(),thumb=14;
+      seek.value=Math.max(0,Math.min(1,(e.clientX-box.left-thumb/2)/(box.width-thumb)))*Number(seek.max);syncPlay();};
+    seek.onpointerdown=e=>{if(seek.disabled||e.button!==0||pointer!==null)return;e.preventDefault();pointer=e.pointerId;scrubbing=seek;
+      seek.focus({preventScroll:true});seek.setPointerCapture(pointer);preview(e);};
+    seek.onpointermove=e=>{if(e.pointerId===pointer)preview(e);};
+    seek.oninput=()=>{if(scrubbing!==seek)commit();syncPlay();};
+    seek.onpointerup=e=>{if(e.pointerId!==pointer)return;preview(e);commit();pointer=null;scrubbing=null;syncPlay();};
+    seek.onpointercancel=seek.onlostpointercapture=()=>{pointer=null;if(scrubbing===seek){scrubbing=null;syncPlay();}};
+  }};
 function listenHTML(t){const x=curItem()||pick(t);const au=x&&AU[x.id];
   const btn=!x?'':au?'<button class="be-play" data-play="'+x.id+'" aria-label="Play or pause '+esc(x.r[0])+'">'+(isOn(x.id)?SVG.pause:SVG.play)+'</button>':'<a class="be-play" href="'+esc(x.r[3])+'" target="_blank" rel="noopener" aria-label="Open '+esc(x.r[0])+'">'+SVG.out+'</a>';
   return (au?'<div class="be-prog"><input id="beSeek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Recording position" disabled></div>':'')+'<div class="be-listen">'+btn+'<div class="nm">'+(x?esc(x.r[0]):'')+'</div><button class="be-link" id="beAll">All</button></div>';}
-function render(){const b=store();
+function render(){scrubbing=null;const b=store();
   if(ui.view==='lib')return renderLib();
   let h='<button class="be-grab" id="beClose" aria-label="Close"></button><div class="be-body" id="beBody">';
   if(ui.mode==='m'){const list=b.m[ui.pi]||[];
@@ -2465,7 +2479,7 @@ function render(){const b=store();
     h+=(first?'<div class="be-faint">This morning: '+esc(first)+'</div>':'')+'<h2 class="be-h">Delights:</h2>'+linesHTML(b.d,'d');}
   h+=pastHTML()+'</div>'+listenHTML(ui.mode==='m'?0:1);sheet.innerHTML=h;wireCard();wirePlay();syncPlay();}
 function wireCard(){
-  $('beClose').onclick=close;$('beAll').onclick=()=>{ui.view='lib';ui.tab=ui.mode==='m'?0:1;ui.open=null;render();};
+  wireClose();$('beAll').onclick=()=>{ui.view='lib';ui.tab=ui.mode==='m'?0:1;ui.open=null;render();};
   // Re-resolve on every mutation: save() and the snapshot listener can swap the day record out from under us.
   const listOf=kind=>{const b=store();return kind==='m'?(b.m[ui.pi]=b.m[ui.pi]||[]):b.d;};
   const fit=t=>{t.style.height='auto';t.style.height=t.scrollHeight+'px';};
@@ -2491,7 +2505,7 @@ function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+
    '<a class="be-front" href="'+esc(x.r[3])+'"'+(AU[x.id]?' data-play="'+x.id+'"':' target="_blank" rel="noopener"')+' draggable="false"><span class="tt"><b>'+esc(x.r[0])+'</b><small>'+esc(x.r[1])+' · '+esc(x.r[2])+'</small></span>'+(lv?'<span style="color:var(--accent);display:grid">'+SVG.heart.replace('width="20" height="20"','width="14" height="14"')+'</span>':'')+'<span class="ic">'+(AU[x.id]?(isOn(x.id)?SVG.pause:SVG.play):SVG.out)+'</span></a></div>';}).join('');
   if(nh)h+='<button class="be-link" id="beHid" style="align-self:center;color:var(--muted);font-size:13px;margin-top:12px">'+(ui.showHid?'Hide hidden':'Show hidden ('+nh+')')+'</button>';
   sheet.innerHTML=h+'</div>';
-  $('beClose').onclick=close;$('beDone').onclick=()=>{ui.view='card';render();};
+  wireClose();$('beDone').onclick=()=>{ui.view='card';render();};
   sheet.querySelectorAll('.be-tabs button.t').forEach(b=>b.onclick=()=>{ui.tab=+b.dataset.t;ui.open=null;render();});
   const hb=$('beHid');if(hb)hb.onclick=()=>{ui.showHid=!ui.showHid;render();};
   // Keep the row elements in place so their slide transition runs and a swipe cannot become a play tap.
@@ -2509,22 +2523,31 @@ function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+
     row.addEventListener('keydown',e=>{if((e.key==='Escape'||e.key==='ArrowRight')&&ui.open===id){e.preventDefault();openRow(null);a.focus();}});
     row.querySelectorAll('.be-act button').forEach(btn=>btn.onclick=()=>{const k=btn.dataset.a==='love'?'loved':'hidden';prefs[k][id]=!prefs[k][id];if(!prefs[k][id])delete prefs[k][id];savePrefs();ui.open=null;render();});});
   wirePlay();syncPlay();}
-function open(){sheet.style.animation='';ui.view='card';ui.mode=modeNow();ui.past=false;sheet.hidden=false;back.hidden=false;render();}
-function close(){sheet.hidden=true;back.hidden=true;sheet.innerHTML='';}
+function dismissSheet(){sheet.style.transition='transform .2s ease';sheet.style.transform='translateY(100%)';clearTimeout(dismissTimer);dismissTimer=setTimeout(close,200);}
+function wireClose(){const handle=$('beClose');let pointer=null,sy=0,dy=0,moved=false;
+  const reset=()=>{pointer=null;sheet.style.transition='transform .2s ease';sheet.style.transform='';};
+  handle.onpointerdown=e=>{if(e.button!==0||pointer!==null)return;pointer=e.pointerId;sy=e.clientY;dy=0;moved=false;sheet.style.animation='none';sheet.style.transition='none';handle.setPointerCapture(pointer);};
+  handle.onpointermove=e=>{if(e.pointerId!==pointer)return;dy=Math.max(0,e.clientY-sy);if(Math.abs(e.clientY-sy)>8)moved=true;sheet.style.transform='translateY('+dy+'px)';};
+  handle.onpointerup=e=>{if(e.pointerId!==pointer)return;pointer=null;if(dy>80)dismissSheet();else reset();};
+  handle.onpointercancel=()=>{moved=true;reset();};
+  handle.onlostpointercapture=()=>{if(pointer!==null)reset();};
+  handle.onclick=e=>{if(moved&&e.detail!==0){e.preventDefault();return;}close();};}
+function open(){clearTimeout(dismissTimer);sheet.style.transform='';sheet.style.transition='';sheet.style.animation='';ui.view='card';ui.mode=modeNow();ui.past=false;sheet.hidden=false;back.hidden=false;render();}
+function close(){clearTimeout(dismissTimer);scrubbing=null;sheet.hidden=true;back.hidden=true;sheet.innerHTML='';sheet.style.transform='';sheet.style.transition='';}
 fab.onclick=open;back.onclick=close;
 // Touch: drag the sheet down to dismiss (from the handle, or anywhere once its content is scrolled to the top).
 // When past days are showing, a downward swipe tucks them away instead; an upward swipe reveals them.
 {let y0=null,x0=0,ok=false,dy=0;const scroller=()=>sheet.querySelector('.be-body,.be-list');
- sheet.addEventListener('touchstart',e=>{if(e.target.closest('.be-front,.be-act,.be-pill'))return;const t=e.touches[0];y0=t.clientY;x0=t.clientX;dy=0;const sc=scroller();ok=!!e.target.closest('.be-grab,.be-tabs')||!sc||sc.scrollTop<=0;sheet.style.animation='none';},{passive:true});
+ sheet.addEventListener('touchstart',e=>{y0=null;if(e.target.closest('.be-front,.be-act,.be-pill,.be-prog,.be-grab'))return;const t=e.touches[0];y0=t.clientY;x0=t.clientX;dy=0;const sc=scroller();ok=!!e.target.closest('.be-tabs')||!sc||sc.scrollTop<=0;sheet.style.animation='none';},{passive:true});
  sheet.addEventListener('touchmove',e=>{if(y0==null)return;const t=e.touches[0];dy=t.clientY-y0;if(Math.abs(t.clientX-x0)>Math.abs(dy)){y0=null;sheet.style.transform='';return;}
    if(ok&&dy>0&&!(ui.view==='card'&&ui.past)){sheet.style.transition='none';sheet.style.transform='translateY('+dy+'px)';}},{passive:true});
  sheet.addEventListener('touchend',()=>{if(y0==null)return;y0=null;sheet.style.transition='transform .2s ease';
    if(ok&&dy>0&&ui.view==='card'&&ui.past){sheet.style.transform='';if(dy>60){ui.past=false;render();}return;}
-   if(ok&&dy>90){sheet.style.transform='translateY(100%)';setTimeout(()=>{sheet.style.transform='';sheet.style.transition='';close();},180);return;}
+   if(ok&&dy>90){dismissSheet();return;}
    sheet.style.transform='';
    const sc=scroller();if(ui.view==='card'&&!ui.past&&dy<-60&&sc&&sc.scrollHeight<=sc.clientHeight+4){ui.past=true;render();}});}const sRun=$('sRun');
 // Always available; the observer just notes whether a session is running.
-function syncFab(){fab.hidden=false;const live=!!(sRun&&!sRun.hidden);fab.classList.toggle('sess',live);
+function syncFab(){fab.hidden=false;
   const tb=document.getElementById('tabbar');const h=tb&&getComputedStyle(tb).display!=='none'?tb.getBoundingClientRect().height:0;fab.style.setProperty('--beDock',h+'px');}
 window.addEventListener('resize',syncFab);
 // Mode switches (focus, done screen, report) show and hide the tab bar without touching sRun.
