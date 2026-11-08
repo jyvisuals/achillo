@@ -11,7 +11,8 @@ const src=fs.readFileSync(path.join(__dirname,'../src/achilles-tracker.html'),'u
 const {LIB,AU,START,END,SKIP,clipRanges,clipLength,clipPosition,sourcePosition}=vm.runInNewContext(src.slice(src.indexOf("const PCB="),src.indexOf('const PROMPTS='))+
   src.slice(src.indexOf('const AU={'),src.indexOf('const player=new Audio();'))+';({LIB,AU,START,END,SKIP,clipRanges,clipLength,clipPosition,sourcePosition})');
 const longerIds=[...Array.from({length:8},(_,i)=>'0-'+(23+i)),...Array.from({length:7},(_,i)=>'1-'+(22+i))];
-const additions=[...longerIds,'0-22','1-18','1-19'];
+const additions=[...Array.from({length:6},(_,i)=>'0-'+(31+i)),...Array.from({length:6},(_,i)=>'1-'+(29+i))];
+longerIds.push(...additions);
 const protectedIds=['0-19','1-9','1-10','1-11','1-12','1-20'];
 const prefs={loved:{'0-7':true,'0-19':true,'0-20':true,'0-16':true},hidden:{'0-1':true}};
 const row=id=>`.be-row[data-id="${id}"]`;
@@ -161,9 +162,9 @@ for(const id of longerIds){
         assert.equal(await page.locator(row(id)+' .be-front').getAttribute('target'),'_blank');
       }
     }
-    assert.equal(total,76);assert.equal(playable,69);
-    assert.deepEqual(groupedCounts,[28,27,21]);
-    assert.deepEqual(Array.from(LIB,tab=>tab.length),[31,29,16]);
+    assert.equal(total,88);assert.equal(playable,81);
+    assert.deepEqual(groupedCounts,[34,33,21]);
+    assert.deepEqual(Array.from(LIB,tab=>tab.length),[37,35,16]);
     assert.ok(Object.values(AU).every(url=>url.startsWith('https://')));
     // A deterministic audio fixture checks intro seeking, resume, manual rewind, and replay.
     const intro=Object.entries(START).find(([id,start])=>start>3&&start<90);
@@ -259,6 +260,56 @@ for(const id of longerIds){
     await fixture.evaluate(()=>{window.__audio[0].playbackRate=2;});
     await fixture.click('.be-play');
     await fixture.waitForFunction(start=>window.__audio.some(a=>a.paused&&Math.abs(a.currentTime-start)<.2),start);
+    // Real media time: short taps/seeks do not count; listening across a pause does.
+    await fixture.evaluate(()=>{const p=JSON.parse(localStorage.getItem('ach:beLib'));p.plays={};localStorage.setItem('ach:beLib',JSON.stringify(p));});
+    await fixture.reload();await fixture.click('#beFab');await fixture.click('#beAll');
+    await fixture.click(`.be-tabs button[data-t="${tabFor(introId)}"]`);
+    if(await fixture.locator(row(introId)).count()===0)await fixture.click('#beHid');
+    assert.equal(await fixture.locator(`[data-play-count="${introId}"]`).isVisible(),false);
+    const count=()=>fixture.evaluate(id=>JSON.parse(localStorage.getItem('ach:beLib')).plays?.[id]||0,introId);
+    await fixture.locator(row(introId)+' .be-front').click();
+    await fixture.waitForFunction(start=>window.__audio[0].currentTime>=start+4,start);
+    await fixture.click('.be-play');assert.equal(await count(),0);
+    await fixture.locator('#beSeek').fill('45');
+    await fixture.waitForFunction(()=>!window.__audio[0].seeking);
+    assert.equal(await count(),0);
+    await fixture.click('.be-play');
+    // Updating the count must preserve the row, its scroll position and an open swipe.
+    await fixture.click('#beAll');await fixture.click(`.be-tabs button[data-t="${tabFor(introId)}"]`);
+    if(await fixture.locator(row(introId)).count()===0)await fixture.click('#beHid');
+    await fixture.locator(row(introId)+' .be-front').evaluate(el=>{window.__countRow=el;el.focus();});
+    await fixture.keyboard.press('ArrowLeft');
+    await fixture.waitForFunction(id=>JSON.parse(localStorage.getItem('ach:beLib')).plays?.[id]===1,introId);
+    assert.ok(await fixture.locator(row(introId)+' .be-front').evaluate(el=>el===window.__countRow));
+    assert.equal(await fixture.locator(row(introId)+'.open').count(),1);
+    assert.equal(await fixture.locator(`[data-play-count="${introId}"]`).textContent(),'1 play');
+    await fixture.keyboard.press('Escape');
+    await fixture.waitForFunction(()=>getComputedStyle(window.__countRow).transform==='matrix(1, 0, 0, 1, 0, 0)');
+    if(process.env.BOOKENDS_SCREENSHOT_DIR){
+      await fixture.locator(row(introId)).scrollIntoViewIfNeeded();
+      await fixture.screenshot({path:path.join(process.env.BOOKENDS_SCREENSHOT_DIR,'bookends-count.png')});
+    }
+    await fixture.click('#beDone');await fixture.click('.be-play');
+    await fixture.locator('#beSeek').fill('0');await fixture.click('.be-play');
+    await fixture.waitForFunction(start=>window.__audio[0].currentTime>=start+1,start);
+    await fixture.click('.be-play');assert.equal(await count(),1);
+    // Finishing and replaying creates the next play, while the existing count remains.
+    await fixture.locator('#beSeek').fill(String(Math.round((fixtureLength-.3)*10)/10));await fixture.click('.be-play');
+    await fixture.waitForFunction(start=>window.__audio[0].paused&&Math.abs(window.__audio[0].currentTime-start)<.2,start);
+    await fixture.click('.be-play');
+    await fixture.waitForFunction(id=>JSON.parse(localStorage.getItem('ach:beLib')).plays?.[id]===2,introId);
+    await fixture.click('.be-play');await fixture.reload();await fixture.click('#beFab');await fixture.click('#beAll');
+    await fixture.click(`.be-tabs button[data-t="${tabFor(introId)}"]`);
+    if(await fixture.locator(row(introId)).count()===0)await fixture.click('#beHid');
+    assert.equal(await fixture.locator(`[data-play-count="${introId}"]`).textContent(),'2 plays');
+    assert.equal(await fixture.locator('[data-play-count]:not([hidden])').count(),1);
+    assert.equal(await fixture.locator(row('0-19')+' [data-play-count]').count(),0);
+    await fixture.route(AU['0-7'],route=>route.abort());
+    await fixture.click('.be-tabs button[data-t="0"]');await fixture.locator(row('0-7')+' .be-front').click();
+    await fixture.waitForFunction(()=>window.__audio[0].error!==null);
+    assert.equal(await fixture.evaluate(()=>JSON.parse(localStorage.getItem('ach:beLib')).plays['0-7']||0),0);
+    assert.equal(await count(),2);
+    console.log('Play counts: short taps/seeks ignored; pause/resume, live row update, replay and persistence OK');
     await fixture.close();
     console.log('Intro seek/resume/replay, touch scrubbing, canceled drag, mouse and keyboard seeking OK');
     if(process.argv.includes('--live-audio')||process.argv.includes('--all-audio')){
@@ -313,6 +364,6 @@ for(const id of longerIds){
       }
     }
     assert.deepEqual(errors,[]);
-    console.log('Bookends OK: 76 rows, 69 playable; 15 new readings of 8–40 minutes, all streams under 40 minutes, saved preferences and gestures preserved.');
+    console.log('Bookends OK: 88 rows, 81 playable; 12 more readings of 8–40 minutes and personal play counts, all streams under 40 minutes, saved preferences and gestures preserved.');
   }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(e=>{console.error(e);process.exitCode=1;});

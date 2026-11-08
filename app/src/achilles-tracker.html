@@ -2203,6 +2203,8 @@ resumeSession();
 #beSheet .be-prog input::-moz-range-progress{height:3px;background:var(--accent)}
 #beSheet .be-prog input::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:var(--accent)}
 #beSheet .be-prog input:disabled{opacity:.4;cursor:default}
+#beSheet .be-status{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+#beSheet .be-count{font-size:10px;line-height:1.2;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
 #beSheet .be-front .ic{color:var(--muted);display:grid;opacity:.7}#beSheet .be-front .ic.on{color:var(--accent);opacity:1}
 #beSheet .be-listen .nm{flex:1;font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #beSheet .be-link{border:0;background:transparent;color:var(--accent);font:inherit;font-size:14px;padding:12px 0}
@@ -2266,7 +2268,13 @@ const LIB=[[
 ["Ajanta","Muriel Rukeyser","11 min","https://writing.upenn.edu/pennsound/x/Rukeyser.php"],
 ["Live at the Bowery Poetry Club","Akilah Oliver","22 min","https://writing.upenn.edu/pennsound/x/Oliver.php"],
 ["Howl — Parts I, II and III","Allen Ginsberg","22.5 min","https://writing.upenn.edu/pennsound/x/Ginsberg.php"],
-["Manhattan Luck","Alice Notley","24.5 min","https://writing.upenn.edu/pennsound/x/Notley.php"]
+["Manhattan Luck","Alice Notley","24.5 min","https://writing.upenn.edu/pennsound/x/Notley.php"],
+["Selected Poems — live at CUE","Robert Creeley","23.5 min","https://writing.upenn.edu/pennsound/x/Creeley.php"],
+["The Black Interior and Selected Poems","Elizabeth Alexander","37.5 min","https://writing.upenn.edu/pennsound/x/Alexander-Elizabeth.php"],
+["An Army of Lovers — excerpt","Juliana Spahr & David Buuck, read by Spahr","22 min","https://writing.upenn.edu/pennsound/x/Spahr.php"],
+["Selected Poems — live at Segue","Harryette Mullen","31 min","https://writing.upenn.edu/pennsound/x/Mullen-Harryette.php"],
+["Hello, the Roses and Other Poems","Mei-mei Berssenbrugge","21.5 min","https://writing.upenn.edu/pennsound/x/Berssenbrugge.php"],
+["Summer Solstice","Bernadette Mayer","11.5 min","https://writing.upenn.edu/pennsound/x/Mayer.php"]
 ],[
 ['Thank You','Ross Gay','45 sec','https://theworld.org/stories/2013/08/14/earth-poetry'],
 ['Twilight: After Haying','Jane Kenyon, read by Amanda Holmes','1 min','https://shows.acast.com/readmeapoem/episodes/twilight-after-haying-by-jane-kenyon'],
@@ -2296,7 +2304,13 @@ const LIB=[[
 ["Waterlily Fire","Muriel Rukeyser","16.5 min","https://writing.upenn.edu/pennsound/x/Rukeyser.php"],
 ["The Outer Banks","Muriel Rukeyser","10 min","https://writing.upenn.edu/pennsound/x/Rukeyser.php"],
 ["The She Said Dialogues and Lover Too","Akilah Oliver","11 min","https://writing.upenn.edu/pennsound/x/Oliver.php"],
-["Melpomene","Anne Waldman","17 min","https://writing.upenn.edu/pennsound/x/Waldman.php"]
+["Melpomene","Anne Waldman","17 min","https://writing.upenn.edu/pennsound/x/Waldman.php"],
+["The Book of a Thousand Eyes — selections","Lyn Hejinian","16.5 min","https://writing.upenn.edu/pennsound/x/Hejinian.php"],
+["Deepstep Come Shining — excerpt","C. D. Wright","24.5 min","https://writing.upenn.edu/pennsound/x/Wright.php"],
+["Of Being Numerous — live reading","George Oppen","24.5 min","https://writing.upenn.edu/pennsound/x/Oppen.php"],
+["Love in the Days of Rage — excerpts","Lawrence Ferlinghetti","13 min","https://writing.upenn.edu/pennsound/x/Ferlinghetti.php"],
+["One Big Self — selected readings","C. D. Wright","15 min","https://writing.upenn.edu/pennsound/x/Wright.php"],
+["Selected Poems — live at Penn","Bernadette Mayer with Philip Good","34 min","https://writing.upenn.edu/pennsound/x/Mayer.php"]
 ],[
 ['Self-Compassion Break','Kristin Neff','5 min','https://self-compassion.org/blog/take-a-self-compassion-break/'],
 ['Loving-Kindness and Compassion','Livia Walsh · UC San Diego','3 min',UCSD],
@@ -2329,8 +2343,12 @@ const SVG={mic:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stro
 const $=id=>document.getElementById(id), sheet=$('beSheet'), fab=$('beFab'), back=$('beBack');
 let dismissTimer=null;
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let prefs={loved:{},hidden:{}};try{prefs=Object.assign(prefs,JSON.parse(localStorage.getItem('ach:beLib')||'{}'));}catch(e){}
+let prefs={loved:{},hidden:{},plays:{}};try{prefs=Object.assign(prefs,JSON.parse(localStorage.getItem('ach:beLib')||'{}'));}catch(e){}
+if(!prefs.plays||typeof prefs.plays!=='object'||Array.isArray(prefs.plays))prefs.plays={};
 const savePrefs=()=>{try{localStorage.setItem('ach:beLib',JSON.stringify(prefs));}catch(e){}};
+const playCount=id=>Number.isSafeInteger(prefs.plays[id])&&prefs.plays[id]>0?prefs.plays[id]:0;
+const playCountLabel=id=>{const n=playCount(id);return n?n+' '+(n===1?'play':'plays'):'';};
+function syncPlayCounts(){sheet.querySelectorAll('[data-play-count]').forEach(el=>{const id=el.dataset.playCount;el.textContent=playCountLabel(id);el.hidden=!playCount(id);});}
 const H=window.__be;
 const store=()=>{const d=H.day();d.be=d.be||{};d.be.m=d.be.m||{};d.be.d=d.be.d||[];return d.be;};
 const touch=()=>{try{H.save();}catch(e){}};
@@ -2418,7 +2436,19 @@ const AU={
 "1-27": "https://media.sas.upenn.edu/pennsound/authors/Oliver/Oliver-Akilah_LHRS_Boulder_9-16-99.mp3",
 "0-29": "https://media.sas.upenn.edu/pennsound/authors/Ginsberg/Knitting-Factory/May-4/Ginsberg-Allen_01_Howl-I-III_NY_5-4-95.mp3",
 "1-28": "https://media.sas.upenn.edu/pennsound/authors/Waldman/Fellows-Feb-2015/Waldman-Anne_Fellows-Reading_Melpomene_KWH-UPenn_2-16-15.mp3",
-"0-30": "https://media.sas.upenn.edu/pennsound/authors/Notley/Naropa_06-80/Notley-Alice_04_Manhattan-Luck_Naropa-Institute_6-80.mp3"
+"0-30": "https://media.sas.upenn.edu/pennsound/authors/Notley/Naropa_06-80/Notley-Alice_04_Manhattan-Luck_Naropa-Institute_6-80.mp3",
+"0-31": "https://media.sas.upenn.edu/pennsound/authors/Creeley/Cue/Creeley-Robert_reading_CUE-Art-Foundation_01-18-2005.mp3",
+"0-32": "https://media.sas.upenn.edu/writershouse/Alexander-Elizabeth_reading_Brave-Testimony_KWH-UPenn_4-14-2004.mp3",
+"0-33": "https://media.sas.upenn.edu/pennsound/authors/Spahr/Segue-BPC-05-07-2011/An-Army-Of-Lovers.mp3",
+"0-34": "https://media.sas.upenn.edu/pennsound/authors/Mullen-Harryette/4-Mullen-Harryette_Segue_NY_4-3-04.mp3",
+"0-35": "https://media.sas.upenn.edu/pennsound/authors/Berssenbrugge/09-20-2016/Complete-Reading_Readings-in-Contemporary-American-Poetry_09-20-2016.mp3",
+"0-36": "https://media.sas.upenn.edu/pennsound/authors/Mayer/3-26-18/Mayer-Bernadette_Summer-Solstice_KWH-Fellows-Reading_3-26-2018.mp3",
+"1-29": "https://media.sas.upenn.edu/pennsound/authors/Hejinian/Hejinian-Lyn_from-The-Book-of-a-Thousand-Eyes_01-15-2011.mp3",
+"1-30": "https://media.sas.upenn.edu/pennsound/authors/Wright-CD/Univ-of-Arizona/Wright-CD_02_From-Deepstep-Come-Shining_University-of-Arizona_9-13-00.mp3",
+"1-31": "https://media.sas.upenn.edu/pennsound/authors/Oppen/Oppen-George_Complete-Recording_Long-Island-University_02-15-66.mp3",
+"1-32": "https://media.sas.upenn.edu/pennsound/groups/Mottram-centennial/Ferlinghetti/Ferlinghetti-Lawrence_Reading_London_1988.mp3",
+"1-33": "https://media.sas.upenn.edu/pennsound/authors/Wright-CD/Wright-CD_Complete-Reading_KWLS_2003.mp3",
+"1-34": "https://media.sas.upenn.edu/pennsound/authors/Mayer/KWH-10-21-14/Mayer-Bernadette_Reading_KWH-UPenn_10-21-2014.mp3"
 };
 // Verified beginning of each reading or guided practice, in seconds. Streams remain unmodified.
 const START={
@@ -2484,7 +2514,19 @@ const START={
 "1-27": 28,
 "0-29": 0,
 "1-28": 0,
-"0-30": 28.4
+"0-30": 28.4,
+"0-31": 34.8,
+"0-32": 602.2,
+"0-33": 0,
+"0-34": 142,
+"0-35": 71.2,
+"0-36": 35.3,
+"1-29": 13.5,
+"1-30": 112.3,
+"1-31": 63.8,
+"1-32": 531.9,
+"1-33": 14.4,
+"1-34": 33.3
 };
 // Verified content endings and any interior non-content sections, in source-file seconds.
 const END={
@@ -2556,7 +2598,19 @@ const END={
 "1-27": 701.5,
 "0-29": 1335,
 "1-28": 1026,
-"0-30": 1509.5
+"0-30": 1509.5,
+"0-31": 1452,
+"0-32": 2837.6,
+"0-33": 1308.8,
+"0-34": 2001.5,
+"0-35": 1365.4,
+"0-36": 713.5,
+"1-29": 991.8,
+"1-30": 1588,
+"1-31": 1526.3,
+"1-32": 1323,
+"1-33": 923,
+"1-34": 2063.8
 };
 const SKIP={"1-19":[[2812,2854.5]]};
 function clipRanges(id,duration){
@@ -2570,6 +2624,20 @@ function clipPosition(time,ranges){let pos=0;for(const [from,to] of ranges){if(t
 function sourcePosition(pos,ranges){for(const [from,to] of ranges){if(pos<to-from)return from+Math.max(0,pos);pos-=to-from;}return ranges.at(-1)?.[1]||0;}
 const player=new Audio();player.preload='none';let cur=null,pendingStart=null,scrubbing=null,boundaryTimer=null;
 const activeRanges=()=>clipRanges(cur,player.duration);
+// One play means ten seconds of listening in this attempt. Pausing keeps the attempt;
+// switching recordings or finishing starts another. Seeks and buffering add no time.
+let listening={seconds:0,counted:false,anchor:null};
+function sampleListening(){
+  const now=performance.now(),time=player.currentTime,a=listening.anchor;
+  if(a&&!player.seeking){const wall=(now-a.wall)/1000,advance=time-a.time;
+    const inRange=activeRanges().some(([from,to])=>a.time>=from&&time<=to+.25);
+    if(inRange&&advance>0&&advance<=wall*a.rate+.5)listening.seconds+=Math.min(wall,advance/a.rate);
+  }
+  listening.anchor=cur&&!player.paused&&!player.seeking&&player.readyState>=3&&pendingStart==null?{wall:now,time,rate:player.playbackRate}:null;
+  if(cur&&!listening.counted&&listening.seconds>=10){listening.counted=true;prefs.plays[cur]=Math.min(Number.MAX_SAFE_INTEGER,playCount(cur)+1);savePrefs();syncPlayCounts();}
+}
+['playing','timeupdate','pause','waiting','stalled','ratechange','seeked'].forEach(ev=>player.addEventListener(ev,sampleListening));
+player.addEventListener('seeking',()=>{listening.anchor=null;});
 const seekStart=()=>{if(pendingStart==null||!Number.isFinite(player.duration)||player.duration<=0)return;
   const ranges=activeRanges();if(!ranges.length){player.pause();pendingStart=null;return;}
   try{player.currentTime=ranges[0][0];pendingStart=null;}catch(_){}};
@@ -2577,6 +2645,7 @@ player.addEventListener('loadedmetadata',seekStart);player.addEventListener('can
 const isOn=id=>cur===id&&!player.paused;
 const curItem=()=>{if(!cur)return null;const [t,k]=cur.split('-').map(Number);return {r:LIB[t][k],id:cur};};
 function playId(id){if(cur===id){player.paused?player.play().catch(()=>{}):player.pause();return;}
+  sampleListening();listening={seconds:0,counted:false,anchor:null};
   clearTimeout(boundaryTimer);cur=id;pendingStart=START[id]||0;player.src=AU[id];player.play().catch(()=>{});
 }
 function syncPlay(){sheet.querySelectorAll('[data-play]').forEach(b=>{const on=isOn(b.dataset.play);const ic=b.classList.contains('be-play')?b:b.querySelector('.ic');if(ic){ic.innerHTML=on?SVG.pause:SVG.play;ic.classList.toggle('on',on);}b.setAttribute('aria-pressed',on);});
@@ -2591,7 +2660,7 @@ player.addEventListener('play',()=>{window.__beAudioOn=true;syncFab();if(!('medi
   try{const x=curItem();navigator.mediaSession.metadata=new MediaMetadata({title:x.r[0],artist:x.r[1]});navigator.mediaSession.playbackState='playing';}catch(e){}});
 const release=()=>{window.__beAudioOn=false;syncFab();try{H.sessMedia();}catch(e){}};
 player.addEventListener('pause',()=>{clearTimeout(boundaryTimer);release();});player.addEventListener('ended',release);
-const finishClip=()=>{clearTimeout(boundaryTimer);player.pause();pendingStart=START[cur]||0;seekStart();syncPlay();};
+const finishClip=()=>{clearTimeout(boundaryTimer);sampleListening();player.pause();listening={seconds:0,counted:false,anchor:null};pendingStart=START[cur]||0;seekStart();syncPlay();};
 // Check media time as well as scheduling the boundary: buffering and rate changes must not
 // finish early, and seeks (including lock-screen seeks) must not enter excluded sections.
 function enforceClip(){clearTimeout(boundaryTimer);if(pendingStart!=null||!cur)return;
@@ -2653,7 +2722,7 @@ function renderLib(){const t=ui.tab;const rows=libraryItems(t);const nh=rows.fil
   const vis=rows.filter(x=>ui.showHid||!prefs.hidden[x.id]).sort((a,b)=>((prefs.loved[b.id]?1:0)-(prefs.loved[a.id]?1:0))||((AU[b.id]?1:0)-(AU[a.id]?1:0))||a.order-b.order);
   let h='<button class="be-grab" id="beClose" aria-label="Close"></button><div class="be-tabs"><div>'+TABS.map((n,k)=>'<button class="t'+(k===t?' on':'')+'" data-t="'+k+'" aria-pressed="'+(k===t)+'">'+n+'</button>').join('')+'</div><button class="be-link" id="beDone">Done</button></div><div class="be-list">';
   h+=vis.map(x=>{const lv=!!prefs.loved[x.id],hd=!!prefs.hidden[x.id];return '<div class="be-row'+(ui.open===x.id?' open':'')+(hd?' hid':'')+'" data-id="'+x.id+'"><div class="be-act"><button class="lv" data-a="love" aria-pressed="'+lv+'" aria-label="'+(lv?'Unlove ':'Love ')+esc(x.r[0])+'">'+SVG.heart+'<span>'+(lv?'Hearted':'Heart')+'</span></button><button data-a="hide" aria-label="'+(hd?'Unhide ':'Hide ')+esc(x.r[0])+'">'+SVG.x+'<span>'+(hd?'Unhide':'Hide')+'</span></button></div>'+
-   '<a class="be-front" href="'+esc(x.r[3])+'"'+(AU[x.id]?' data-play="'+x.id+'"':' target="_blank" rel="noopener"')+' draggable="false"><span class="tt"><b>'+esc(x.r[0])+'</b><small>'+esc(x.r[1])+' · '+esc(x.r[2])+'</small></span>'+(lv?'<span style="color:var(--accent);display:grid">'+SVG.heart.replace('width="20" height="20"','width="14" height="14"')+'</span>':'')+'<span class="ic">'+(AU[x.id]?(isOn(x.id)?SVG.pause:SVG.play):SVG.out)+'</span></a></div>';}).join('');
+   '<a class="be-front" href="'+esc(x.r[3])+'"'+(AU[x.id]?' data-play="'+x.id+'"':' target="_blank" rel="noopener"')+' draggable="false"><span class="tt"><b>'+esc(x.r[0])+'</b><small>'+esc(x.r[1])+' · '+esc(x.r[2])+'</small></span>'+(lv?'<span style="color:var(--accent);display:grid">'+SVG.heart.replace('width="20" height="20"','width="14" height="14"')+'</span>':'')+'<span class="be-status"><span class="ic">'+(AU[x.id]?(isOn(x.id)?SVG.pause:SVG.play):SVG.out)+'</span>'+(AU[x.id]?'<span class="be-count" data-play-count="'+x.id+'"'+(playCount(x.id)?'':' hidden')+'>'+playCountLabel(x.id)+'</span>':'')+'</span></a></div>';}).join('');
   if(nh)h+='<button class="be-link" id="beHid" style="align-self:center;color:var(--muted);font-size:13px;margin-top:12px">'+(ui.showHid?'Hide hidden':'Show hidden ('+nh+')')+'</button>';
   sheet.innerHTML=h+'</div>';
   wireClose();$('beDone').onclick=()=>{ui.view='card';render();};
