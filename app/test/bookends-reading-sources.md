@@ -1,5 +1,7 @@
 # Longer readings and library organization
 
+Historical notes for the initial reading additions. See [the current longer-reading collection](bookends-longer-readings.md) for the expanded library and the selections under 40 minutes.
+
 The library now has 61 entries: 40 readings, essays, and literary conversations across Morning and Evening, and 21 guided practices in Meditations. There are 54 in-card streams. The six existing book links remain unchanged; the restored full Audre Lorde reading is also an external link.
 
 All 58 previous recording IDs, entries, audio URLs, and cue points are preserved. The five guided practices previously mixed into Morning and Evening are displayed in Meditations using their original IDs, so saved hearts and hidden states continue to apply. Daily suggestions use the reading collections; choosing a meditation explicitly still works.

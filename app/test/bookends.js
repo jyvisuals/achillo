@@ -10,7 +10,8 @@ const vm=require('node:vm');
 const src=fs.readFileSync(path.join(__dirname,'../src/achilles-tracker.html'),'utf8');
 const {LIB,AU,START,END,SKIP,clipRanges,clipLength,clipPosition,sourcePosition}=vm.runInNewContext(src.slice(src.indexOf("const PCB="),src.indexOf('const PROMPTS='))+
   src.slice(src.indexOf('const AU={'),src.indexOf('const player=new Audio();'))+';({LIB,AU,START,END,SKIP,clipRanges,clipLength,clipPosition,sourcePosition})');
-const additions=['0-0','0-1','0-2','0-3','0-4','0-5','0-6','0-7','0-8','0-9','0-10','0-12','0-13','0-14','0-20','0-22','1-0','1-1','1-2','1-4','1-5','1-8','1-13','1-17','1-21','2-15'];
+const longerIds=[...Array.from({length:8},(_,i)=>'0-'+(23+i)),...Array.from({length:7},(_,i)=>'1-'+(22+i))];
+const additions=[...longerIds,'0-22','1-18','1-19'];
 const protectedIds=['0-19','1-9','1-10','1-11','1-12','1-20'];
 const prefs={loved:{'0-7':true,'0-19':true,'0-20':true,'0-16':true},hidden:{'0-1':true}};
 const row=id=>`.be-row[data-id="${id}"]`;
@@ -26,8 +27,13 @@ for(const id of Object.keys(AU)){
   }
   const ranges=clipRanges(id,end+60),length=clipLength(ranges);
   assert.ok(length>0,id+' retains content');
+  assert.ok(length<40*60,id+' stays under 40 minutes');
   assert.equal(sourcePosition(0,ranges),start);
   assert.ok(Math.abs(sourcePosition(length,ranges)-end)<1e-6);
+}
+for(const id of longerIds){
+  assert.ok(AU[id],id+' is playable in the card');
+  assert.ok(clipLength(clipRanges(id,END[id]))>=8*60,id+' retains at least eight minutes after trimming');
 }
 
 (async()=>{
@@ -155,9 +161,9 @@ for(const id of Object.keys(AU)){
         assert.equal(await page.locator(row(id)+' .be-front').getAttribute('target'),'_blank');
       }
     }
-    assert.equal(total,61);assert.equal(playable,54);
-    assert.deepEqual(groupedCounts,[20,20,21]);
-    assert.deepEqual(Array.from(LIB,tab=>tab.length),[23,22,16]);
+    assert.equal(total,76);assert.equal(playable,69);
+    assert.deepEqual(groupedCounts,[28,27,21]);
+    assert.deepEqual(Array.from(LIB,tab=>tab.length),[31,29,16]);
     assert.ok(Object.values(AU).every(url=>url.startsWith('https://')));
     // A deterministic audio fixture checks intro seeking, resume, manual rewind, and replay.
     const intro=Object.entries(START).find(([id,start])=>start>3&&start<90);
@@ -287,6 +293,8 @@ for(const id of Object.keys(AU)){
         assert.ok(Number.isFinite(duration)&&duration>(START[id]||0),id+' has a valid duration');
         const length=clipLength(clipRanges(id,duration));
         assert.ok(length>0,id+' has a valid listening section');
+        assert.ok(length<40*60,id+' plays for less than 40 minutes');
+        if(longerIds.includes(id))assert.ok(length>=8*60,id+' plays for at least eight minutes');
         assert.ok(Math.abs(Number(await page.locator('#beSeek').getAttribute('max'))-length)<.1);
         for(const [from,to] of SKIP[id]||[]){
           await page.locator('#beSeek').fill(String(Math.round(clipPosition(from-.4,clipRanges(id,duration))*10)/10));
@@ -305,6 +313,6 @@ for(const id of Object.keys(AU)){
       }
     }
     assert.deepEqual(errors,[]);
-    console.log('Bookends OK: 61 rows, 54 playable; readings first, meditation preferences preserved, animated gestures, no accidental playback or page errors.');
+    console.log('Bookends OK: 76 rows, 69 playable; 15 new readings of 8–40 minutes, all streams under 40 minutes, saved preferences and gestures preserved.');
   }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(e=>{console.error(e);process.exitCode=1;});

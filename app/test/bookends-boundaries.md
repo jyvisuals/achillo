@@ -1,5 +1,7 @@
 # Bookends playback boundaries
 
+This records the initial 54-stream boundary audit. The [subsequent longer-reading update](bookends-longer-readings.md) adds recordings and replaces the overlong selections at 0-22, 1-18 and 1-19 with shorter, newly reviewed bounds.
+
 All 54 in-card sources were fetched and fully decoded for this audit. Timestamped speech transcripts were inspected at the configured openings and endings and searched for promotions inside the retained content. Ambiguous boundaries received a second transcription pass. This is machine-assisted content review, not a claim that every minute was manually listened to.
 
 The player uses source-file timestamps without downloading or editing media into the app. It clamps the progress bar to the retained content, protects the opening on replay and native seeks, and pauses/resets at the ending. Media-time checks and a boundary timer handle playback-rate changes and buffering. Interior exclusions use the same timeline, so seeking and displayed progress omit those sections too.
