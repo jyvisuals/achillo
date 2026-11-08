@@ -2207,7 +2207,7 @@ resumeSession();
 #beSheet .be-listen .nm{flex:1;font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #beSheet .be-link{border:0;background:transparent;color:var(--accent);font:inherit;font-size:14px;padding:12px 0}
 #beSheet .be-tabs{display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0}
-#beSheet .be-tabs div{display:flex;gap:24px}
+#beSheet .be-tabs div{display:flex;gap:clamp(10px,3vw,24px)}
 #beSheet .be-tabs button.t{height:44px;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font:inherit;font-size:15px;font-weight:500;padding:0}
 #beSheet button:focus:not(:focus-visible),#beSheet a:focus:not(:focus-visible){outline:none}
 #beSheet .be-tabs button.t.on{color:var(--ink);border-bottom-color:var(--accent)}
@@ -2256,7 +2256,9 @@ const LIB=[[
 ['Saying Yes to Our Life','Tara Brach','11 min',PCB],
 ['Relaxed and Awake','Tara Brach','16.5 min',PCB],
 ['Inciting Joy','Ross Gay','an essay a day','https://audible.com/series/Essays-Series-Audiobooks/B0BWJKP489'],
-['A Litany of Survival','Audre Lorde, read by Amanda Holmes','2.5 min','https://shows.acast.com/readmeapoem/episodes/a-litany-of-survival-by-audre-lorde']
+['A Litany of Survival','Audre Lorde, read by Amanda Holmes','2.5 min','https://shows.acast.com/readmeapoem/episodes/a-litany-of-survival-by-audre-lorde'],
+['Uses of the Erotic: The Erotic as Power','Audre Lorde · full reading','23.5 min · YouTube','https://www.youtube.com/watch?v=aWmq9gw4Rq0'],
+['An Evening of Poetry','Mary Oliver · reading & audience Q&A','68 min','https://podcasts.apple.com/us/podcast/mary-oliver-rebroadcast/id968204382?i=1000381969294']
 ],[
 ['Thank You','Ross Gay','1.5 min','https://theworld.org/stories/2013/08/14/earth-poetry'],
 ['Twilight: After Haying','Jane Kenyon, read by Amanda Holmes','1.5 min','https://shows.acast.com/readmeapoem/episodes/twilight-after-haying-by-jane-kenyon'],
@@ -2278,7 +2280,8 @@ const LIB=[[
 ['The Garden We Share','Poetry Off the Shelf','26.5 min','https://www.poetryfoundation.org/podcasts/151306/the-garden-we-share'],
 ['Tending Joy and Practicing Delight','On Being · Ross Gay','57 min','https://onbeing.org/programs/ross-gay-tending-joy-and-practicing-delight/'],
 ['Before You Know Kindness','On Being · Naomi Shihab Nye','48 min','https://podknife.com/episodes/naomi-shihab-nye-before-you-know-kindness-as-the-deepest-thing-inside'],
-['Catalog of Unabashed Gratitude (book)','Ross Gay, a poem a night','a few min each','https://www.audible.com/author/Ross-Gay/B001JOVOJM']
+['Catalog of Unabashed Gratitude (book)','Ross Gay, a poem a night','a few min each','https://www.audible.com/author/Ross-Gay/B001JOVOJM'],
+['The Book of Delights — live reading','Ross Gay · selected essays','35 min','https://podcasts.apple.com/us/podcast/the-book-of-delights-essays/id1291774950?i=1000430411142']
 ],[
 ['Self-Compassion Break','Kristin Neff','5 min','https://self-compassion.org/blog/take-a-self-compassion-break/'],
 ['Loving-Kindness and Compassion','Livia Walsh · UC San Diego','3 min',UCSD],
@@ -2298,7 +2301,7 @@ const LIB=[[
 ['Loving Kindness Guided Meditation','Jack Kornfield · Heart Wisdom','26.5 min','https://beherenownetwork.com/heart-wisdom-with-jack-kornfield-ep-224-loving-kindness-guided-meditation/']
 ]];
 const PROMPTS=['How do I want to show up today?','What would actually satisfy me?','What could I do today with all of me in it?','Where am I settling for sensation over feeling?','What’s alive in my body right now?','What do I want to say yes to today?'];
-const TABS=['Morning','Evening','Kindness'];
+const TABS=['Morning','Evening','Meditations'];
 const SVG={mic:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
  ok:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
  up:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>',
@@ -2318,7 +2321,11 @@ const store=()=>{const d=H.day();d.be=d.be||{};d.be.m=d.be.m||{};d.be.d=d.be.d||
 const touch=()=>{try{H.save();}catch(e){}};
 let ui={view:'card',mode:'m',pi:0,past:false,tab:0,open:null,showHid:false};
 const modeNow=()=>new Date().getHours()<15?'m':'e';
-const pick=t=>{const L=LIB[t].map((r,k)=>({r,id:t+'-'+k})).filter(x=>!prefs.hidden[x.id]);if(!L.length)return null;const lv=L.filter(x=>prefs.loved[x.id]);const pool=lv.length?lv:L;const dn=Math.floor(Date.now()/864e5);return pool[dn%pool.length];};
+// Preserve saved recording IDs while keeping guided practices out of the reading suggestions.
+const isMeditation=id=>id.startsWith('2-')||['0-16','0-17','0-18','1-15','1-16'].includes(id);
+const libraryItems=t=>LIB.flatMap((list,group)=>list.map((r,k)=>({r,id:group+'-'+k,group})))
+  .filter(x=>t===2?isMeditation(x.id):x.group===t&&!isMeditation(x.id)).map((x,order)=>({...x,order}));
+const pick=t=>{const L=libraryItems(t).filter(x=>!prefs.hidden[x.id]);if(!L.length)return null;const lv=L.filter(x=>prefs.loved[x.id]);const pool=lv.length?lv:L;const dn=Math.floor(Date.now()/864e5);return pool[dn%pool.length];};
 function pastDays(){const all=H.allDays(),out=[];Object.keys(all).filter(k=>k<H.today&&all[k]&&all[k].be).sort().reverse().slice(0,14).forEach(k=>{const b=all[k].be;const dt=new Date(k+'T12:00');const lab=dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
   if(ui.mode==='m'){const ent=Object.keys(b.m||{}).filter(i=>(b.m[i]||[]).length).map(i=>({q:PROMPTS[i]||'',lines:b.m[i]}));if(ent.length)out.push({lab,ent});}
   else{const first=Object.keys(b.m||{}).map(i=>(b.m[i]||[])[0]).find(Boolean);if((b.d||[]).length)out.push({lab,ent:[{q:first?'Morning: '+first:'',lines:b.d}]});}});return out;}
@@ -2379,7 +2386,9 @@ const AU={
 "1-13": "https://cdn.simplecast.com/audio/49fe14cf-8aef-4a4f-83ca-a3ac86a522d8/episodes/d2ca6fd7-0ff8-4d73-aab0-a4eb1f8365bc/audio/5651edef-a0b1-4c46-bbe9-5e0ae695add5/default_tc.mp3",
 "1-17": "https://cdn.simplecast.com/audio/a807ce/a807ce62-71b3-4522-84db-7b464c9f5740/1cc50781-8fd9-448e-a05e-b97d1ec55adc/341bfbfcd32401094ff879d2f3872f1ba22b6aa3_tc.mp3",
 "2-15": "https://pscrb.fm/rss/p/rss.art19.com/episodes/5e44dadb-a0bb-4d76-94ca-4f52d3df9516.mp3",
-"0-12": "https://media.blubrry.com/balancedmind/content.blubrry.com/balancedmind/FinalOrb01122021.mp3"
+"0-12": "https://media.blubrry.com/balancedmind/content.blubrry.com/balancedmind/FinalOrb01122021.mp3",
+"0-22": "https://media.blubrry.com/litarchiveproject/content.blubrry.com/litarchiveproject/Literary_Arts_The_Archive_Project_Mary_Oliver.mp3",
+"1-21": "https://static1.squarespace.com/static/58b7692a15d5db26394ba30c/t/5c6c8c9a53450ae7ee4641a8/1776824369098/Ross+Gay+-+Book+of+Delights.mp3"
 };
 // Verified beginning of each reading or guided practice, in seconds. Streams remain unmodified.
 const START={
@@ -2428,7 +2437,9 @@ const START={
 "2-11": 11,
 "2-12": 51.5,
 "2-15": 393.8,
-"0-12": 733.2
+"0-12": 733.2,
+"0-22": 122.8,
+"1-21": 748.8
 };
 const player=new Audio();player.preload='none';let cur=null,pendingStart=null,scrubbing=null;
 const seekStart=()=>{if(pendingStart==null||!Number.isFinite(player.duration)||player.duration<=0)return;
@@ -2498,8 +2509,8 @@ function wireCard(){
   const op=$('beOpenPast'),cp=$('beClosePast');if(op)op.onclick=()=>{ui.past=true;render();};if(cp)cp.onclick=()=>{ui.past=false;render();};
   const body=$('beBody');let sy=null;body.onpointerdown=e=>{sy=e.pointerType==='touch'?null:e.clientY;};body.onpointerup=e=>{if(sy==null)return;const dy=e.clientY-sy;sy=null;
     if(dy<-60&&!ui.past&&body.scrollHeight<=body.clientHeight+4){ui.past=true;render();}else if(dy>60&&ui.past&&body.scrollTop<=0){ui.past=false;render();}};}
-function renderLib(){const t=ui.tab;const rows=LIB[t].map((r,k)=>({r,k,id:t+'-'+k}));const nh=rows.filter(x=>prefs.hidden[x.id]).length;
-  const vis=rows.filter(x=>ui.showHid||!prefs.hidden[x.id]).sort((a,b)=>((prefs.loved[b.id]?1:0)-(prefs.loved[a.id]?1:0))||((AU[b.id]?1:0)-(AU[a.id]?1:0))||a.k-b.k);
+function renderLib(){const t=ui.tab;const rows=libraryItems(t);const nh=rows.filter(x=>prefs.hidden[x.id]).length;
+  const vis=rows.filter(x=>ui.showHid||!prefs.hidden[x.id]).sort((a,b)=>((prefs.loved[b.id]?1:0)-(prefs.loved[a.id]?1:0))||((AU[b.id]?1:0)-(AU[a.id]?1:0))||a.order-b.order);
   let h='<button class="be-grab" id="beClose" aria-label="Close"></button><div class="be-tabs"><div>'+TABS.map((n,k)=>'<button class="t'+(k===t?' on':'')+'" data-t="'+k+'" aria-pressed="'+(k===t)+'">'+n+'</button>').join('')+'</div><button class="be-link" id="beDone">Done</button></div><div class="be-list">';
   h+=vis.map(x=>{const lv=!!prefs.loved[x.id],hd=!!prefs.hidden[x.id];return '<div class="be-row'+(ui.open===x.id?' open':'')+(hd?' hid':'')+'" data-id="'+x.id+'"><div class="be-act"><button class="lv" data-a="love" aria-pressed="'+lv+'" aria-label="'+(lv?'Unlove ':'Love ')+esc(x.r[0])+'">'+SVG.heart+'<span>'+(lv?'Hearted':'Heart')+'</span></button><button data-a="hide" aria-label="'+(hd?'Unhide ':'Hide ')+esc(x.r[0])+'">'+SVG.x+'<span>'+(hd?'Unhide':'Hide')+'</span></button></div>'+
    '<a class="be-front" href="'+esc(x.r[3])+'"'+(AU[x.id]?' data-play="'+x.id+'"':' target="_blank" rel="noopener"')+' draggable="false"><span class="tt"><b>'+esc(x.r[0])+'</b><small>'+esc(x.r[1])+' · '+esc(x.r[2])+'</small></span>'+(lv?'<span style="color:var(--accent);display:grid">'+SVG.heart.replace('width="20" height="20"','width="14" height="14"')+'</span>':'')+'<span class="ic">'+(AU[x.id]?(isOn(x.id)?SVG.pause:SVG.play):SVG.out)+'</span></a></div>';}).join('');

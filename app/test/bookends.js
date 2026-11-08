@@ -10,10 +10,11 @@ const vm=require('node:vm');
 const src=fs.readFileSync(path.join(__dirname,'../src/achilles-tracker.html'),'utf8');
 const {LIB,AU,START}=vm.runInNewContext(src.slice(src.indexOf("const PCB="),src.indexOf('const PROMPTS='))+
   src.slice(src.indexOf('const AU={'),src.indexOf('const player=new Audio();'))+';({LIB,AU,START})');
-const additions=['0-0','0-1','0-2','0-3','0-4','0-5','0-6','0-7','0-8','0-9','0-10','0-12','0-13','0-14','0-20','1-0','1-1','1-2','1-4','1-5','1-8','1-13','1-17','2-15'];
+const additions=['0-0','0-1','0-2','0-3','0-4','0-5','0-6','0-7','0-8','0-9','0-10','0-12','0-13','0-14','0-20','0-22','1-0','1-1','1-2','1-4','1-5','1-8','1-13','1-17','1-21','2-15'];
 const protectedIds=['0-19','1-9','1-10','1-11','1-12','1-20'];
-const prefs={loved:{'0-7':true,'0-19':true,'0-20':true},hidden:{'0-1':true}};
+const prefs={loved:{'0-7':true,'0-19':true,'0-20':true,'0-16':true},hidden:{'0-1':true}};
 const row=id=>`.be-row[data-id="${id}"]`;
+const tabFor=id=>id.startsWith('2-')||['0-16','0-17','0-18','1-15','1-16'].includes(id)?2:+id.split('-')[0];
 
 (async()=>{
   const server=http.createServer((req,res)=>{
@@ -64,7 +65,10 @@ const row=id=>`.be-row[data-id="${id}"]`;
     await dragHandle(120);await page.locator('#beSheet').waitFor({state:'hidden'});
     await page.click('#beFab');await library(0);
     assert.deepEqual((await ids()).slice(0,4),['0-7','0-20','0-19','0-0']);
-    assert.equal((await ids()).at(-1),'0-18');
+    assert.equal((await ids()).at(-1),'0-21');
+    assert.equal(await page.locator(row('0-16')).count(),0);
+    assert.equal(await page.locator(row('0-22')).count(),1);
+    assert.equal(await page.locator(row('0-21')+' .be-front').getAttribute('href'),'https://www.youtube.com/watch?v=aWmq9gw4Rq0');
     assert.equal(await page.locator(row('0-1')).count(),0);
     // Swiping preserves the DOM, animates the snap, and does not activate the recording.
     await page.locator(row('0-0')+' .be-front').evaluate(el=>{
@@ -126,17 +130,20 @@ const row=id=>`.be-row[data-id="${id}"]`;
     await page.reload();await page.click('#beFab');await library(0);
     assert.equal((await ids())[0],'0-0'); // Saved ordering survives reload.
     await page.click('#beHid');
-    let total=0,playable=0;
+    let total=0,playable=0;const groupedCounts=[];
     for(let tab=0;tab<3;tab++){
       await page.click(`.be-tabs button[data-t="${tab}"]`);
       total+=await page.locator('.be-row').count();playable+=await page.locator('.be-front[data-play]').count();
+      groupedCounts.push(await page.locator('.be-row').count());
+      if(tab===2){assert.equal((await ids())[0],'0-16');assert.equal(await page.locator('.be-tabs button[data-t="2"]').textContent(),'Meditations');}
       for(const id of protectedIds.filter(id=>id.startsWith(tab+'-'))){
         assert.equal(await page.locator(row(id)+' [data-play]').count(),0);
         assert.equal(await page.locator(row(id)+' .be-front').getAttribute('target'),'_blank');
       }
     }
-    assert.equal(total,58);assert.equal(playable,52);
-    assert.deepEqual(Array.from(LIB,tab=>tab.length),[21,21,16]);
+    assert.equal(total,61);assert.equal(playable,54);
+    assert.deepEqual(groupedCounts,[20,20,21]);
+    assert.deepEqual(Array.from(LIB,tab=>tab.length),[23,22,16]);
     assert.ok(Object.values(AU).every(url=>url.startsWith('https://')));
     // A deterministic audio fixture checks intro seeking, resume, manual rewind, and replay.
     const intro=Object.entries(START).find(([id,start])=>start>3&&start<90);
@@ -159,7 +166,7 @@ const row=id=>`.be-row[data-id="${id}"]`;
       return route.fulfill({status:206,contentType:'audio/wav',headers:{'Accept-Ranges':'bytes','Content-Range':`bytes ${from}-${to}/${wav.length}`},body:wav.subarray(from,to+1)});
     });
     await fixture.goto(page.url());await fixture.click('#beFab');await fixture.click('#beAll');
-    await fixture.click(`.be-tabs button[data-t="${introId.split('-')[0]}"]`);
+    await fixture.click(`.be-tabs button[data-t="${tabFor(introId)}"]`);
     if(await fixture.locator(row(introId)).count()===0)await fixture.click('#beHid');
     await fixture.locator(row(introId)+' .be-front').click();
     await fixture.waitForFunction(start=>window.__audio.some(a=>a.currentTime>start&&a.currentTime<start+3&&!a.paused),start).catch(async e=>{
@@ -216,7 +223,7 @@ const row=id=>`.be-row[data-id="${id}"]`;
       const audioIds=process.env.BOOKENDS_AUDIO_IDS?.split(',')||(process.argv.includes('--all-audio')?Object.keys(AU):[...additions,'0-11']);
       assert.ok(audioIds.every(id=>AU[id]),'Every requested recording must exist');
       for(const id of audioIds){
-        await page.click(`.be-tabs button[data-t="${id.split('-')[0]}"]`);
+        await page.click(`.be-tabs button[data-t="${tabFor(id)}"]`);
         const front=page.locator(row(id)+' .be-front');
         assert.equal(await front.locator('.ic svg path').getAttribute('d'),'M7 4l13 8-13 8z');
         await front.click();
@@ -249,10 +256,10 @@ const row=id=>`.be-row[data-id="${id}"]`;
         assert.equal(await page.locator('.be-play').getAttribute('aria-pressed'),'false');
         assert.equal(context.pages().length,1);
         console.log('Played, paused, and reached the end',id,LIB[+id.split('-')[0]][+id.split('-')[1]][0]);
-        await library(+id.split('-')[0]);
+        await library(tabFor(id));
       }
     }
     assert.deepEqual(errors,[]);
-    console.log('Bookends OK: 58 rows, 52 playable; ordering, saved preferences, animated mouse/touch swipes, no accidental playback or page errors.');
+    console.log('Bookends OK: 61 rows, 54 playable; readings first, meditation preferences preserved, animated gestures, no accidental playback or page errors.');
   }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(e=>{console.error(e);process.exitCode=1;});
