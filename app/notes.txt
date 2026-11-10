@@ -1,15 +1,1 @@
-Bookends: 12 more readings, each 8–40 minutes after trimming. Tiny personal play counts appear after ten seconds of listening and remember repeat plays.
-Bookends: 15 more long readings, each at least eight minutes after trimming. Every in-card recording is under 40 minutes; longer events are now selections ending at complete poems.
-Bookends: skip recording introductions and promotional endings; progress and seeking stay within the reading. Reviewed all 54 streams and replaced a changing pre-roll source with the author’s full recording.
-Bookends: readings lead the morning and evening library; guided practices now have their own Meditations tab. Added long Mary Oliver and Ross Gay readings and restored the full Audre Lorde reading link.
-Bookends: drag down from the wider top handle to close; compact button now sits at the bottom right.
-Bookends: drag the audio progress bar reliably without moving the card; larger touch area and smoother seeking.
-Bookends: Singularity now plays in the card, starting at the reading.
-Bookends: 23 more library pieces play in the card.
-Bookends: skip recording introductions, seek with the playback bar, and hear the standalone reading of Kindness.
-Bookends: hearted pieces come first in each library tab, with playable recordings first within each group. Swipe smoothly to reveal labeled Heart and Hide buttons.
-Bookends: the sun tab now sits docked at the bottom on every screen (tap or pull up), not just during PT. Less space above the session timer. Lock-screen play/pause follows whatever is playing.
-PT bookends: library pieces with an audio file now play right in the card (audio only, keeps going with the screen locked). Others open their own app.
-New: a small sun button during any session opens a quiet card. Mornings: swipe through prompts and add answers one at a time. Evenings: Delights. Swipe up for past days. "All" opens a listening library (swipe a row left to love or hide it).
-BFR mornings: the band superset is two rounds instead of three, with 10-second rests between rounds (evenings keep three). About 40 minutes now.
-Fixed: last night's calf-raise fix could stop a BFR morning from counting as a finished round.
+BFR ball presses: slower, longer presses (5 seconds each, 1 to relax) at 20-10-10-10. Same time under the cuff as before.
