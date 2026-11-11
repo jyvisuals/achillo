@@ -1108,7 +1108,7 @@ Object.assign(EX,{
  bcr15a:{name:'BFR seated calf raise · 15 reps (2 of 4)',reps:15,setup:0,phases:[['up','Up',2,'Up.'],['down','Down',2,'Down.']],rest:0},
  bcr15b:{name:'BFR seated calf raise · 15 reps (3 of 4)',reps:15,setup:0,phases:[['up','Up',2,'Up.'],['down','Down',2,'Down.']],rest:0},
  bcr15c:{name:'BFR seated calf raise · 15 reps (4 of 4)',reps:15,setup:0,phases:[['up','Up',2,'Up.'],['down','Down',2,'Down.']],rest:0},
- cuffdown:{name:'Cuff off',reps:1,setup:0,phases:[['rest','Cuff off',10,'Deflate all the way; cuff stays on the thigh. Scar massage while it\'s off.']],rest:0},
+ cuffdown:{name:'Cuff off',reps:1,setup:0,phases:[['rest','Cuff off',10,'Deflate all the way; cuff stays on the thigh. Subtalar mobilization while it\'s off.']],rest:0},
  cuffoff:{name:'Cuff off',reps:1,setup:0,phases:[['rest','Cuff off',90,'Deflate all the way; cuff stays on the thigh. Ninety seconds off.']],rest:0},
  bpi1:{name:'BFR standing calf raise · set 1 of 4',reps:8,setup:20,setupCue:'Cuff back up. Sneakers on, heel lift in the left. At the counter, feet hip-width, hands on the edge. Rise evenly on both feet, lower slowly.',phases:[['up','Up',2,'Rise evenly on both feet.'],['down','Down',3,'Lower slowly.']],rest:0},
  bpi2:{name:'BFR standing calf raise · set 2 of 4',reps:8,setup:0,phases:[['up','Up',2,'Up.'],['down','Down',3,'Lower slowly.']],rest:0},
@@ -1153,8 +1153,9 @@ function homeList0(){const d=day();const left=homeLeft(d);
   if(!bfrPending())return left.flatMap(k=>ANK_KEYS[k]);
   // The round was credited (calf raises + scar done) but the cuff isometrics were cut short: just finish those.
   if(d.bfrA&&(d.homeN||0)>=1&&d.homeAt&&Date.now()-d.homeAt<4*3600e3&&!(d.ankleDone||[]).some(isHome))return ['bpi1','srest','bpi2','srest','bpi3','srest','bpi4','deflatex'];
-  const gap=['cuffoff'];   // Chris: cuff off 1 to 3 minutes between exercises
-  const after=left.flatMap(k=>ANK_KEYS[k]);
+  // Chris: cuff off 1 to 3 minutes between exercises. Subtalar mobilization (90 s, seated, no calf load) fills it.
+  const sub=left.includes('subtalar');const gap=sub?['cuffdown'].concat(ANK_KEYS.subtalar):['cuffoff'];
+  const after=left.filter(k=>!(sub&&k==='subtalar')).flatMap(k=>ANK_KEYS[k]);
   const calf=d.bfrA?[]:['bcr30','srest','bcr15a','srest','bcr15b','srest','bcr15c'];
   // BFR goes last: the routine with a fresh calf, then BFR as the finisher (scar massage fills the cuff break).
   return after.concat(calf,d.bfrA?[]:gap,['bpi1','srest','bpi2','srest','bpi3','srest','bpi4','deflatex']);}
