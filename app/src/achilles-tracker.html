@@ -1137,7 +1137,15 @@ function gymLeft(d){return ankBases().filter(k=>isGym(k)&&!(d.ankleDone||[]).inc
 let preAssume=false; // while pre-rendering audio before the morning check, assume it will be quiet
 function bfrPending(){const d=day();const v=verdictKind(TODAY);return bfrPlanned()&&(!v||v==='go')&&!(d.bfr>0);}
 // Chris's pattern: calf raises under the cuff → cuff off 1–3 min (scar massage fills it) → band isometric under the cuff → deflate → the rest of the no-cuff work.
-function homeList(){const d=day();const left=homeLeft(d);
+// Doming and toe yoga run as a superset: a doming set straight into a toe-yoga set, one rest per pair.
+function footSuperset(L){const D=L.filter(k=>/^doming_\d$/.test(k)),T=L.filter(k=>/^toeyoga2_\d$/.test(k));if(!D.length||!T.length)return L;
+  const i=L.findIndex(k=>/^(doming|toeyoga2)_\d$/.test(k));const keep=L.filter((k,j)=>{if(/^(doming|toeyoga2)_\d$/.test(k))return false;
+    // drop the rests that sat between their own sets
+    if(k==='arest'){const a=L[j-1]||'',b=L[j+1]||'';return !(/^(doming|toeyoga2)_\d$/.test(a)&&/^(doming|toeyoga2)_\d$/.test(b));}return true;});
+  const ss=[];const n=Math.max(D.length,T.length);for(let r=0;r<n;r++){if(r)ss.push('arest');if(D[r])ss.push(D[r]);if(T[r])ss.push(T[r]);}
+  const at=keep.findIndex((k,j)=>j>=i)<0?keep.length:Math.min(i,keep.length);keep.splice(at,0,...ss);return keep;}
+function homeList(){return footSuperset(homeList0());}
+function homeList0(){const d=day();const left=homeLeft(d);
   if(!bfrPending())return left.flatMap(k=>ANK_KEYS[k]);
   // The round was credited (calf raises + scar done) but the cuff isometrics were cut short: just finish those.
   if(d.bfrA&&(d.homeN||0)>=1&&d.homeAt&&Date.now()-d.homeAt<4*3600e3&&!(d.ankleDone||[]).some(isHome))return ['bpi1','srest','bpi2','srest','bpi3','srest','bpi4','deflatex'];
