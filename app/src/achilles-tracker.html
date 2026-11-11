@@ -1052,12 +1052,12 @@ ANK_DEF.forEach(([k,sets,name,reps,setup,setupCue,phases,inBoot])=>{ANK_KEYS[k]=
   for(let i=1;i<=3;i++)EX['pfc_'+i]={name:'Plantarflexion isometric · 15 s holds · set '+i+' of 3',reps:3,setup:i===1?10:0,setupCue:'Boot off. Sit, knee slightly bent, a ball between the ball of your foot and the wall, foot pointed. Set the distance so the foot never comes up past {HINGE}.',phases:[['up','Press',2,'Press the ball of the foot into the ball.'],['hold','Hold',15,'Hold it. Three or four out of ten.'],['down','Release',2,'Ease off.'],['rest','Rest',8,'Rest.']],rest:0,base:'pfwall',inBoot:false};
   // The 2-minute recovery before hold 4 is filled with the third doming set (it moves here from the doming block in the evening).
   EX.pfdome=Object.assign({},EX.doming_3,{base:'pfwall',setup:6,setupCue:'Rest for the calf: foot off the ball, one set of doming while it recovers.'});
-  const DAVID=['pfwall_1','circ_cw','pfrest','pfwall_2','circ_ccw','pfrest','pfwall_3','arest','pfdome','arest','pfwall_4'],CHRIS=['pfc_1','arest','pfc_2','arest','pfc_3'];
+  const DAVID=['pfwall_1','circ_cw','pfrest','pfwall_2','circ_ccw','pfrest','pfwall_3','circ_cw','pfrest','pfwall_4']/* the gap before hold 4 gets circles too, like the others */,CHRIS=['pfc_1','arest','pfc_2','arest','pfc_3'];
   const evening=()=>{try{return (day().homeN||0)>=1;}catch(e){return false;}};
   // Morning round gets Chris's version, evening round gets David's.
   Object.defineProperty(ANK_KEYS,'pfwall',{get(){return evening()?DAVID:CHRIS;},enumerable:true,configurable:true});
   const DOM3=ANK_KEYS.doming.slice(),DOM2=DOM3.slice(0,3);ANK_FULL.doming=DOM3;
-  Object.defineProperty(ANK_KEYS,'doming',{get(){return evening()&&ankBases().includes('pfwall')?DOM2:DOM3;},enumerable:true,configurable:true});})();
+  Object.defineProperty(ANK_KEYS,'doming',{get(){return DOM3;},enumerable:true,configurable:true});/* all three sets live in the doming + toe yoga superset */})();
 // ---- Hips: Chris's daily hip mobility, one guided session.
 const HIP_NAMES={};const HIPS=[];
 (function(){const add=(g,name,key,o)=>{HIP_NAMES[g]=name;EX[key]=Object.assign({rest:0,base:g,hips:true},o);HIPS.push(key);};
