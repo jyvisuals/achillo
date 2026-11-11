@@ -4,7 +4,7 @@ const run=async(dt,seed)=>{const p=await b.newPage({viewport:{width:390,height:8
  await p.addInitScript(([t,sd])=>{const R=Date;window.__off=new R(t).getTime()-R.now();class D extends R{constructor(...a){if(a.length)super(...a);else super(R.now()+window.__off);}static now(){return R.now()+window.__off;}};window.Date=D;if(sd)localStorage.setItem('ach:day:'+t.slice(0,10),JSON.stringify(sd));},[dt,seed]);
  await p.goto('file://'+process.cwd()+'/test/out/index.html');await p.waitForTimeout(2500);return {p,errs,logs};};
 const fmt=(n)=>new Date(n.schedule.at).toLocaleString('en-US',{weekday:'short',hour:'numeric',minute:'2-digit'})+' '+n.title+(n.extra?' ['+n.extra.kind+']':'')+' — '+n.body;
-const base={ankle:1,bfr:1,bfrA:1,foot:1,imagery:1,hingeSet:25,morning:{swell:'same',inc:'clean',pain:'none',quick:1},snacks:[{k:'toeyoga2',t:new Date('2026-10-16T09:30').getTime()}]};
+const base={ankle:1,bfr:1,bfrA:1,foot:1,imagery:1,hingeSet:25,morning:{swell:'same',inc:'clean',pain:'none',quick:1},snacks:[{k:'balance',t:new Date('2026-10-16T09:30').getTime()}]};
 let r=await run('2026-10-16T10:00',base);
 console.log('errors:',r.errs,'\n',r.logs.join('\n'));
 let pend=await r.p.evaluate(()=>window.__ln.pending);console.log('pending',pend.length);pend.slice(0,40).forEach(n=>console.log(' ',fmt(n)));

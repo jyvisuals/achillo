@@ -18,7 +18,7 @@ await finishAll(p);console.log('  after:',JSON.stringify(await st()));
 await at('21:00:00');await p.evaluate(()=>__t.start(false,false,'home'));await p.waitForTimeout(300);
 console.log('\nD. Third start: session?',await p.evaluate(()=>!!__t.sess),'msg:',await p.evaluate(()=>document.querySelector('#nowDone').textContent));
 // quick ones
-for(const k of ['pfwall','doming','toeyoga2','invev','bandsup']){await p.evaluate(k=>__t.start(false,false,'snack:'+k),k);await p.waitForTimeout(200);console.log('Quick '+k+' ['+await mins(p)+' min]: '+await names(p));await p.evaluate(()=>__t.finish(false));}
+for(const k of ['pfwall','dance','subtalar','balance','tib','march']){await p.evaluate(k=>__t.start(false,false,'snack:'+k),k);await p.waitForTimeout(200);console.log('Quick '+k+' ['+await mins(p)+' min]: '+await names(p));await p.evaluate(()=>__t.finish(false));}
 // E. BFR morning interrupted during the cuff isometrics
 await p.evaluate(()=>{localStorage.clear();});await p.clock.setSystemTime(new Date('2026-11-04T06:30:00'));await p.reload();await p.waitForTimeout(1500);
 await p.evaluate(()=>__t.start(false,false,'home'));await p.waitForTimeout(300);

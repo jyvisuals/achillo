@@ -2,10 +2,10 @@ const { chromium } = require('playwright');
 (async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});const p=await b.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
 await p.clock.install({time:new Date('2026-10-31T09:00:00')});await p.goto('file:///home/claude/achilles-app/test/out/index.html');await p.waitForTimeout(1500);
 // 5: one set of a 3-set quick one, then stop → not credited; finish all → credited
-await p.evaluate(()=>__t.start(false,false,'snack:toeyoga2'));await p.clock.runFor(500);
+await p.evaluate(()=>__t.start(false,false,'snack:balance'));await p.clock.runFor(500);
 await p.evaluate(()=>{const S=__t.sess.steps;const first=S.findIndex(s=>s.kind==='mark');__t.sess.doneEx.push(S[first].ex);__t.finish(false);});
 const a=(await p.evaluate(()=>(__t.day().snacks||[]).length));
-await p.evaluate(()=>__t.start(false,false,'snack:toeyoga2'));await p.clock.runFor(500);
+await p.evaluate(()=>__t.start(false,false,'snack:balance'));await p.clock.runFor(500);
 await p.evaluate(()=>{__t.sess.steps.forEach(s=>{if(s.kind==='mark')__t.sess.doneEx.push(s.ex);});__t.finish(true);});
 const b2=(await p.evaluate(()=>(__t.day().snacks||[]).length));
 // 3: bfrCounted survives persist/resume

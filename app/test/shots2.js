@@ -9,5 +9,5 @@ await p.click('#tabbar button[data-tab=log]');await p.waitForTimeout(500);await 
 await p.click('#tabbar button[data-tab=settings]');await p.waitForTimeout(500);await p.screenshot({path:'test/out/s4-set.png'});
 await p.click('#tabbar button[data-tab=today]');await p.waitForTimeout(400);
 await p.evaluate(()=>[...document.querySelectorAll('#nowBtns button')].find(b=>b.textContent==='Pick a quick one').click());await p.waitForTimeout(500);await p.screenshot({path:'test/out/s5-sheet.png'});
-await p.click('#snackPick button[data-k="doming"]');await p.waitForTimeout(1500);await p.screenshot({path:'test/out/s6-session.png'});
+await p.click('#snackPick button[data-k="tib"]');await p.waitForTimeout(1500);await p.screenshot({path:'test/out/s6-session.png'});
 console.log('errors',errs);await b.close();})();
