@@ -1147,7 +1147,7 @@ function pairSuperset(L,A,B){const ra=new RegExp('^'+A+'(_\\d)?$'),rb=new RegExp
   L.forEach((k,j)=>{if(both(k)){if(at<0)at=keep.length;return;}if(k==='arest'&&both(L[j-1]||'')&&both(L[j+1]||''))return;keep.push(k);});
   const ss=[];const n=Math.max(D.length,T.length);for(let r=0;r<n;r++){if(r)ss.push('arest');if(D[r])ss.push(D[r]);if(T[r])ss.push(T[r]);}
   keep.splice(at<0?keep.length:at,0,...ss);return keep;}
-function footSuperset(L){return pairSuperset(L,'wshift','march');}
+function footSuperset(L){return pairSuperset(pairSuperset(L,'tib','balance'),'wshift','march');}
 function homeList(){return footSuperset(homeList0());}
 function homeList0(){const d=day();const left=homeLeft(d);
   if(!bfrPending())return left.flatMap(k=>ANK_KEYS[k]);
