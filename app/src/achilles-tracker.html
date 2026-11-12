@@ -576,6 +576,7 @@ pre.rtext{display:none}
       <button id="sImg">Imagery (5 min)</button>
       <button id="sMap">Calf map (10 min)</button>
       <button id="sHips">Hips (16 min)</button>
+      <button id="sFin">Finisher (12 min, optional)</button>
     </div>
     <details class="ankpick" id="ankPick"><summary>Chris’s program · pick any exercise</summary><div id="ankList"></div></details>
     <div class="envnote" id="envNote" hidden></div>
@@ -884,7 +885,7 @@ function allDays(){const out=Object.assign({},days);try{for(let i=0;i<localStora
 // goes up, so merging two records means taking the max of each counter and the union of what's done.
 function mergeDay(a,b){a=a||{};b=b||{};const o=Object.assign({},a,b);
   const mx=k=>{if(a[k]!=null||b[k]!=null)o[k]=Math.max(+a[k]||0,+b[k]||0);};
-  ['iso','ankle','bfr','imagery','routine','foot','bfrA','bfrSkip','homeN','gymN','hips','homeAt','gymAt'].forEach(mx);
+  ['iso','ankle','bfr','imagery','routine','foot','bfrA','bfrSkip','homeN','gymN','hips','fin','homeAt','gymAt'].forEach(mx);
   const an=+a.ankle||0, bn=+b.ankle||0;
   if(an!==bn)o.ankleDone=(an>bn?a:b).ankleDone||[]; else o.ankleDone=[...new Set([...(a.ankleDone||[]),...(b.ankleDone||[])])];
   if(!o.ankleDone.length)delete o.ankleDone;
@@ -970,6 +971,7 @@ function renderTasks(){
   {const L=ankLeft(d).length,T=ankBases().length-1;row('Chris’s program','Twice a day, morning and evening: Barefoot PT. '+(L<T&&L>0?(T-L)+' of '+T+' done this round; picks up where you left off.':(d.ankle===1?'Evening round still to do.':'')),d.ankle||0,'ankle',2,true);}
   row('Quick ones','One boot-on drill, all its sets, every hour or so between rounds. Logs itself.',(d.snacks||[]).length,'snackN',8,false);
   row('Hips','Chris · daily. 90/90, glute, adductor, hip flexors, ITB. About 16 min.',d.hips||0,'hips',1,true);
+  if((d.homeN||0)>=2||d.fin)row('Finisher','Optional, after the evening round: eyes-closed balance, a walk around the house, bridges, clamshells. About 12 min.',d.fin||0,'fin',1,false);
   row('Imagery','5 min guided, first-person. One after a session, one at bedtime.',d.imagery||0,'imagery',2,true);
   if(bfrDay(today))row('BFR',(verdictKind(TODAY)&&verdictKind(TODAY)!=='go'?'Skipped today: morning wasn\'t quiet. ':'First thing after the morning check: ')+'seated calf raise 30/15/15/15, cuff off 2 min, knee-bent isometric 30/15/15/15 × 3 s squeezes.',d.bfr||0,'bfr',1,true);
 
@@ -1090,6 +1092,17 @@ function drawHip(){const w=document.querySelector('.wrap');const on=!!(sess&&ses
     el.innerHTML='<svg viewBox="0 0 200 110"><g'+(flip?' transform="translate(200 0) scale(-1 1)"':'')+'>'+(HIP_FIG[g]||'')+'</g></svg>';}
   el.classList.toggle('holding',st.kind==='hold');}
 const HIPS_LAST=HIPS[HIPS.length-1];
+// ---- Finisher: optional, after the evening round. Balance, a walk, hips. Nothing that loads the calf hard.
+const FIN=[];const FIN_NAMES={};
+(function(){const add=(g,name,key,o)=>{FIN_NAMES[g]=name;EX[key]=Object.assign({rest:0,base:g,fin:true,name},o);FIN.push(key);};
+  for(let i=1;i<=2;i++){add('fin_bal','Single-leg balance · eyes closed','fin_bal_'+i,{name:'Single-leg balance · eyes closed · set '+i+' of 2',reps:3,setup:i===1?12:0,setupCue:'Sneakers on, heel lift in. At the counter, fingertips on the edge. Stand on the left, close your eyes. Open them any time you need to.',phases:[['hold','Eyes closed',5,'Eyes closed. Stand tall.'],['rest','Down',5,'Eyes open, both feet down.']]});if(i<2)FIN.push('arest');}
+  FIN.push('arest');
+  add('fin_walk','Walk the house · heel to toe','fin_walk',{reps:1,setup:8,setupCue:'Still in sneakers. Walk slowly around the house.',phases:[['rest','Walk',180,'Heel down, roll through, push off gently. Even steps, both sides the same.']]});
+  FIN.push('arest');
+  for(let i=1;i<=2;i++){add('fin_bridge','Glute bridge','fin_bridge_'+i,{name:'Glute bridge · set '+i+' of 2',reps:12,setup:i===1?12:0,setupCue:'On your back, knees bent, feet flat, hip-width. Squeeze the glutes and lift.',phases:[['up','Up',2,'Squeeze and lift.'],['hold','Hold',1,'Hold.'],['down','Down',2,'Lower slowly.']]});FIN.push('arest');}
+  for(const [side,word] of [['L','left'],['R','right']])for(let i=1;i<=2;i++){add('fin_clam'+side,'Clamshell · '+word,'fin_clam'+side+'_'+i,{name:'Clamshell · '+word+' knee up · set '+i+' of 2',reps:12,setup:i===1?10:0,setupCue:'On your '+(side==='L'?'right':'left')+' side, knees bent, feet together. Open the top knee like a clamshell, feet stay touching.',phases:[['up','Open',2,'Open the knee.'],['down','Close',2,'Close slowly.']]});FIN.push('arest');}
+  FIN.pop();})();
+const FIN_LAST=FIN[FIN.length-1];
 const ankLast=k=>ANK_KEYS[k][ANK_KEYS[k].length-1];
 const ROUND_AM=['scar','pump','dance','subtalar','pfwall','calfman','wallcalf','standcalf','bootback'],ROUND_PM=['scar','pump','pfwall','bandsup','tib','balance','wshift','march','steps','bootback'];
 function ankBases(){const d=day();const sameRound=d.bfr>0&&(d.homeN||0)===0&&(d.ankle||0)===0;
@@ -1340,7 +1353,7 @@ function breathCue(st,left){ // 4 in, 6 out, repeating through the hold
   if(st.kind!=='hold'||st.secs<20){$('tBreath').textContent='';ringEl.classList.remove('breathe');return;}
   ringEl.classList.add('breathe'); const t=(st.secs-left)%10; $('tBreath').textContent=t<4?'breathe in':'breathe out';}
 function build(withPress,withRoutine,mode,forced){ if(withRoutine===undefined)withRoutine=true;
-  let list; if(forced&&forced.length)list=forced; else if(mode==='home')list=homeList(); else if(mode==='gym')list=gymLeft(day()).flatMap(k=>ANK_KEYS[k]); else if(mode&&mode.startsWith('snack:')){const L=(ANK_FULL[mode.slice(6)]||ANK_KEYS[mode.slice(6)]).slice();const i=L.indexOf('pfdome');if(i>0)L.splice(i-1,3,'pfrest2');list=L;} else if(mode==='ankle')list=ankList(); else if(mode&&mode.startsWith('ankle:'))list=ankList(mode.slice(6)); else if(mode==='bfrpress')list=BFR_PRESS.concat(withRoutine?ROUTINE:[]); else if(mode==='bfrquad')list=BFR_QUAD; else if(mode==='foot')list=ankList(); else if(mode==='imagery')list=['imagery']; else if(mode==='map')list=MAP_LIST.slice(); else if(mode==='hips')list=HIPS.slice(); else list=homeList();
+  let list; if(forced&&forced.length)list=forced; else if(mode==='home')list=homeList(); else if(mode==='gym')list=gymLeft(day()).flatMap(k=>ANK_KEYS[k]); else if(mode&&mode.startsWith('snack:')){const L=(ANK_FULL[mode.slice(6)]||ANK_KEYS[mode.slice(6)]).slice();const i=L.indexOf('pfdome');if(i>0)L.splice(i-1,3,'pfrest2');list=L;} else if(mode==='ankle')list=ankList(); else if(mode&&mode.startsWith('ankle:'))list=ankList(mode.slice(6)); else if(mode==='bfrpress')list=BFR_PRESS.concat(withRoutine?ROUTINE:[]); else if(mode==='bfrquad')list=BFR_QUAD; else if(mode==='foot')list=ankList(); else if(mode==='imagery')list=['imagery']; else if(mode==='map')list=MAP_LIST.slice(); else if(mode==='hips')list=HIPS.slice(); else if(mode==='fin')list=FIN.slice(); else list=homeList();
   const steps=[];
   list.forEach((k,ei)=>{const e=EX[k];if(!e)return;
     const H=t=>t&&t.replace('{HINGE}',bootFor(today).cur.deg+'°');
@@ -1473,7 +1486,7 @@ const preQ={key:null,url:null,busy:false}; // the next quick one, ready for a St
 const listKey=l=>vol+':'+l.join('|');
 async function prebuild(mode,wp,wr){try{if(sess||pre.busy||!sound)return;preAssume=true;let b;try{b=build(wp,wr,mode);}finally{preAssume=false;}if(!b.list.length)return;const k=listKey(b.list);if(pre.key===k&&pre.url)return;
   pre.busy=true;const url=await buildTrackFor(b.steps);if(pre.url)URL.revokeObjectURL(pre.url);pre.key=k;pre.url=url;
-  if(track.__prepare){track.__opts=voiceOpts();track.__prepare(url,voice?speechPlan(b.steps,b.list):[],{rate:prefs.rate,voice:prefs.voice},JSON.stringify(planOf(b.steps,mode==='hips'?'Hips':'Barefoot PT',0,false,mode||'home')));}}catch(e){}finally{pre.busy=false;}}
+  if(track.__prepare){track.__opts=voiceOpts();track.__prepare(url,voice?speechPlan(b.steps,b.list):[],{rate:prefs.rate,voice:prefs.voice},JSON.stringify(planOf(b.steps,mode==='hips'?'Hips':mode==='fin'?'Finisher':'Barefoot PT',0,false,mode||'home')));}}catch(e){}finally{pre.busy=false;}}
 async function prebuildQuick(){try{if(sess||preQ.busy||pre.busy||!sound||!track.__prepare)return;const sn=snackNext();if(!sn)return;const mode='snack:'+sn;const b=build(false,false,mode);if(!b.list.length)return;const k=listKey(b.list);if(preQ.key===k&&preQ.url)return;
   preQ.busy=true;const url=await buildTrackFor(b.steps);if(preQ.url)URL.revokeObjectURL(preQ.url);preQ.key=k;preQ.url=url;
   track.__opts=voiceOpts();track.__prepare(url,voice?speechPlan(b.steps,b.list):[],{rate:prefs.rate,voice:prefs.voice},JSON.stringify(planOf(b.steps,'Quick one',0,false,mode)),'quick');}catch(e){}finally{preQ.busy=false;}}
@@ -1535,6 +1548,7 @@ function lockInfo(){try{if(!sess||window.__beAudioOn)return;if(!('mediaSession' 
 // Check exercises off the moment they finish, not at the end of the session.
 function recordDone(key,how){try{nativeEvt('done',{key});if(sess&&sess.mode&&sess.mode.startsWith('snack:'))return;const d=day();let changed=false;
   if(EX[key]&&EX[key].hips){if(key===HIPS_LAST&&!d.hips){d.hips=1;persist();queueSave(TODAY);renderTasks();renderLog();}return;}
+  if(EX[key]&&EX[key].fin){if(key===FIN_LAST){d.fin=(d.fin||0)+1;persist();queueSave(TODAY);renderTasks();renderLog();}return;}
   const base=EX[key]&&EX[key].base;
   if(base&&key===ankLast(base)&&!(d.ankleDone||[]).includes(base)){d.ankleDone=(d.ankleDone||[]).concat(base);changed=true;
     if(how==='skipped'&&!(sess&&sess.doneEx.some(k=>EX[k]&&EX[k].base===base))){d.ankleSkip=(d.ankleSkip||[]).filter(x=>x!==base).concat(base);}else d.ankleSkip=(d.ankleSkip||[]).filter(x=>x!==base);sess.ankNew=(sess.ankNew||0)+1;if(isHome(base))d.homeAt=Date.now();if(isGym(base))d.gymAt=Date.now();
@@ -1623,7 +1637,7 @@ function tick(){if(!sess||paused)return; const now=Date.now();
 }
 function beginRun(){ $('jumpList').hidden=true; ringEl.classList.remove('done','breathe'); $('tBreath').textContent='';
   $('sPick').hidden=true;$('sPickNote').hidden=true;$('sDone').hidden=true;$('sRun').hidden=false;
-  $('isoh').textContent=sess.mode==='hips'?'Hips':sess.mode==='home'?'Barefoot PT':sess.mode==='gym'?'Boot-on PT':sess.mode.startsWith('snack:')?'Quick one':(sess.mode==='foot'||sess.mode==='ankle')?'Chris’s program':sess.mode.startsWith('ankle:')?EX[ANK_KEYS[sess.mode.slice(6)][0]].name.split(' · set')[0]:sess.mode==='imagery'?'Motor imagery':sess.mode==='map'?'Calf map':sess.mode==='bfrpress'?'BFR calf':sess.mode==='bfrquad'?'BFR quad set':sess.withPress?(sess.withRoutine?'Calf press + routine':'Calf press'):'PT routine';
+  $('isoh').textContent=sess.mode==='fin'?'Finisher':sess.mode==='hips'?'Hips':sess.mode==='home'?'Barefoot PT':sess.mode==='gym'?'Boot-on PT':sess.mode.startsWith('snack:')?'Quick one':(sess.mode==='foot'||sess.mode==='ankle')?'Chris’s program':sess.mode.startsWith('ankle:')?EX[ANK_KEYS[sess.mode.slice(6)][0]].name.split(' · set')[0]:sess.mode==='imagery'?'Motor imagery':sess.mode==='map'?'Calf map':sess.mode==='bfrpress'?'BFR calf':sess.mode==='bfrquad'?'BFR quad set':sess.withPress?(sess.withRoutine?'Calf press + routine':'Calf press'):'PT routine';
   document.querySelector('.wrap').classList.add('focus'); window.scrollTo(0,0);
   if(navigator.wakeLock){navigator.wakeLock.request('screen').then(w=>wake=w).catch(()=>{});}
   setL('tPause',paused?'Resume':'Pause'); $('ctlRow').classList.toggle('paused',paused);$('tStop').hidden=!paused;
@@ -1715,6 +1729,7 @@ function renderAnkle(){const el=$('ankList');if(!el)return;el.innerHTML='';const
 $('sImg').onclick=()=>startSession(false,false,'imagery');
 $('sMap').onclick=()=>startSession(false,false,'map');
 $('sHips').onclick=()=>startSession(false,false,'hips');
+$('sFin').onclick=()=>startSession(false,false,'fin');
 let pSrc='',tapPauseAt=0;
 function audSummary(){const on=[voice?'Voice':null,sound?'Cues':null,phoneTaps?'Taps':null].filter(Boolean);return on.length?on.join(' · '):'Silent';}
 function renderAudTog(){const b=$('tAudTog');if(!b)return;const open=!$('audRow').hidden;b.classList.toggle('open',open);$('tAudTogL').textContent=open?'Done':audSummary();}
@@ -1730,7 +1745,7 @@ $('tPause').onclick=e=>{if(!sess)return; if(!paused){const p0=posSeconds();tick(
 // ---- skip / jump: skipping forward past an exercise counts it as done.
 const REST_KEY=/^(arest|brest|srest|pfrest2?|cuffdown|cuffoff|deflatex?|bootback)$/;
 const groupOf=k=>EX[k]&&EX[k].base?EX[k].base:/^bcr/.test(k)?'bfrA':/^bpi/.test(k)?'bfrB':k;
-const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);if(d)return d[2];if(HIP_NAMES[g])return HIP_NAMES[g];if(g==='bfrA')return 'BFR seated calf raise';if(g==='bfrB')return 'BFR standing calf raise';if(/^map_/.test(g)){const m=MAP_M.find(x=>'map_'+x.m===g);if(m)return 'Calf map · '+m.name;}return EX[g]?EX[g].name:g;};
+const groupName=g=>{const d=ANK_DEF.find(x=>x[0]===g);if(d)return d[2];if(HIP_NAMES[g])return HIP_NAMES[g];if(FIN_NAMES[g])return FIN_NAMES[g];if(g==='bfrA')return 'BFR seated calf raise';if(g==='bfrB')return 'BFR standing calf raise';if(/^map_/.test(g)){const m=MAP_M.find(x=>'map_'+x.m===g);if(m)return 'Calf map · '+m.name;}return EX[g]?EX[g].name:g;};
 function jumpTo(idx){if(!sess)return;hush();$('jumpList').hidden=true;dbg('jump: to step',idx,sess.steps[idx]&&sess.steps[idx].ex);
   // Skipping forward past an exercise counts it as done.
   if(idx>sess.i){const to=sess.steps[idx]&&sess.steps[idx].ex;const seen=new Set();for(let j=sess.i;j<idx&&j<sess.steps.length;j++){const k=sess.steps[j].ex;if(k&&k!==to&&!seen.has(k)){seen.add(k);recordDone(k,'skipped');}}}
