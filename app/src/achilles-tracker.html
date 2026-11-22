@@ -1108,7 +1108,7 @@ const FIN=[];const FIN_NAMES={};
   FIN.pop();})();
 const FIN_LAST=FIN[FIN.length-1];
 const ankLast=k=>ANK_KEYS[k][ANK_KEYS[k].length-1];
-const ROUND_AM=['scar','dance','subtalar','kneewall','wcalf','wallcalf','standcalf','bootback'],ROUND_PM=['scar','pump','pfwall','bandsup','tib','rdlbox','kbhand','march','bootback'];
+const ROUND_AM=['scar','dance','subtalar','kneewall','wcalf','wallcalf','standcalf'],ROUND_PM=['scar','pump','pfwall','bandsup','tib','rdlbox','kbhand','march'];
 function ankBases(){const d=day();const sameRound=d.bfr>0&&(d.homeN||0)===0&&(d.ankle||0)===0;
   // BFR calf raises stand in for the manual calf raise, and BFR presses for the wall isometric, only if they're actually in this round.
   const calfCovered=sameRound||(bfrPending()&&(!d.bfrA||(d.homeN||0)===0)), pressCovered=sameRound||bfrPending();   // BFR calf raises done in this same round still count
